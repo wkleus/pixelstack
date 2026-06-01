@@ -27,7 +27,7 @@ const Portfolio = () => {
         Here are some of my Web App Portfolio Works. Click on the links below to
         view them. You can find more of them on my{' '}
         <a
-          href="https://github.com/source-code-examples"
+          href="https://github.com/wkleus"
           target="_blank"
           className="font-semibold underline hover:text-cyan-600"
         >

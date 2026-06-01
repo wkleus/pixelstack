@@ -8,22 +8,53 @@ import { Portfolio } from '@/types'
 export const portfolios: Portfolio[] = [
   {
     // Project name
-    name: 'Second-hand Bookstore',
+    name: 'HomeSphere',
 
     // Short description of the project
-    overview: 'A full-stack second-hand online bookstore built with React.js',
+    overview:
+      'A full-stack Site  for browsing and discovering residential properties across Europe — from city apartments to alpine chalets',
 
     // Technologies used in the project
-    techStack: ['HTML', 'CSS', 'JavaScript', 'React', 'Responsive Design'],
+    techStack: [
+      'HTML',
+      'CSS',
+      'JavaScript',
+      'React',
+      'React Router',
+      'Responsive Design',
+      'Node.js',
+      'Express.js',
+      'MongoDB',
+      'Vite',
+    ],
 
     // GitHub repository link
-    sourceUrl: 'https://github.com/source-code-examples',
+    sourceUrl: 'https://github.com/wkleus/homesphere',
 
     // Live preview link
-    preview: 'https://github.com/source-code-examples',
+    preview: 'https://homesphere-web.vercel.app/',
 
     // Image displayed in the portfolio section
-    imageSrc: '/portfolio-img/second-hand-bookstore.jpg',
+    imageSrc: '/portfolio-img/homesphere.png',
+  },
+  {
+    name: 'Linguify',
+    overview:
+      'Web application to support users in working with multilingual text',
+    techStack: [
+      'HTML',
+      'CSS',
+      'JavaScript',
+      'React',
+      'React Router',
+      'APIs',
+      'Responsive Design',
+      'Vite',
+      'Jest',
+    ],
+    sourceUrl: 'https://github.com/wkleus/linguify',
+    preview: 'https://linguify-web.vercel.app/',
+    imageSrc: '/portfolio-img/linguify.png',
   },
   {
     name: 'Portfolio Fullstack App',
@@ -39,7 +70,7 @@ export const portfolios: Portfolio[] = [
       'Framer Motion',
       'Responsive Design',
     ],
-    sourceUrl: 'https://github.com/source-code-examples',
+    sourceUrl: 'https://github.com/wkleus',
     preview: 'https://pixelstack-me.vercel.app/',
     imageSrc: '/portfolio-img/portfolio-fullstack.png',
   },
@@ -56,8 +87,8 @@ export const portfolios: Portfolio[] = [
       'Form Validation',
       'Responsive Design',
     ],
-    sourceUrl: 'https://github.com/source-code-examples/little-lemon',
-    preview: 'https://source-code-examples.github.io/little-lemon/',
+    sourceUrl: 'https://github.com/wkleus/little-lemon',
+    preview: 'https://wkleus.github.io/little-lemon/',
     imageSrc: '/portfolio-img/restaurant-frontend.png',
   },
   {
@@ -72,16 +103,16 @@ export const portfolios: Portfolio[] = [
       'React Router',
       'Responsive Design',
     ],
-    sourceUrl: 'https://github.com/source-code-examples/houseplants-shop',
-    preview: 'https://source-code-examples.github.io/houseplants-shop/',
+    sourceUrl: 'https://github.com/wkleus/houseplants-shop',
+    preview: 'https://wkleus.github.io/houseplants-shop/',
     imageSrc: '/portfolio-img/houseplants-shop.png',
   },
   {
     name: 'Web Art Blog',
     overview: 'A responsive art blog frontend',
     techStack: ['HTML', 'CSS', 'JavaScript', 'Responsive Design'],
-    sourceUrl: 'https://github.com/source-code-examples/art-blog',
-    preview: 'https://source-code-examples.github.io/art-blog/',
+    sourceUrl: 'https://github.com/wkleus/art-blog',
+    preview: 'https://wkleus.github.io/art-blog/',
     imageSrc: '/portfolio-img/web-art-blog.png',
   },
   {
@@ -89,28 +120,24 @@ export const portfolios: Portfolio[] = [
     overview:
       'A travel recommendation app that provides users with personalized travel recommendations based on their search inputs',
     techStack: ['HTML', 'CSS', 'JavaScript', 'JSON Data', 'Fetch API'],
-    sourceUrl: 'https://github.com/source-code-examples/travelRecommendation',
-    preview: 'https://source-code-examples.github.io/travelRecommendation/',
+    sourceUrl: 'https://github.com/wkleus/travelRecommendation',
+    preview: 'https://wkleus.github.io/travelRecommendation/',
     imageSrc: '/portfolio-img/travel-recommender.png',
   },
   {
     name: 'Portfolio Frontend',
     overview: 'A responsive portfolio frontend built with React',
     techStack: ['HTML', 'CSS', 'JavaScript', 'React', 'Responsive Design'],
-    sourceUrl:
-      'https://github.com/source-code-examples/meta-advanced-react-portfolio',
-    preview:
-      'https://source-code-examples.github.io/meta-advanced-react-portfolio/',
+    sourceUrl: 'https://github.com/wkleus/meta-advanced-react-portfolio',
+    preview: 'https://wkleus.github.io/meta-advanced-react-portfolio/',
     imageSrc: '/portfolio-img/portfolio-frontend.png',
   },
   {
     name: 'Luxury Jewels Store',
     overview: 'A luxury jewelry store frontend with responsive design.',
     techStack: ['HTML', 'CSS', 'JavaScript', 'Responsive Design'],
-    sourceUrl:
-      'https://github.com/source-code-examples/meta-mangata-gallo-frontend',
-    preview:
-      'https://source-code-examples.github.io/meta-mangata-gallo-frontend/',
+    sourceUrl: 'https://github.com/wkleus/meta-mangata-gallo-frontend',
+    preview: 'https://wkleus.github.io/meta-mangata-gallo-frontend/',
     imageSrc: '/portfolio-img/mangata-gallo.png',
   },
   {
@@ -118,9 +145,8 @@ export const portfolios: Portfolio[] = [
     overview:
       'Back-end web application, that links people giving away unwanted household items with those seeking free, recycled items.',
     techStack: ['HTML', 'CSS', 'JavaScript', 'Node.js', 'Express.js'],
-    sourceUrl:
-      'https://github.com/source-code-examples/backend-nodejs-capstone',
-    preview: 'https://github.com/source-code-examples/backend-nodejs-capstone',
+    sourceUrl: 'https://github.com/wkleus/backend-nodejs-capstone',
+    preview: 'https://github.com/wkleus/backend-nodejs-capstone',
     imageSrc: '/portfolio-img/household-items-exchange.png',
   },
   {
@@ -129,9 +155,9 @@ export const portfolios: Portfolio[] = [
       'A collection of desktop widgets written in Java, using JavaFX and CSS.',
     techStack: ['Java', 'JavaFX', 'CSS'],
     sourceUrl:
-      'https://github.com/source-code-examples/GUI-code-samples/tree/main/WidgetsCollection/src',
+      'https://github.com/wkleus/GUI-code-samples/tree/main/WidgetsCollection/src',
     preview:
-      'https://github.com/source-code-examples/GUI-code-samples/tree/main/WidgetsCollection/src',
+      'https://github.com/wkleus/GUI-code-samples/tree/main/WidgetsCollection/src',
     imageSrc: '/portfolio-img/desktop-widget.jpg',
   },
   {
@@ -139,9 +165,9 @@ export const portfolios: Portfolio[] = [
     overview: 'A IP address finder written in Java, using JavaFX and CSS.',
     techStack: ['Java', 'JavaFX', 'FXML', 'CSS'],
     sourceUrl:
-      'https://github.com/source-code-examples/GUI-code-samples/tree/main/IpAddressFinderFXGui/src',
+      'https://github.com/wkleus/GUI-code-samples/tree/main/IpAddressFinderFXGui/src',
     preview:
-      'https://github.com/source-code-examples/GUI-code-samples/tree/main/IpAddressFinderFXGui/src',
+      'https://github.com/wkleus/GUI-code-samples/tree/main/IpAddressFinderFXGui/src',
     imageSrc: '/portfolio-img/ip-address-finder.jpg',
   },
 ]
