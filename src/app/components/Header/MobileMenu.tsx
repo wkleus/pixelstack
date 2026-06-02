@@ -6,6 +6,7 @@ import {
   SunIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline'
+import { LightbulbIcon, LightbulbOffIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { useTheme } from '../../context/ThemeContext'
@@ -78,12 +79,12 @@ const MobileMenu = () => {
               {theme === 'dark' ? (
                 <>
                   Light
-                  <SunIcon className="ml-2 h-5 w-5" />
+                  <LightbulbIcon className="ml-2 h-5 w-5" />
                 </>
               ) : (
                 <>
                   Dark
-                  <MoonIcon className="ml-2 h-5 w-5" />
+                  <LightbulbOffIcon className="ml-2 h-5 w-5" />
                 </>
               )}
             </button>

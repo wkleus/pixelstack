@@ -3,12 +3,37 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import { Sparkle, Star, Zap } from 'lucide-react'
 
 const Intro = () => {
   return (
-    <section className="relative overflow-hidden py-24">
+    <section className="relative overflow-hidden py-28 sm:py-40 sm:pb-140 lg:py-10 lg:pb-20 xl:py-30 2xl:py-50">
       {/* Background gradient + blurred glow effect */}
       <div className="from-primary/20 before:bg-primary/40 pointer-events-none absolute inset-0 bg-gradient-to-b to-transparent before:absolute before:top-10 before:left-1/2 before:h-[900px] before:w-[900px] before:-translate-x-1/2 before:rounded-full before:opacity-20 before:blur-[120px] before:content-['']" />
+
+      <div className="hidden dark:sm:block">
+        <motion.div
+          initial={{ opacity: 0, y: 20, x: 120 }}
+          animate={{ opacity: 1, y: -100, x: 0 }}
+          transition={{ duration: 1.2 }}
+        >
+          <Sparkle className="dark:fill-primary/10 dark:stroke-primary/0 fill-primary/5 stroke-primary/0 absolute top-15 right-20 h-25 w-25 rotate-45 transform animate-pulse drop-shadow-[0_0_6px_rgba(255,255,200,0.6)] lg:right-100" />
+          {/* <Star className="dark:fill-primary/10 dark:stroke-primary/0 absolute top-32 right-52 h-15 w-15 rotate-90 transform animate-pulse fill-cyan-500 stroke-cyan-500 drop-shadow-[0_0_6px_rgba(255,255,200,0.6)]" />{' '}
+        <Star className="dark:fill-primary/10 dark:stroke-primary/0 absolute top-22.5 right-35 h-22 w-22 rotate-45 transform animate-pulse fill-cyan-500 stroke-cyan-500 drop-shadow-[0_0_6px_rgba(255,255,200,0.6)]" /> */}
+        </motion.div>
+      </div>
+
+      <div className="hidden dark:sm:block">
+        <motion.div
+          initial={{ opacity: 0, y: -300, x: 120 }}
+          animate={{ opacity: 1, y: -100, x: 0 }}
+          transition={{ duration: 2 }}
+        >
+          <Zap className="dark:fill-primary/10 dark:stroke-primary/0 fill-primary/5 stroke-primary/0 absolute top-40 left-20 h-36 w-36 -rotate-12 transform animate-pulse drop-shadow-[0_0_6px_rgba(255,200,150,0.6)] lg:left-90" />
+        </motion.div>
+      </div>
+
+      <div></div>
 
       <div className="relative mx-auto max-w-4xl px-4 text-center">
         {/* Avatar with fade-in + scale animation */}
@@ -69,7 +94,7 @@ const Intro = () => {
           {/* Contact button */}
           <Link
             href="/connect"
-            className="rounded-lg border-2 border-gray-300 px-10 py-3 font-bold transition-colors hover:border-2 hover:border-amber-500 hover:text-amber-600 dark:border-gray-700 dark:hover:text-amber-400"
+            className="rounded-lg border-2 border-cyan-300 px-10 py-3 font-bold text-cyan-500 transition-colors hover:border-2 hover:border-amber-500 hover:text-amber-600 dark:border-cyan-700 dark:text-gray-300 dark:hover:text-amber-400"
           >
             Contact Me
           </Link>

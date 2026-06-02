@@ -1,5 +1,5 @@
 import { useTheme } from '@/app/context/ThemeContext'
-import { SunIcon, MoonIcon } from '@heroicons/react/24/solid'
+import { LightbulbIcon, LightbulbOff } from 'lucide-react'
 
 export default function ThemeSwitchButton() {
   // Access the current theme and the function to toggle it
@@ -15,9 +15,9 @@ export default function ThemeSwitchButton() {
     >
       {/* Render the appropriate icon depending on the current theme */}
       {theme === 'dark' ? (
-        <SunIcon className="h-5 w-5" /> // Show sun icon in dark mode
+        <LightbulbIcon className="h-5 w-5" /> // Show sun icon in dark mode
       ) : (
-        <MoonIcon className="h-5 w-5" /> // Show moon icon in light mode
+        <LightbulbOff className="h-5 w-5" /> // Show moon icon in light mode
       )}
     </button>
   )

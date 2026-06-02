@@ -36,7 +36,7 @@ const Portfolio = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.7 }}
-              className={`grid grid-cols-1 items-center gap-16 md:grid-cols-2 ${
+              className={`grid grid-cols-1 items-center gap-10 md:grid-cols-2 ${
                 isReversed ? 'md:flex-row-reverse' : ''
               }`}
             >

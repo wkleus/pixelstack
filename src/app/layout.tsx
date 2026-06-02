@@ -10,7 +10,7 @@ import Footer from './components/Footer/Footer'
  * and the base URL for all metadata links.
  */
 export const metadata: Metadata = {
-  title: 'WebFolio – Full Stack Developer Portfolio',
+  title: 'PixelStack',
   description:
     'Web App Portfolio, a Full Stack Web Developer specializing in React, Next.js, and modern web technologies.',
   metadataBase: new URL('https://pixelstack.me'),

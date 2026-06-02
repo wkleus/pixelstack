@@ -3,8 +3,9 @@
 import { portfolios } from '@/data/portfolio'
 import Image from 'next/image'
 import Link from 'next/link'
-import { FaExternalLinkAlt, FaGithub } from 'react-icons/fa'
+import { FaGithub } from 'react-icons/fa'
 import { motion } from 'framer-motion'
+import { HiOutlineGlobeAlt } from 'react-icons/hi'
 
 const Portfolio = () => {
   return (
@@ -78,7 +79,7 @@ const Portfolio = () => {
                 target="_blank"
                 className="text-secondary flex items-center gap-2 transition-colors hover:text-cyan-500"
               >
-                <FaExternalLinkAlt className="h-5 w-5" />
+                <HiOutlineGlobeAlt className="h-6 w-6" />
                 <span>Preview</span>
               </Link>
               <Link

@@ -7,7 +7,7 @@ const FooterSocialLinks = () => {
   return (
     <div className="flex space-x-6">
       <Link
-        href="https://github.com/source-code-examples/"
+        href="https://github.com/wkleus/"
         target="_blank"
         className="text-2xl text-gray-600 opacity-70 transition duration-300 hover:opacity-100 dark:text-gray-300"
       >
@@ -15,7 +15,7 @@ const FooterSocialLinks = () => {
       </Link>
 
       <Link
-        href="http://localhost:4000/"
+        href="https://pixelstack-me.vercel.app/"
         target="_blank"
         className="text-2xl text-gray-600 opacity-70 transition duration-300 hover:opacity-100 dark:text-gray-300"
       >

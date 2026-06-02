@@ -12,7 +12,7 @@ export const portfolios: Portfolio[] = [
 
     // Short description of the project
     overview:
-      'A full-stack Site  for browsing and discovering residential properties across Europe — from city apartments to alpine chalets',
+      'A full-stack site for discovering residential properties across Europe - from city apartments to alpine chalets',
 
     // Technologies used in the project
     techStack: [
@@ -57,7 +57,7 @@ export const portfolios: Portfolio[] = [
     imageSrc: '/portfolio-img/linguify.png',
   },
   {
-    name: 'Portfolio Fullstack App',
+    name: 'PixelStack Portfolio',
     overview:
       'A full-stack portfolio app built with TypeScript, Next.js & Tailwind CSS.',
     techStack: [
@@ -75,7 +75,7 @@ export const portfolios: Portfolio[] = [
     imageSrc: '/portfolio-img/portfolio-fullstack.png',
   },
   {
-    name: 'Restaurant Web App',
+    name: 'Little Lemon Restaurant',
     overview: 'A responsive restaurant frontend built with React.js.',
     techStack: [
       'HTML',

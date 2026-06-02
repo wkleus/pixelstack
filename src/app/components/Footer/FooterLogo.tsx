@@ -10,7 +10,7 @@ const FooterLogo = () => {
             alt="logo"
             fill
             sizes="auto"
-            className="object-contain brightness-60"
+            className="object-contain brightness-40 dark:brightness-60"
           />
         </div>
       </Link>
