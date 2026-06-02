@@ -9,7 +9,7 @@ import { HiOutlineGlobeAlt } from 'react-icons/hi'
 
 const Portfolio = () => {
   return (
-    <div className="mx-auto max-w-7xl py-20">
+    <div className="mx-auto max-w-7xl py-28">
       <motion.h1
         initial={{ opacity: 0, y: -25 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -23,7 +23,7 @@ const Portfolio = () => {
         initial={{ opacity: 0, y: 0, x: 120 }}
         animate={{ opacity: 1, y: 0, x: 0 }}
         transition={{ duration: 1.0 }}
-        className="mb-8 text-center text-lg text-gray-500"
+        className="mt-6 mb-10 text-center text-lg text-gray-500"
       >
         Here are some of my Web App Portfolio Works. Click on the links below to
         view them. You can find more of them on my{' '}

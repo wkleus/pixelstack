@@ -2,8 +2,8 @@
 
 import { posts } from '@/data/posts'
 import Link from 'next/link'
-import { FaCalendarAlt, FaClock } from 'react-icons/fa'
 import { motion } from 'framer-motion'
+import { Calendar1, HourglassIcon } from 'lucide-react'
 
 const Posts = () => {
   // Create a copy of the posts array, sort by newest first, and limit to 3 items
@@ -16,7 +16,7 @@ const Posts = () => {
 
   return (
     <section className="dark:bg-dark/60 w-full bg-[#faf7f7] px-4 py-28">
-      <div className=" mx-auto max-w-7xl">
+      <div className="mx-auto max-w-7xl">
         {/* Section title with fade-in animation */}
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
@@ -56,15 +56,18 @@ const Posts = () => {
               </p>
 
               {/* Post metadata: date + reading time */}
-              <div className="flex items-center gap-6 text-xs text-gray-500 dark:text-gray-400">
+              <div className="flex items-center gap-8 text-xs text-gray-500 opacity-80 dark:text-gray-400">
                 <span className="flex items-center">
-                  <FaCalendarAlt className="mr-2 opacity-70" />
-                  {new Date(post.createdAt).toLocaleDateString()}
-                </span>
-
-                <span className="flex items-center">
-                  <FaClock className="mr-2 opacity-70" />
+                  <HourglassIcon className="mr-2" size={18} />
                   {post.timeToRead}
+                </span>
+                <span className="flex items-center">
+                  <Calendar1 className="mr-2 size-5" />
+                  {new Date(post.createdAt).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                  })}
                 </span>
               </div>
             </motion.article>

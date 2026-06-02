@@ -19,7 +19,7 @@ export const frontendSkills = [
 export const backendSkills = [
   { label: 'Node.js • Express.js', level: 80, delay: 0.2 },
   { label: 'Java • Spring Boot', level: 65, delay: 0.4 },
-  { label: 'Python • Flask • Django', level: 60, delay: 0.6 },
+  { label: 'Python • Flask • Django', level: 55, delay: 0.6 },
   {
     label: 'Databases (MongoDB • PostgreSQL • MySQL • SQL/NoSQL)',
     level: 65,

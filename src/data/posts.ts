@@ -19,10 +19,11 @@ export const posts: Post[] = [
       'A practical guide to today’s CSS — covering selectors, layout systems, and the patterns every developer should know.',
 
     // Publication date (ISO format)
-    createdAt: '2025-11-03',
+    // createdAt: '2025-11-03',
+    createdAt: '11/03/25',
 
     // Estimated reading time
-    timeToRead: '14 min read',
+    timeToRead: '14 min',
 
     // URL-friendly identifier used for routing
     handle: 'fundamentals-of-css',
@@ -35,7 +36,7 @@ export const posts: Post[] = [
     overview:
       'A clear introduction to the foundational HTML elements, modern semantics, and best practices for structuring content.',
     createdAt: '2025-10-11',
-    timeToRead: '11 min read',
+    timeToRead: '11 min',
     handle: 'fundamentals-of-html',
     content: fundamentalsOfHtml,
   },
@@ -44,7 +45,7 @@ export const posts: Post[] = [
     overview:
       'A concise and practical walkthrough of the core JavaScript concepts that power modern web applications.',
     createdAt: '2025-11-25',
-    timeToRead: '15 min read',
+    timeToRead: '15 min',
     handle: 'fundamentals-of-js',
     content: fundamentalsOfJS,
   },
@@ -53,7 +54,7 @@ export const posts: Post[] = [
     overview:
       'A comprehensive introduction to TypeScript — covering the type system, generics, narrowing, and powerful language patterns.',
     createdAt: '2025-12-15',
-    timeToRead: '20 min read',
+    timeToRead: '20 min',
     handle: 'fundamentals-of-ts',
     content: fundamentalsOfTS,
   },
