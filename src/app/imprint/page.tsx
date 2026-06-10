@@ -1,148 +1,3 @@
-// const Imprint = () => {
-//   return (
-//     <div className="mx-auto max-w-xl px-4 py-16 text-sm text-gray-500 dark:text-gray-400">
-//       {/* Title */}
-//       <h1 className="mb-12 text-center text-2xl font-bold opacity-90">
-//         Imprint
-//       </h1>
-
-//       {/* Imprint Section */}
-//       <section className="space-y-4">
-//         <h2 className="text-lg font-medium">
-//           Information according to § 5 TMG
-//         </h2>
-
-//         <h3 className="mt-5 mb-1 text-base font-medium">Contact</h3>
-//         <p>
-//           Email:{' '}
-//           <a
-//             href="mailto:contact@pixelstack.me"
-//             className="transition hover:text-cyan-500 hover:underline"
-//           >
-//             contact@pixelstack.me
-//           </a>
-//         </p>
-
-//         <h3 className="mt-5 mb-1 text-base font-medium">
-//           Responsible for the content
-//         </h3>
-//         <p className="opacity-80">
-//           Max Mustermann
-//           <br />
-//           Mustermannstr. 99
-//           <br />
-//           10245 Berlin, Germany
-//         </p>
-//         <h3 className="mt-5 mb-1 text-base font-medium">
-//           Liability for content
-//         </h3>
-//         <p className="opacity-80">
-//           The contents of this website were created with care. No guarantee is
-//           given for accuracy, completeness or timeliness.
-//         </p>
-
-//         <h3 className="mt-5 mb-1 text-base font-medium">Liability for links</h3>
-//         <p className="leading-relaxed opacity-80">
-//           External links are beyond my control. Responsibility lies with the
-//           respective provider.
-//         </p>
-
-//         <h3 className="mt-5 mb-1 text-base font-medium">Copyright</h3>
-//         <p className="opacity-80">
-//           All content on this website is subject to German copyright law.
-//         </p>
-//       </section>
-
-//       {/* Divider */}
-//       <div className="my-12 h-px w-full bg-gray-300 opacity-40 dark:bg-gray-700" />
-
-//       {/* Privacy Policy */}
-//       <h1 className="mb-8 text-center text-2xl font-bold opacity-90">
-//         Privacy Policy
-//       </h1>
-
-//       <section className="space-y-4">
-//         <h2 className="mt-5 mb-1 text-lg font-medium">1. Overview</h2>
-//         <p className="opacity-80">
-//           Personal data is processed only to the extent necessary for a
-//           functional website.
-//         </p>
-
-//         <h2 className="mt-5 mb-1 text-lg font-medium">2. Controller</h2>
-//         <p>
-//           Max Mustermann
-//           <br />
-//           Mustermannstr. 99
-//           <br />
-//           10245 Berlin, Germany
-//           <br />
-//           Email:{' '}
-//           <a
-//             href="mailto:contact@pixelstack.me"
-//             className="transition hover:text-cyan-500 hover:underline"
-//           >
-//             contact@pixelstack.me
-//           </a>
-//         </p>
-
-//         <h2 className="mt-5 mb-1 text-lg font-medium">
-//           3. Data collection when visiting this website
-//         </h2>
-//         <p className="opacity-80">
-//           Technical data (browser, OS, time of access) is collected
-//           automatically for security and operation.
-//         </p>
-
-//         <h2 className="text-lg font-medium opacity-80">4. Contact form</h2>
-//         <p className="leading-relaxed opacity-80">
-//           Data submitted via contact form is stored for processing your request.
-//         </p>
-
-//         <h2 className="text-lg font-medium opacity-80">
-//           5. Cookies and local storage
-//         </h2>
-//         <p className="leading-relaxed opacity-80">
-//           Cookies or local storage may be used to improve usability.
-//         </p>
-
-//         <h2 className="text-lg font-medium opacity-80">6. Server log files</h2>
-//         <p className="leading-relaxed opacity-80">
-//           Server log files are collected automatically and cannot be assigned to
-//           individuals.
-//         </p>
-
-//         <h2 className="text-lg font-medium opacity-80">7. Your rights</h2>
-//         <p className="leading-relaxed opacity-80">
-//           You have the right to information, correction, deletion and more
-//           within legal limits.
-//         </p>
-
-//         <h2 className="text-lg font-medium opacity-80">
-//           8. Online dispute resolution
-//         </h2>
-//         <p className="leading-relaxed opacity-80">
-//           EU platform:{' '}
-//           <a
-//             href="https://ec.europa.eu/consumers/odr/"
-//             target="_blank"
-//             className="text-cyan-400 transition hover:text-cyan-300"
-//           >
-//             https://ec.europa.eu/consumers/odr/
-//           </a>
-//         </p>
-
-//         <h2 className="text-lg font-medium opacity-80">9. Changes</h2>
-//         <p className="leading-relaxed opacity-80">
-//           This policy may be updated to reflect legal or functional changes.
-//         </p>
-//       </section>
-//     </div>
-//   )
-// }
-
-// export default Imprint
-
-// src/app/impressum/page.tsx
 export const dynamic = 'force-dynamic'
 
 const Imprint = () => {
@@ -230,13 +85,15 @@ const Imprint = () => {
       </h1>
 
       <section className="space-y-4">
-        <h2 className="mt-5 mb-1 text-lg font-medium">1. Overview</h2>
+        <h2 className="mt-5 mb-1 text-lg font-medium">
+          Scope of data processing
+        </h2>
         <p className="opacity-80">
           Personal data is processed only to the extent necessary for a
           functional website.
         </p>
 
-        <h2 className="mt-5 mb-1 text-lg font-medium">2. Controller</h2>
+        <h2 className="mt-5 mb-1 text-lg font-medium">Controller</h2>
         <p>
           {name}
           <br />
@@ -256,53 +113,50 @@ const Imprint = () => {
         </p>
 
         <h2 className="mt-5 mb-1 text-lg font-medium">
-          3. Data collection when visiting this website
+          Data collection when visiting this website
         </h2>
         <p className="opacity-80">
           Technical data (browser, OS, time of access) is collected
           automatically for security and operation.
         </p>
 
-        <h2 className="text-lg font-medium opacity-80">4. Contact form</h2>
+        <h2 className="text-lg font-medium opacity-80">Contact form</h2>
         <p className="leading-relaxed opacity-80">
           Data submitted via contact form is stored for processing your request.
+          The legal basis for this processing is Art. 6(1)(b) DSGVO (contract
+          preparation) and Art. 6(1)(f) DSGVO (legitimate interest in responding
+          to inquiries).
         </p>
 
         <h2 className="text-lg font-medium opacity-80">
-          5. Cookies and local storage
+          Cookies and local storage
         </h2>
         <p className="leading-relaxed opacity-80">
           Cookies or local storage may be used to improve usability.
         </p>
 
-        <h2 className="text-lg font-medium opacity-80">6. Server log files</h2>
+        <h2 className="text-lg font-medium opacity-80">Server log files</h2>
         <p className="leading-relaxed opacity-80">
           Server log files are collected automatically and cannot be assigned to
           individuals.
         </p>
 
-        <h2 className="text-lg font-medium opacity-80">7. Your rights</h2>
+        <h2 className="text-lg font-medium opacity-80">Your rights</h2>
         <p className="leading-relaxed opacity-80">
           You have the right to information, correction, deletion and more
           within legal limits.
         </p>
 
         <h2 className="text-lg font-medium opacity-80">
-          8. Online dispute resolution
+          Consumer dispute resolution
         </h2>
         <p className="leading-relaxed opacity-80">
-          EU platform:{' '}
-          <a
-            href="https://ec.europa.eu/consumers/odr/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-cyan-400 transition hover:text-cyan-300"
-          >
-            https://ec.europa.eu/consumers/odr/
-          </a>
+          The European Commission's online dispute resolution platform was
+          discontinued on July 20, 2025. As a B2B service provider, I am not
+          required to participate in consumer arbitration proceedings.
         </p>
 
-        <h2 className="text-lg font-medium opacity-80">9. Changes</h2>
+        <h2 className="text-lg font-medium opacity-80">Changes</h2>
         <p className="leading-relaxed opacity-80">
           This policy may be updated to reflect legal or functional changes.
         </p>
