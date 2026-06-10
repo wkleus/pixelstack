@@ -1,10 +1,28 @@
 /**
  * API tests for /api/connect
- *
- * Tests the following cases: success, empty fields, invalid email
+ * Tests: success, validation errors (3 cases), rate limiting
+ * Total: 5 tests
  */
 
-// Mock NextResponse.json so Jest doesn't crash
+/* MOCKS for Node.js test environment */
+
+// 1. TextEncoder/TextDecoder for Resend
+const { TextEncoder, TextDecoder } = require('util')
+global.TextEncoder = TextEncoder
+global.TextDecoder = TextDecoder
+
+// 2. Mock Resend to prevent actual API calls during tests
+jest.mock('resend', () => ({
+  Resend: jest.fn().mockImplementation(() => ({
+    emails: {
+      send: jest
+        .fn()
+        .mockResolvedValue({ data: { id: 'mock-id' }, error: null }),
+    },
+  })),
+}))
+
+// 3. Mock NextResponse
 jest.mock('next/server', () => ({
   NextResponse: {
     json: (data: unknown, init?: Record<string, unknown>) => ({
@@ -14,66 +32,90 @@ jest.mock('next/server', () => ({
   },
 }))
 
+/* TESTS */
+
 import { POST } from '@/app/api/connect/route'
 import { NextRequest } from 'next/server'
 
-type ContactBody = {
-  name: string
-  email: string
-  message: string
-}
-
-// Helper: creates a mock request
-const createRequest = (body: ContactBody): NextRequest => {
+// Helper to create a mock request with custom IP
+const createRequest = (body: any, ip: string = '127.0.0.1'): NextRequest => {
+  const headers = new Headers()
+  headers.set('x-forwarded-for', ip)
   return {
     json: async () => body,
-    headers: new Headers(),
+    headers,
   } as unknown as NextRequest
 }
 
 describe('Contact API', () => {
-  // TEST 1: API accepts valid data
-  test('accepts valid data', async () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  // Test 1: Happy path - valid form submission
+  test('accepts valid form data', async () => {
     const validData = {
       name: 'Max Mustermann',
-      email: 'max.mustermann@test-example.com',
-      message: 'Hey hey! This is a test message.',
+      email: 'max@example.com',
+      message: 'This is a valid message with more than 20 characters.',
     }
 
-    const request = createRequest(validData)
-    const response = await POST(request)
-
-    // Check: status 200 (= OK)
+    const response = await POST(createRequest(validData, '192.168.1.10'))
     expect(response.status).toBe(200)
   })
 
-  // TEST 2: API rejects empty fields
-  test('rejects empty fields', async () => {
-    const emptyData = {
-      name: '',
-      email: '',
-      message: '',
-    }
+  // Test 2: Validation errors - each with UNIQUE IP to avoid rate limiting
+  test.each([
+    [
+      'empty fields',
+      { name: '', email: '', message: '' },
+      'Missing required fields.',
+      '192.168.2.1', // Unique IP for this test case
+    ],
+    [
+      'invalid email',
+      {
+        name: 'Max',
+        email: 'wrong',
+        message: 'Valid message with 20+ characters...',
+      },
+      'Invalid email format.',
+      '192.168.2.2', // Unique IP for this test case
+    ],
+    [
+      'short message',
+      { name: 'Max', email: 'max@example.com', message: 'short' },
+      'Message must be between 20 and 300 characters.',
+      '192.168.2.3', // Unique IP for this test case
+    ],
+  ])('rejects %s', async (_, data, expectedError, ip) => {
+    const response = await POST(createRequest(data, ip))
 
-    const request = createRequest(emptyData)
-    const response = await POST(request)
-
-    // Check: status 400 (= error)
     expect(response.status).toBe(400)
+    const body = await response.json()
+    expect(body.message).toBe(expectedError)
   })
 
-  // TEST 3: API rejects invalid email
-  test('rejects invalid email', async () => {
-    const invalidEmail = {
+  // Test 3: Rate limiting per IP
+  test('enforces rate limiting per IP', async () => {
+    const validData = {
       name: 'Max Mustermann',
-      email: 'no-email',
-      message: 'test-message',
+      email: 'max@example.com',
+      message: 'This is a valid message with more than 20 characters.',
     }
+    const ip = '10.0.0.99'
 
-    const request = createRequest(invalidEmail)
-    const response = await POST(request)
+    // First request from IP - should succeed
+    const firstResponse = await POST(createRequest(validData, ip))
+    expect(firstResponse.status).toBe(200)
 
-    // Check: status 400 (= error)
-    expect(response.status).toBe(400)
+    // Second request from same IP within rate limit window - should be blocked
+    const secondResponse = await POST(createRequest(validData, ip))
+    expect(secondResponse.status).toBe(429)
+
+    const body = await secondResponse.json()
+    expect(body.message).toBe(
+      'Too many requests. Please wait a moment before trying again.',
+    )
   })
 })

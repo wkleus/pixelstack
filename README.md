@@ -1,17 +1,19 @@
 # PixelStack Web Portfolio
 
-[![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-38B2AC?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-[![Framer Motion](https://img.shields.io/badge/FramerMotion-0055FF?style=for-the-badge&logo=framer&logoColor=white)](https://www.framer.com/motion/)
+[![Next.js](https://img.shields.io/badge/Next.js-0070F3?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
+[![Vercel](https://img.shields.io/badge/Vercel-2EAD33?style=for-the-badge&logo=vercel&logoColor=000000)](https://vercel.com/)
+[![Resend](https://img.shields.io/badge/Resend-E93D28?style=for-the-badge&logo=resend&logoColor=white)](https://resend.com/)
 [![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
-[![Resend](https://img.shields.io/badge/Resend-000000?style=for-the-badge&logo=resend&logoColor=white)](https://resend.com/)
-[![ReactIcons](https://img.shields.io/badge/ReactIcons-000000?style=for-the-badge&logo=react&logoColor=white)](https://react-icons.github.io/react-icons/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Framer Motion](https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white)](https://www.framer.com/motion/)
+[![React Icons](https://img.shields.io/badge/React_Icons-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react-icons.github.io/react-icons/)
+[![Jest](https://img.shields.io/badge/Jest-C21325?style=for-the-badge&logo=jest&logoColor=white)](https://jestjs.io/)
+[![Playwright](https://img.shields.io/badge/Playwright-2EADEE?style=for-the-badge&logo=playwright&logoColor=white)](https://playwright.dev/)
 [![Status: Deployed](https://img.shields.io/badge/Status-Deployed-22c55e?style=for-the-badge)](/)
 [![Status: Live](https://img.shields.io/badge/Status-Live-22c55e?style=for-the-badge)](https://pixelstack.me)
-[![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com)
 
-An animated and responsive portfolio for web apps — built with **Next.js**, **TypeScript**, **React.js**, **Tailwind CSS**, **Framer Motion** and **Resend**.
+An animated and responsive portfolio for web apps - built with **Next.js**, **TypeScript**, **React.js**, **Tailwind CSS**, **Framer Motion** and **Resend**.
 Features: portfolio showcase, blog system, contact form with real email delivery via Resend, profile page and dark/light mode.
 
 ## Live Demo
@@ -68,10 +70,9 @@ Check out the live demo of the project here:
 
 ### Modern UI & UX
 
-- Fully responsive layout
+- Fully responsive layout / Mobile-friendly navigation
 - Smooth Framer Motion animations
 - Light/Dark mode with custom ThemeContext
-- Clean typography and polished visual design
 
 ### Components & Pages
 
@@ -79,8 +80,10 @@ Check out the live demo of the project here:
 - **Portfolio** with project previews, tech stack, and live links
 - **Blog system** with dynamic routes (`/posts/[handle]`)
 - **Contact form** with real email delivery via Resend (`/api/connect`)
+  -> includes client & server-side validation, XXS sanitization, rate limiting
 - **Mobile navigation** with hamburger menu
 - **Footer** with social links and branding
+- **Imprint** with privat policy and legal informations
 
 ### Tech Stack
 
@@ -99,100 +102,46 @@ Check out the live demo of the project here:
 ## Project Structure
 
 ```
-📁 project-root
+📁 pixelstack
 │
-├── 📂 src                              # Main source folder
+├── 📂 src
+│   ├── 📂 app
+│   │   ├── 📂 api/connect          # Contact form API endpoint
+│   │   ├── 📂 components           # Reusable UI components
+│   │   │   ├── 📂 Connect          # Contact form (hook + component)
+│   │   │   ├── 📂 Footer           # Footer with social links
+│   │   │   ├── 📂 Header           # Header + theme toggle
+│   │   │   ├── 📂 Home             # Homepage sections
+│   │   │   ├── 📂 MessageUI        # Error/success messages
+│   │   │   └── 📂 Profile          # About me components
+│   │   ├── 📂 portfolio            # Portfolio overview
+│   │   ├── 📂 posts                # Blog system
+│   │   ├── 📂 profile              # Profile page
+│   │   ├── 📂 context              # ThemeContext provider
+│   │   ├── 📄 layout.tsx
+│   │   ├── 📄 globals.css
+│   │   └── 📄 page.tsx             # Homepage
 │   │
-│   ├── 📂 app                          # Next.js App Router – pages & server routes
-│   │   │
-│   │   ├── 📂 connect                  # "Contact Me" page
-│   │   │   └── 📄 page.tsx
-│   │   │
-│   │   ├── 📂 components               # Reusable UI components
-│   │   │   │
-│   │   │   ├── 📂 Connect              # Contact form components
-│   │   │   │   ├── 📄 ConnectForm.tsx
-│   │   │   │   └── 📄 useConnectForm.ts
-│   │   │   │
-│   │   │   ├── 📂 Footer               # Footer with social links
-│   │   │   │   ├── 📄 Footer.tsx
-│   │   │   │   ├── 📄 FooterLogo.tsx
-│   │   │   │   └── 📄 FooterSocialLinks.tsx
-│   │   │   │
-│   │   │   ├── 📂 Header               # Header with theme toggle & mobile menu
-│   │   │   │   ├── 📄 HeaderNav.tsx
-│   │   │   │   ├── 📄 MobileMenu.tsx
-│   │   │   │   └── 📄 ThemeSwitchButton.tsx
-│   │   │   │
-│   │   │   ├── 📂 Home                 # Homepage sections
-│   │   │   │   ├── 📂 InfoMail         # Newsletter components
-│   │   │   │   │   ├── 📄 InfoMail.tsx
-│   │   │   │   │   └── 📄 useMailStatus.ts
-│   │   │   │   ├── 📄 Intro.tsx
-│   │   │   │   ├── 📄 Portfolio.tsx
-│   │   │   │   └── 📄 Posts.tsx
-│   │   │   │
-│   │   │   ├── 📂 MessageUI            # Error & success messages
-│   │   │   │   ├── 📄 ErrorMessage.tsx
-│   │   │   │   └── 📄 SuccessMessage.tsx
-│   │   │   │
-│   │   │   └── 📂 Profile              # About me components
-│   │   │       ├── 📄 EducationCard.tsx
-│   │   │       ├── 📄 SkillBar.tsx
-│   │   │       └── 📄 SkillSection.tsx
-│   │   │
-│   │   ├── 📂 portfolio                # Portfolio overview page
-│   │   │   └── 📄 page.tsx
-│   │   │
-│   │   ├── 📂 posts                    # Blog system
-│   │   │   ├── 📂 [handle]             # Dynamic blog post route
-│   │   │   │   └── 📄 page.tsx
-│   │   │   └── 📄 page.tsx             # Blog index page
-│   │   │
-│   │   ├── 📂 profile                  # Profile / About Me page
-│   │   │   └── 📄 page.tsx
-│   │   │
-│   │   ├── 📂 api                      # Serverless API routes
-│   │   │   └── 📂 connect              # Contact form endpoint with email delivery
-│   │   │       └── 📄 route.ts
-│   │   │
-│   │   ├── 📂 context
-│   │   │   └── 📄 ThemeContext.tsx     # Custom theme logic
-│   │   │
-│   │   ├── 📄 layout.tsx               # Root layout (header, footer, providers)
-│   │   ├── 📄 globals.css              # Global Tailwind styles
-│   │   └── 📄 page.tsx                 # Homepage
+│   ├── 📂 data                     # Static content
+│   │   ├── 📂 content              # Blog post details
+│   │   ├── 📄 posts.ts             # Blog metadata
+│   │   └── 📄 portfolio.ts         # Portfolio data
 │   │
-│   ├── 📂 data                         # Static content
-│   │   ├── 📂 content                  # Blog post details
-│   │   │   └── 📄 post-details.tsx
-│   │   ├── 📄 posts.ts                 # Blog metadata
-│   │   └── 📄 portfolio.ts             # Portfolio metadata
-│   │
-│   └── 📂 types                        # Shared TypeScript types
-│       └── 📄 index.ts
+│   └── 📂 types                    # TypeScript definitions
 │
-├── 📂 tests                            # Unit & API tests
-│   ├── 📄 useConnectForm.test.ts       # Hook tests
-│   └── 📄 api-connect.test.ts          # API route tests
+├── 📂 tests                        # Unit & API tests
+│   ├── 📄 useConnectForm.test.ts
+│   └── 📄 api-connect.test.ts
 │
-├── 📂 e2e                              # Playwright E2E browser tests
-│   └── 📄 contact-form.e2e.spec.ts    # Contact form E2E test
+├── 📂 e2e                          # Playwright E2E tests
+│   └── 📄 contact-form.e2e.spec.ts
 │
-├── 📂 public                           # Static assets
-│   ├── 📂 avatars
-│   ├── 📂 logos
-│   ├── 📂 portfolio-img
-│   └── 📂 icons
+├── 📂 public                       # Static assets
 │
 ├── 📄 jest.config.ts
-├── 📄 jest.setup.ts
 ├── 📄 playwright.config.ts
-├── 📄 .env.local                       # Local environment variables (not committed)
-├── 📄 .gitignore
-├── 📄 README.md
 ├── 📄 package.json
-└── 📄 tsconfig.json
+└── 📄 README.md
 ```
 
 ---
@@ -217,21 +166,31 @@ Dark mode is handled through a custom `ThemeContext`:
 
 ## Testing
 
-The project includes three layers of tests — unit, API, and E2E browser tests via Playwright.
+The project includes three layers of tests — unit, API, and E2E browser tests via Playwright:
+
+- Unit Tests: React Hook logic (form state, change handlers, submission)
+- API Tests: Route validation, error handling & rate limiting (5 scenarios)
+- E2E Tests: Browser flow with Playwright (form fill, submission, validation)
+
+Run tests locally:
+
+```
+npm run test        # Unit & API tests (watch mode)
+npm run test:run    # Unit & API tests (single run)
+npm run test:e2e    # Playwright E2E tests
+```
 
 ### Results
 
 | Suite                    | Tests  | Status             |
 | ------------------------ | ------ | ------------------ |
 | Unit (hook logic)        | 4      | ✅ passing         |
-| API (backend validation) | 3      | ✅ passing         |
+| API (backend validation) | 5      | ✅ passing         |
 | E2E (browser flow)       | 3      | ✅ passing         |
-| **Total**                | **10** | **✅ all passing** |
+| **Total**                | **12** | **✅ all passing** |
 
 ---
 
 ## License
 
 This project is private and serves as a personal portfolio.
-
----
