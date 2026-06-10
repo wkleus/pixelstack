@@ -26,7 +26,7 @@ const HeaderNav = () => {
   return (
     // Sticky navigation bar with dynamic blur based on theme
     <nav
-      className="dark:bg-primary/10 fixed z-50 w-full border-b border-gray-200 bg-white/80 shadow-sm transition-colors dark:border-gray-800"
+      className="dark:bg-primary/10 fixed z-50 w-full border-b border-gray-200 bg-white/80 shadow-sm transition-colors dark:border-cyan-900"
       style={{
         backdropFilter: theme === 'dark' ? 'blur(40px)' : 'blur(10px)',
       }}

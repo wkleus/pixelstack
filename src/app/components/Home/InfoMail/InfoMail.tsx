@@ -43,7 +43,7 @@ const InfoMail = () => {
   }
 
   return (
-    <section className="dark:bg-dark/30 w-full border-t border-black/5 bg-[#f2f2f2] px-4 py-28 dark:border-white/5">
+    <section className="dark:bg-dark/80 w-full border-t border-black/5 bg-[#f2f2f2] px-4 py-28 dark:border-white/5">
       <div className="mx-auto max-w-3xl text-center">
         {/* Section title */}
         <motion.h2

@@ -12,11 +12,11 @@ export default function Welcome() {
       {/* Portfolio preview section */}
       <Portfolio />
 
-      {/* Latest posts section */}
-      <Posts />
-
       {/* Email subscription section */}
       <InfoMail />
+
+      {/* Latest posts section */}
+      <Posts />
     </>
   )
 }
