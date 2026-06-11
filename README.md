@@ -8,6 +8,7 @@
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![Framer Motion](https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white)](https://www.framer.com/motion/)
 [![React Icons](https://img.shields.io/badge/React_Icons-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react-icons.github.io/react-icons/)
+[![Search](https://img.shields.io/badge/Search-Enabled-22c55e?style=for-the-badge&logo=search&logoColor=white)]()
 [![Jest](https://img.shields.io/badge/Jest-C21325?style=for-the-badge&logo=jest&logoColor=white)](https://jestjs.io/)
 [![Playwright](https://img.shields.io/badge/Playwright-2EADEE?style=for-the-badge&logo=playwright&logoColor=white)](https://playwright.dev/)
 [![Status: Deployed](https://img.shields.io/badge/Status-Deployed-22c55e?style=for-the-badge)](/)
@@ -79,6 +80,7 @@ Check out the live demo of the project here:
 - **Hero section** with animated intro
 - **Portfolio** with project previews, tech stack, and live links
 - **Blog system** with dynamic routes (`/posts/[handle]`)
+- **Search bar** filters portfolio items and blog posts by title, keyword in the description or technology
 - **Contact form** with real email delivery via Resend (`/api/connect`)
   -> includes client & server-side validation, XXS sanitization, rate limiting
 - **Mobile navigation** with hamburger menu

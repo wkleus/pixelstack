@@ -3,11 +3,11 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { Sparkle, Star, Zap } from 'lucide-react'
+import { Sparkle, Zap } from 'lucide-react'
 
 const Intro = () => {
   return (
-    <section className="relative overflow-hidden py-22 sm:py-42 lg:py-10 lg:pb-20 xl:py-30 2xl:py-50">
+    <section className="relative overflow-hidden py-22 lg:py-10 xl:py-30 2xl:py-30">
       {/* Background gradient + blurred glow effect */}
       <div className="from-primary/20 before:bg-primary/40 pointer-events-none absolute inset-0 bg-gradient-to-b to-transparent before:absolute before:top-10 before:left-1/2 before:h-[900px] before:w-[900px] before:-translate-x-1/2 before:rounded-full before:opacity-20 before:blur-[120px] before:content-['']" />
 

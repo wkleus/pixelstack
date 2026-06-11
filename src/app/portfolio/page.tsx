@@ -6,8 +6,15 @@ import Link from 'next/link'
 import { FaGithub } from 'react-icons/fa'
 import { motion } from 'framer-motion'
 import { HiOutlineGlobeAlt } from 'react-icons/hi'
+import SearchBar from '../components/Search/SearchBar'
+import { useSearch } from '@/app/hooks/useSearch'
 
 const Portfolio = () => {
+  const { query, setQuery, filtered, totalCount, resultCount } = useSearch(
+    portfolios,
+    ['name', 'overview', 'techStack'],
+  )
+
   return (
     <div className="mx-auto max-w-7xl py-28">
       <motion.h1
@@ -34,8 +41,22 @@ const Portfolio = () => {
         >
           GitHub profile
         </a>
-        .
+        {'.'}
       </motion.p>
+
+      <motion.div
+        initial={{ opacity: 0, x: -120 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 1, ease: 'easeOut' }}
+      >
+        <SearchBar
+          value={query}
+          onChange={setQuery}
+          placeholder="Search by name, description or tech..."
+          resultCount={resultCount}
+          totalCount={totalCount}
+        />
+      </motion.div>
 
       <motion.div
         initial={{ opacity: 0, y: 120 }}
@@ -43,7 +64,7 @@ const Portfolio = () => {
         transition={{ duration: 1.2 }}
         className="grid grid-cols-1 gap-8 md:grid-cols-3"
       >
-        {portfolios.map((portfolio) => (
+        {filtered.map((portfolio) => (
           <article
             key={portfolio.name}
             className="dark:bg-dark/50 rounded-lg bg-white p-6 shadow-md transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-cyan-500/20"
@@ -94,6 +115,12 @@ const Portfolio = () => {
           </article>
         ))}
       </motion.div>
+
+      {filtered.length === 0 && (
+        <p className="mt-16 text-center text-gray-400">
+          No projects match your search.
+        </p>
+      )}
     </div>
   )
 }

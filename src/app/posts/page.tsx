@@ -4,10 +4,17 @@ import { posts } from '@/data/posts'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Calendar1, HourglassIcon } from 'lucide-react'
+import SearchBar from '@/app/components/Search/SearchBar'
+import { useSearch } from '@/app/hooks/useSearch'
 
 const Posts = () => {
   const sortedPosts = [...posts].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  )
+
+  const { query, setQuery, filtered, totalCount, resultCount } = useSearch(
+    sortedPosts,
+    ['name', 'overview'],
   )
 
   return (
@@ -17,13 +24,26 @@ const Posts = () => {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.3 }}
         transition={{ duration: 0.8, ease: 'easeOut' }}
-        className="mb-16 text-center text-4xl font-bold"
+        className="mb-10 text-center text-4xl font-bold"
       >
         Blog Posts
       </motion.h1>
+      <motion.div
+        initial={{ opacity: 0, x: -80 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.7, ease: 'easeOut' }}
+      >
+        <SearchBar
+          value={query}
+          onChange={setQuery}
+          placeholder="Search posts..."
+          resultCount={resultCount}
+          totalCount={totalCount}
+        />
+      </motion.div>
 
       <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-        {sortedPosts.map((post) => (
+        {filtered.map((post) => (
           <motion.article
             key={post.handle}
             initial={{ opacity: 0, y: 25 }}
@@ -59,6 +79,12 @@ const Posts = () => {
           </motion.article>
         ))}
       </div>
+
+      {filtered.length === 0 && (
+        <p className="mt-16 text-center text-gray-400">
+          No posts match your search.
+        </p>
+      )}
     </div>
   )
 }
