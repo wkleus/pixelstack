@@ -82,7 +82,7 @@ Check out the live demo of the project here:
 - **Blog system** with dynamic routes (`/posts/[handle]`)
 - **Search bar** filters portfolio items and blog posts by title, keyword in the description or technology
 - **Contact form** with real email delivery via Resend (`/api/connect`)
-  -> includes client & server-side validation, XXS sanitization, rate limiting
+  -> includes client & server-side validation, XXS sanitization, rate limiting and auto-reply to sender
 - **Mobile navigation** with hamburger menu
 - **Footer** with social links and branding
 - **Imprint** with privat policy and legal informations
@@ -151,7 +151,15 @@ Check out the live demo of the project here:
 ## Contact Form & Email
 
 The contact form at `/connect` sends a `POST` request to `/api/connect`.
-The API route handles input validation, XSS sanitization, rate limiting (1 request per IP per minute), and real email delivery via **[Resend](https://resend.com)**.
+
+The API route handles:
+
+- Input validation and XSS sanitization
+- Rate limiting (1 request per IP per minute)
+- Sending the contact message to the inbox and
+- Sending an automatic confirmation email back to the sender
+
+Both emails are delivered via **[Resend](https://resend.com)**. If the auto-reply fails, the request still returns success — the notification to the inbox was already sent.
 
 ---
 

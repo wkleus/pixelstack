@@ -1,19 +1,7 @@
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
 
-// Debug: Check if env is loading correctly
-console.log('\n=== Environment Check Start ===')
-console.log('NODE_ENV:', process.env.NODE_ENV)
-console.log('RESEND_API_KEY exists:', !!process.env.RESEND_API_KEY)
-console.log(
-  'RESEND_API_KEY first 5 chars:',
-  process.env.RESEND_API_KEY?.substring(0, 5),
-)
-console.log('RESEND_FROM:', process.env.RESEND_FROM)
-console.log('RESEND_TO:', process.env.RESEND_TO)
-console.log('=== Environment Check End ===\n')
-
-// Resend client - initialized once, reused across requests
+// Resend client
 const resend = new Resend(process.env.RESEND_API_KEY)
 
 // In-memory rate limiter
@@ -30,7 +18,7 @@ interface ContactRequestBody {
 
 // HELPERS
 
-// Basic email format validation
+// Email format validation
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 // HTML-escape user input to prevent XSS in the email body
@@ -105,16 +93,11 @@ export async function POST(request: Request) {
       message: sanitizeString(body.message),
     }
 
-    // Debug: Show the complete from-string
-    const fromString = `PixelStack Contact <${process.env.RESEND_FROM}>`
-    console.log('Sending from:', fromString)
-    console.log('\n')
-
-    // Send email via Resend
-    const { error } = await resend.emails.send({
+    // 1.Send the contact message to the inbox
+    const { error: notifyError } = await resend.emails.send({
       from: `PixelStack Contact <${process.env.RESEND_FROM}>`,
       to: process.env.RESEND_TO!,
-      replyTo: sanitizedData.email, // clicking "Reply" goes to the sender
+      replyTo: sanitizedData.email,
       subject: `New message from ${sanitizedData.name}`,
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
@@ -137,10 +120,9 @@ export async function POST(request: Request) {
       `,
     })
 
-    // Handle Resend errors
-    if (error) {
+    if (notifyError) {
       if (process.env.NODE_ENV === 'development') {
-        console.error('Resend error:', error)
+        console.error('Resend error (notify):', notifyError)
       }
       return NextResponse.json(
         { message: 'Failed to send message. Please try again.' },
@@ -148,8 +130,56 @@ export async function POST(request: Request) {
       )
     }
 
+    // Send a confirmation email back to the sender
+    const { error: replyError } = await resend.emails.send({
+      from: `PixelStack <${process.env.RESEND_FROM}>`,
+      to: sanitizedData.email,
+      subject: `Thanks for reaching out, ${sanitizedData.name}!`,
+      html: `
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+
+          <h2 style="color: #0891b2;">Thanks for your message!</h2>
+
+          <p>Hi ${sanitizedData.name},</p>
+
+          <p>
+            I've received your message and will get back to you within
+            <strong>1–2 business days</strong>.
+          </p>
+
+          <div style="margin: 24px 0; padding: 16px; background: #f4f4f5; border-left: 3px solid #0891b2; border-radius: 4px;">
+            <p style="margin: 0 0 8px; font-size: 13px; color: #666;">Your message:</p>
+            <p style="margin: 0; font-size: 15px;">${sanitizedData.message}</p>
+          </div>
+
+          <p style="color: #666; font-size: 13px;">
+            If you have anything to add, simply reply to this email.
+          </p>
+
+          <hr style="border: none; border-top: 1px solid #e4e4e7; margin: 24px 0;" />
+
+          <p style="margin: 0; font-size: 13px; color: #999;">
+            PixelStack &mdash;
+            <a href="https://pixelstack.me" style="color: #0891b2; text-decoration: none;">pixelstack.me</a>
+          </p>
+
+        </div>
+      `,
+    })
+
+    // If the auto-reply fails, it still returns success
+    // The notification to the inbox was already sent
+    if (replyError && process.env.NODE_ENV === 'development') {
+      console.error('Resend error (auto-reply):', replyError)
+    }
+
     if (process.env.NODE_ENV === 'development') {
-      console.log('Email sent successfully to:', process.env.RESEND_TO)
+      console.log(
+        'Emails sent — notify:',
+        process.env.RESEND_TO,
+        '/ auto-reply:',
+        sanitizedData.email,
+      )
     }
 
     return NextResponse.json({ message: 'Message sent successfully.' })
