@@ -16,7 +16,7 @@ const Portfolio = () => {
   )
 
   return (
-    <div className="mx-auto max-w-7xl py-28">
+    <div className="mx-5 py-28 sm:mx-15 md:mx-5 lg:mx-15 xl:mx-30">
       <motion.h1
         initial={{ opacity: 0, y: -25 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -62,7 +62,7 @@ const Portfolio = () => {
         initial={{ opacity: 0, y: 120 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1.2 }}
-        className="grid grid-cols-1 gap-8 md:grid-cols-3"
+        className="grid grid-cols-1 gap-8 md:grid-cols-2 2xl:grid-cols-3"
       >
         {filtered.map((portfolio) => (
           <article

@@ -18,7 +18,7 @@ const Posts = () => {
   )
 
   return (
-    <div className="mx-auto max-w-7xl py-28">
+    <div className="mx-10 max-w-7xl py-28 sm:mx-25 2xl:mx-auto">
       <motion.h1
         initial={{ opacity: 0, y: -25 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -42,7 +42,7 @@ const Posts = () => {
         />
       </motion.div>
 
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
         {filtered.map((post) => (
           <motion.article
             key={post.handle}
