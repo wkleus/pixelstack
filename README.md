@@ -61,6 +61,7 @@ Check out the live demo of the project here:
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
 - [Contact Form & Email](#contact-form--email)
+- [Newsletter](#newsletter)
 - [Dark Mode](#dark-mode)
 - [Testing](#testing)
 - [License](#license)
@@ -83,6 +84,7 @@ Check out the live demo of the project here:
 - **Search bar** filters portfolio items and blog posts by title, keyword in the description or technology
 - **Contact form** with real email delivery via Resend (`/api/connect`)
   -> includes client & server-side validation, XXS sanitization, rate limiting and auto-reply to sender
+- **Newsletter** subscription with admin email notification via Resend
 - **Mobile navigation** with hamburger menu
 - **Footer** with social links and branding
 - **Imprint** with privat policy and legal informations
@@ -108,7 +110,9 @@ Check out the live demo of the project here:
 │
 ├── 📂 src
 │   ├── 📂 app
-│   │   ├── 📂 api/connect          # Contact form API endpoint
+│   │   ├── 📂 api
+│   │   │   ├── 📂 newsletter       # Newsletter subscription endpoint
+│   │   │   └── 📂 connect          # Contact form API endpoint with email
 │   │   ├── 📂 components           # Reusable UI components
 │   │   │   ├── 📂 Connect          # Contact form (hook + component)
 │   │   │   ├── 📂 Footer           # Footer with social links
@@ -160,6 +164,20 @@ The API route handles:
 - Sending an automatic confirmation email back to the sender
 
 Both emails are delivered via **[Resend](https://resend.com)**. If the auto-reply fails, the request still returns success — the notification to the inbox was already sent.
+
+---
+
+## Newsletter
+
+The newsletter form on the homepage sends a `POST` request to `/api/newsletter`.
+
+The API route handles:
+
+- Email format validation and XSS sanitization
+- Rate limiting (1 request per IP per minute)
+- Sending an admin notification to the inbox with the subscriber's email and signup date
+
+Delivered via **[Resend](https://resend.com)**.
 
 ---
 
