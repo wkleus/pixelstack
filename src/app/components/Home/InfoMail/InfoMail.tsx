@@ -11,32 +11,39 @@ const InfoMail = () => {
   const { status, setSubmitting, setSubmitted, setFailed, reset } =
     useMailStatus()
 
-  /**
-   * Handles form submission and performs basic email validation.
-   */
   const inputRef = React.useRef<HTMLInputElement>(null)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     const form = e.target as HTMLFormElement
     const email = (form.elements.namedItem('email') as HTMLInputElement).value
 
-    setSubmitting()
-
+    // Client-side format check before hitting the API
     const isValid = /\S+@\S+\.\S+/.test(email)
-
     if (!isValid) {
       setFailed()
       setTimeout(() => reset(), 3000)
       return
     }
 
-    setSubmitted()
+    setSubmitting()
 
-    // Clear input after success
-    if (inputRef.current) {
-      inputRef.current.value = ''
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+
+      if (res.ok) {
+        setSubmitted()
+        if (inputRef.current) inputRef.current.value = ''
+      } else {
+        setFailed()
+      }
+    } catch {
+      setFailed()
     }
 
     setTimeout(() => reset(), 3000)
@@ -45,7 +52,6 @@ const InfoMail = () => {
   return (
     <section className="dark:bg-dark/80 w-full border-t border-black/5 bg-[#f2f2f2] px-4 py-28 dark:border-white/5">
       <div className="mx-auto max-w-3xl text-center">
-        {/* Section title */}
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -56,7 +62,6 @@ const InfoMail = () => {
           Stay in the Loop
         </motion.h2>
 
-        {/* Subtitle */}
         <motion.p
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -67,7 +72,6 @@ const InfoMail = () => {
           Get updates on new articles, insights and exclusive content.
         </motion.p>
 
-        {/* Email subscription form */}
         <motion.form
           onSubmit={handleSubmit}
           initial={{ opacity: 0, y: 15 }}
@@ -101,7 +105,6 @@ const InfoMail = () => {
           </button>
         </motion.form>
 
-        {/* Animated success/error messages */}
         <AnimatePresence mode="wait">
           <motion.div
             layout
