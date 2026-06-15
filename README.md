@@ -26,7 +26,7 @@ Check out the live demo of the project here:
 ## Preview / Screenshots
 
 <p align="center">
-<img src="public/preview/homepage.png" width="700" alt="Homepage preview" />
+<img src="public/preview/intro.png" width="700" alt="Homepage preview" />
 <br />
 <em>Homepage with animated hero section</em>
 </p>
@@ -50,7 +50,7 @@ Check out the live demo of the project here:
 </p>
 
 <p align="center">
-<img src="public/preview/darkmode.png" width="700" alt="Dark mode preview" />
+<img src="public/preview/intro-darkmode.png" width="700" alt="Dark mode preview" />
 <br />
 <em>Dark mode theme using custom ThemeContext</em>
 </p>
