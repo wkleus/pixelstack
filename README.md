@@ -14,8 +14,8 @@
 [![Status: Deployed](https://img.shields.io/badge/Status-Deployed-22c55e?style=for-the-badge)](/)
 [![Status: Live](https://img.shields.io/badge/Status-Live-22c55e?style=for-the-badge)](https://pixelstack.me)
 
-An animated and responsive portfolio for web apps - built with **Next.js**, **TypeScript**, **React.js**, **Tailwind CSS**, **Framer Motion** and **Resend**.
-Features: portfolio showcase, blog system, contact form with real email delivery via Resend, profile page and dark/light mode.
+An animated and responsive portfolio for web apps — built with **Next.js**, **TypeScript**, **React.js**, **Tailwind CSS**, **Framer Motion** and **Resend**.
+Features: portfolio showcase, blog system, contact form with real email delivery and auto-reply, newsletter subscription with admin notification, search for portfolio and posts, interactive grid hero section with mouse tracking, profile page and dark/light mode. All emails delivered via Resend.
 
 ## Live Demo
 
@@ -35,6 +35,12 @@ Check out the live demo of the project here:
 <img src="public/preview/portfolio-page.png" width="700" alt="Portfolio page preview" />
 <br />
 <em>Portfolio page showcasing projects and tech stack</em>
+</p>
+
+<p align="center">
+<img src="public/preview/blog-page.png" width="700" alt="Blog page preview" />
+<br />
+<em>The blog features posts about tech topics</em>
 </p>
 
 <p align="center">
@@ -62,6 +68,7 @@ Check out the live demo of the project here:
 - [Project Structure](#project-structure)
 - [Contact Form & Email](#contact-form--email)
 - [Newsletter](#newsletter)
+- [Interactive Grid](#interactive-grid)
 - [Dark Mode](#dark-mode)
 - [Testing](#testing)
 - [License](#license)
@@ -78,16 +85,16 @@ Check out the live demo of the project here:
 
 ### Components & Pages
 
-- **Hero section** with animated intro
+- **Hero section** with animated intro, persistent grid background and mouse-following spotlight effect
 - **Portfolio** with project previews, tech stack, and live links
 - **Blog system** with dynamic routes (`/posts/[handle]`)
 - **Search bar** filters portfolio items and blog posts by title, keyword in the description or technology
 - **Contact form** with real email delivery via Resend (`/api/connect`)
-  -> includes client & server-side validation, XXS sanitization, rate limiting and auto-reply to sender
-- **Newsletter** subscription with admin email notification via Resend
+  -> includes client & server-side validation, XSS sanitization, rate limiting and auto-reply to sender
+- **Newsletter** subscription with admin email notification via Resend (`/api/newsletter`)
 - **Mobile navigation** with hamburger menu
 - **Footer** with social links and branding
-- **Imprint** with privat policy and legal informations
+- **Imprint** with privacy policy and legal informations
 
 ### Tech Stack
 
@@ -178,6 +185,17 @@ The API route handles:
 - Sending an admin notification to the inbox with the subscriber's email and signup date
 
 Delivered via **[Resend](https://resend.com)**.
+
+---
+
+## Interactive Grid
+
+The hero section (`/`) features a multi-layer grid background built entirely with React state and CSS `backgroundImage`.
+
+- Persistent grid always visible
+- Color transitions on hover
+- Mouse-following radial spotlight effect tracks cursor position via `getBoundingClientRect`
+- Secondary dot grid layer adds visual depth
 
 ---
 
