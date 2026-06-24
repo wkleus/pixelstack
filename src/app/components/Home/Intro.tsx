@@ -20,45 +20,48 @@ const Intro = () => {
 
   return (
     <section
-      className="relative min-h-screen overflow-hidden py-40"
+      className="relative min-h-screen overflow-hidden py-35"
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
       onMouseMove={handleMouseMove}
     >
       {/* Grid – Background only */}
-      <div
-        className={`pointer-events-none absolute inset-0 z-0 transition-opacity duration-500 ${
-          isHovering ? 'opacity-100' : 'opacity-0'
-        }`}
-      >
-        {/* Main grid */}
+      <div className="pointer-events-none absolute inset-0 z-0">
+        {/* Main grid — always visible, cyan at rest, cyan-greenish on hover */}
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 transition-all duration-500"
           style={{
-            backgroundImage: `
-              linear-gradient(to right, rgba(6, 182, 212, 0.15) 1px, transparent 1px),
-              linear-gradient(to bottom, rgba(6, 182, 212, 0.15) 1px, transparent 1px)
-            `,
+            backgroundImage: isHovering
+              ? `
+                linear-gradient(to right, rgba(20, 184, 166, 0.22) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(20, 184, 166, 0.22) 1px, transparent 1px)
+              `
+              : `
+                linear-gradient(to right, rgba(6, 182, 212, 0.15) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(6, 182, 212, 0.15) 1px, transparent 1px)
+              `,
             backgroundSize: '40px 40px',
           }}
         />
 
-        {/* Mouse-following spotlight effect */}
+        {/* Mouse-following spotlight effect — only visible on hover */}
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 transition-opacity duration-500"
           style={{
-            background: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(6, 182, 212, 0.25) 0%, transparent 250px)`,
+            opacity: isHovering ? 1 : 0,
+            background: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(20, 184, 166, 0.25) 0%, transparent 250px)`,
           }}
         />
       </div>
 
-      {/* Additional fine dot grid for depth */}
+      {/* Additional fine dot grid for depth — always visible, color changes on hover */}
       <div
-        className={`pointer-events-none absolute inset-0 z-0 transition-opacity duration-700 ${
-          isHovering ? 'opacity-60' : 'opacity-0'
-        }`}
+        className="pointer-events-none absolute inset-0 z-0 transition-all duration-700"
         style={{
-          backgroundImage: `radial-gradient(circle at 2px 2px, rgba(6, 182, 212, 0.2) 1.5px, transparent 1.5px)`,
+          opacity: isHovering ? 0.4 : 0.6,
+          backgroundImage: isHovering
+            ? `radial-gradient(circle at 2px 2px, rgba(20, 184, 166, 0.25) 1.5px, transparent 1.5px)`
+            : `radial-gradient(circle at 2px 2px, rgba(6, 182, 212, 0.2) 1.5px, transparent 1.5px)`,
           backgroundSize: '24px 24px',
         }}
       />
