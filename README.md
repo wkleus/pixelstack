@@ -17,6 +17,8 @@
 An animated and responsive portfolio for web apps — built with **Next.js**, **TypeScript**, **React.js**, **Tailwind CSS**, **Framer Motion** and **Resend**.
 Features: portfolio showcase, blog system, contact form with real email delivery and auto-reply, newsletter subscription with admin notification, search for portfolio and posts, interactive grid hero section with mouse tracking, profile page and dark/light mode. All emails delivered via Resend.
 
+An AI‑powered Agent is currently being developed to help users and clients explore my projects, skills, and IT background.
+
 ## Live Demo
 
 Check out the live demo of the project here:
@@ -234,6 +236,25 @@ npm run test:e2e    # Playwright E2E tests
 | API (backend validation) | 5      | ✅ passing         |
 | E2E (browser flow)       | 3      | ✅ passing         |
 | **Total**                | **12** | **✅ all passing** |
+
+---
+
+## Upcoming Work
+
+### AI‑Agent (Portfolio Guide)
+
+This project will soon include an AI‑powered Agent designed for users and clients.  
+The agent will:
+
+- guide users through my software projects
+- explain the technologies I use and the skills I apply
+- highlight my IT education, certifications, and professional experience
+- provide context on how my work reflects my capabilities
+
+### More Features Planned
+
+- Language Switcher (EN/DE)
+- Custom 404 Page
 
 ---
 
