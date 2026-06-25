@@ -3,6 +3,9 @@ import './globals.css'
 import HeaderNav from './components/Header/HeaderNav'
 import { ThemeProvider } from './context/ThemeContext'
 import Footer from './components/Footer/Footer'
+import AgentWidget from './components/Agent/AgentWidget'
+
+const ionosWebsite = process.env.NEXT_PUBLIC_IONOS_WEBSITE
 
 /**
  * Global metadata for the entire application.
@@ -13,7 +16,7 @@ export const metadata: Metadata = {
   title: 'PixelStack',
   description:
     'Web App Portfolio, a Full Stack Web Developer specializing in React, Next.js, and modern web technologies.',
-  metadataBase: new URL('https://pixelstack.me'),
+  metadataBase: new URL(`${ionosWebsite}`),
   openGraph: {
     title: 'WebFolio – Full Stack Developer Portfolio',
     description:
@@ -43,6 +46,9 @@ export default function RootLayout({
 
           {/* Global footer */}
           <Footer />
+
+          {/* AI-powered agent — floating widget visible on all pages */}
+          <AgentWidget />
         </ThemeProvider>
       </body>
     </html>
