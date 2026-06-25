@@ -8,6 +8,10 @@ const client = new OpenAI({
   apiKey: process.env.DEEPSEEK_API_KEY,
 })
 
+// Rate limiter — 1 request per IP per 5 seconds
+const rateLimitMap = new Map<string, number>()
+const RATE_LIMIT_WINDOW_MS = 5_000
+
 interface Message {
   role: 'user' | 'assistant'
   content: string
@@ -15,6 +19,19 @@ interface Message {
 
 // POST /api/agent
 export async function POST(request: Request) {
+  // Rate limiting
+  const ip = request.headers.get('x-forwarded-for') ?? 'unknown'
+  const lastRequest = rateLimitMap.get(ip) ?? 0
+
+  if (Date.now() - lastRequest < RATE_LIMIT_WINDOW_MS) {
+    return NextResponse.json(
+      { message: 'Too many requests. Please wait a moment.' },
+      { status: 429 },
+    )
+  }
+
+  rateLimitMap.set(ip, Date.now())
+
   try {
     // Parse conversation history from request body
     const { messages } = (await request.json()) as { messages: Message[] }
@@ -49,7 +66,13 @@ export async function POST(request: Request) {
   }
 }
 
-// Example Test Request in Postman (POST) or in Terminal (POST):
-// curl -X POST http://localhost:4000/api/agent \
-//   -H "Content-Type: application/json" \
-//   -d '{"messages": [{"role": "user", "content": "What skills do you have?"}]}'
+// Example Test Request in Postman tool or in Terminal with curl:
+/*
+    curl -X POST http://localhost:4000/api/agent \
+    -H "Content-Type: application/json" \
+    -d '{"messages": [{"role": "user", "content": "What skills do you have?"}]}'
+
+    curl -X POST http://localhost:4000/api/agent \
+    -H "Content-Type: application/json" \
+    -d '{"messages": [{"role": "user", "content": "Tell me more details about your backend skills"}]}'
+*/
