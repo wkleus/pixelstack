@@ -10,6 +10,8 @@ import Link from 'next/link'
 
 const ConnectForm = () => {
   const { formData, status, handleChange, handleSubmit } = useConnectForm()
+  const email = process.env.NEXT_PUBLIC_EMAIL
+  const location = process.env.NEXT_PUBLIC_LOCATION
 
   return (
     <motion.div
@@ -37,10 +39,10 @@ const ConnectForm = () => {
                   <div>
                     <h3 className="font-semibold">Email</h3>
                     <Link
-                      href="mailto:contact@pixelstack.me"
+                      href={`mailto:${email}`}
                       className="text-lg text-gray-600 hover:text-cyan-600 dark:text-gray-400"
                     >
-                      contact@pixelstack.me
+                      {email}
                     </Link>
                   </div>
                 </div>
@@ -51,7 +53,7 @@ const ConnectForm = () => {
                   <div>
                     <h3 className="font-semibold">Location</h3>
                     <p className="text-lg text-gray-600 dark:text-gray-400">
-                      Berlin, Germany
+                      {location}
                     </p>
                   </div>
                 </div>

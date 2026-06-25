@@ -5,6 +5,7 @@ const Imprint = () => {
   const name = process.env.NEXT_PUBLIC_IMPRESSUM_NAME || ''
   const street = process.env.NEXT_PUBLIC_IMPRESSUM_STREET || ''
   const city = process.env.NEXT_PUBLIC_IMPRESSUM_CITY || ''
+  const country = process.env.NEXT_PUBLIC_IMPRESSUM_COUNTRY || ''
   // const phone = process.env.NEXT_PUBLIC_IMPRESSUM_PHONE || ''
   const email = process.env.NEXT_PUBLIC_IMPRESSUM_EMAIL || ''
 
@@ -53,7 +54,7 @@ const Imprint = () => {
           <br />
           {city}
           <br />
-          Germany
+          {country}
         </p>
 
         <h3 className="mt-5 mb-1 text-base font-medium">
@@ -101,7 +102,7 @@ const Imprint = () => {
           <br />
           {city}
           <br />
-          Germany
+          {country}
           <br />
           Email:{' '}
           <a
@@ -151,7 +152,7 @@ const Imprint = () => {
           Consumer dispute resolution
         </h2>
         <p className="leading-relaxed opacity-80">
-          The European Commission's online dispute resolution platform was
+          The European Commission&apos;s online dispute resolution platform was
           discontinued on July 20, 2025. As a B2B service provider, I am not
           required to participate in consumer arbitration proceedings.
         </p>

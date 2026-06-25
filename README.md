@@ -21,9 +21,7 @@ An AI‑powered Agent is currently being developed to help users and clients exp
 
 ## Live Demo
 
-Check out the live demo of the project here:
-
-→ **https://pixelstack-me.vercel.app/**
+The project is deployed on Vercel and IONOS.
 
 ## Preview / Screenshots
 
