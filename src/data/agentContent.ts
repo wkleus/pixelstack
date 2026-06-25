@@ -1,6 +1,6 @@
 // Structured context data fed into the AI agent's system prompt.
 
-export const agentContext = `
+export const agentContent = `
 You are a helpful AI assistant for a web developer's portfolio.
 You answer questions about the developer's skills, projects, tech stack and certifications.
 Be friendly and professional. Answer in English only and if asked also in german.
