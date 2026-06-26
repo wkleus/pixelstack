@@ -10,6 +10,8 @@ import {
   FaCircle,
 } from 'react-icons/fa6'
 import { FaTimes } from 'react-icons/fa'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { motion, AnimatePresence } from 'framer-motion'
 import { usePathname } from 'next/navigation'
 
@@ -123,7 +125,43 @@ const AgentWidget = () => {
                         : 'rounded-tl-none border-1 border-gray-200/50 bg-white text-gray-800 shadow-sm dark:border-cyan-500/20 dark:bg-gray-800 dark:text-gray-100'
                     }`}
                   >
-                    {msg.content}
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        strong: ({ children }) => (
+                          <strong className="font-bold text-cyan-400">
+                            {children}
+                          </strong>
+                        ),
+                        em: ({ children }) => (
+                          <em className="text-amber-300 italic">{children}</em>
+                        ),
+                        code: ({ children }) => (
+                          <code className="rounded bg-gray-200/50 px-1 py-0.5 font-mono text-xs dark:bg-gray-700/50">
+                            {children}
+                          </code>
+                        ),
+                        a: ({ href, children }) => {
+                          console.log('Link founded:', href) // debug: checking whether links are detected
+                          return (
+                            <a
+                              href={href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-cyan-400 underline transition-colors hover:text-cyan-300 hover:underline-offset-2"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                console.log('Link clicked:', href)
+                              }}
+                            >
+                              {children}
+                            </a>
+                          )
+                        },
+                      }}
+                    >
+                      {msg.content}
+                    </ReactMarkdown>
                   </div>
                 </div>
               ))
