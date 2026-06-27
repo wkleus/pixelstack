@@ -15,18 +15,23 @@ export interface AgentContext {
 
 // get the complete agent context with dynamic data
 // in development mode: read from agent-prompt.txt
-// in production mode: read from VERCEL_AGENT_CONTEXT env var
+// in production mode: read from AGENT_CONTEXT_* env var
 export const getAgentContext = (): AgentContext => {
   let systemPrompt: string
 
   // in production mode using Vercel environment variable
   if (process.env.NODE_ENV === 'production') {
-    // stored in VERCEL_AGENT_CONTEXT: structured context data fed into the AI agent's system prompt
-    systemPrompt = process.env.VERCEL_AGENT_CONTEXT || ''
+    // stored in AGENT_CONTEXT_*: structured context data fed into the AI agent's system prompt
+    systemPrompt = (
+      (process.env.AGENT_CONTEXT_1 ?? '') +
+      (process.env.AGENT_CONTEXT_2 ?? '') +
+      (process.env.AGENT_CONTEXT_3 ?? '') +
+      (process.env.AGENT_CONTEXT_4 ?? '')
+    ).trim()
 
     // fallback if env var is not set
     if (!systemPrompt) {
-      console.warn('VERCEL_AGENT_CONTEXT not set, using default prompt')
+      console.warn('AGENT_CONTEXT_* is not set, using default prompt')
       systemPrompt =
         'You are a helpful assistant for a web developer portfolio.'
     }

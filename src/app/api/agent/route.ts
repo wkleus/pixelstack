@@ -86,6 +86,12 @@ export async function POST(request: Request) {
     /* get agent context with dynamic data */
     const { systemPrompt, currentDate, timestamp } = getAgentContext()
 
+    // DEBUG: log context in development
+    console.log('CONTEXT_1 length:', process.env.AGENT_CONTEXT_1?.length ?? 0)
+    console.log('CONTEXT_2 length:', process.env.AGENT_CONTEXT_2?.length ?? 0)
+    console.log('CONTEXT_3 length:', process.env.AGENT_CONTEXT_3?.length ?? 0)
+    console.log('CONTEXT_4 length:', process.env.AGENT_CONTEXT_4?.length ?? 0)
+
     // enhanced system prompt with dynamic context
     const enhancedSystemPrompt = `
         ${systemPrompt}
