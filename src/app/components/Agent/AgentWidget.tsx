@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAgent } from '@/app/hooks/useAgent'
 import {
   FaRobot,
@@ -20,6 +20,12 @@ const AgentWidget = () => {
   const { messages, input, setInput, isLoading, sendMessage, handleKeyDown } =
     useAgent()
   const pathname = usePathname()
+
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
 
   return (
     <>
@@ -163,6 +169,7 @@ const AgentWidget = () => {
                       {msg.content}
                     </ReactMarkdown>
                   </div>
+                  <div ref={messagesEndRef} />
                 </div>
               ))
             )}
