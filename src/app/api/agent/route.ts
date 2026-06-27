@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { getAgentContext, logAgentContext } from '@/data/agentContext'
 
+// cheapest deepseek model: 'deepseek-v4-flash',
+const MODEL = process.env.DEEPSEEK_MODEL || 'deepseek-v4-flash'
+
 // DeepSeek API client (OpenAI-compatible)
 const client = new OpenAI({
   baseURL: 'https://api.deepseek.com',
@@ -114,8 +117,9 @@ export async function POST(request: Request) {
 
     /* call DeepSeek API */
     const response = await client.chat.completions.create({
-      model: 'deepseek-chat',
-      max_tokens: 1024,
+      model: MODEL,
+      // model: 'deepseek-chat', // = alternative model -> more expensive than deepseek-v4-flash
+      max_tokens: 1024, // alternative: 1024
       temperature: 0.7, // balanced creativity vs consistency
       messages: [
         { role: 'system', content: enhancedSystemPrompt },
