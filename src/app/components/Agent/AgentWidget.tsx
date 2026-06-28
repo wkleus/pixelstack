@@ -2,13 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useAgent } from '@/app/hooks/useAgent'
-import {
-  FaRobot,
-  FaUser,
-  FaPaperPlane,
-  //   FaChevronDown,
-  FaCircle,
-} from 'react-icons/fa6'
+import { FaRobot, FaUser, FaPaperPlane, FaCircle } from 'react-icons/fa6'
 import { FaTimes } from 'react-icons/fa'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -39,15 +33,14 @@ const AgentWidget = () => {
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.3, ease: 'easeInOut' }}
             onClick={() => setIsOpen((prev) => !prev)}
-            className="fixed right-5 bottom-5 z-50 flex cursor-pointer items-center gap-3 rounded-xl border border-white/20 bg-gradient-to-r from-cyan-600/30 to-cyan-800/90 px-2 py-2 font-medium text-white shadow-xl shadow-cyan-500/20 transition-all duration-200 hover:scale-103 hover:shadow-2xl hover:shadow-cyan-500/40"
+            className="fixed right-5 bottom-5 z-50 flex cursor-pointer items-center gap-3 rounded-xl border border-cyan-500 px-2 py-2 font-medium text-white shadow-xl shadow-cyan-500/20 transition-all duration-200 hover:scale-103 hover:shadow-2xl hover:shadow-cyan-500/40 dark:border-cyan-500/60 dark:bg-gradient-to-r dark:from-cyan-600/30 dark:to-cyan-800/90"
           >
             <div className="flex flex-col items-center gap-0.5 leading-none">
-              <FaRobot className="text-3xl text-amber-400" />
+              <FaRobot className="text-3xl text-amber-500 dark:text-amber-400" />
               <span className="text-xs tracking-wider text-amber-400">
-                <em className="text-cyan-400">Pixel</em>
-                <em>Stack</em>
+                <em className="text-cyan-600 dark:text-cyan-400">Pixel</em>
+                <em className="text-amber-600 dark:text-amber-400">Stack</em>
               </span>
-              {/* <FaChevronDown className="text-xs text-amber-400 opacity-80" /> */}
             </div>
           </motion.button>
         )}
@@ -62,18 +55,18 @@ const AgentWidget = () => {
           className="fixed right-3 bottom-20 z-50 flex h-[500px] w-[350px] flex-col overflow-hidden rounded-2xl border border-gray-200/50 bg-white shadow-2xl shadow-black/20 transition-all duration-300 dark:border-gray-700/50 dark:bg-gray-900 dark:shadow-black/50"
         >
           {/* HEADER */}
-          <div className="flex items-center justify-between bg-gradient-to-r from-cyan-600/30 to-cyan-800/90 px-3 py-3 text-white">
+          <div className="flex items-center justify-between border-b-1 border-gray-500/40 px-3 py-3 text-white dark:bg-gradient-to-r dark:from-cyan-600/30 dark:to-cyan-800/90">
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-                <FaRobot className="text-xl text-amber-400" />
+                <FaRobot className="text-xl text-amber-400 dark:text-amber-400" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-amber-400">
+                <h3 className="text-sm font-semibold text-amber-500 dark:text-amber-400">
                   PixelStack AI
                 </h3>
                 <div className="flex items-center gap-1.5 text-[10px] opacity-90">
                   <FaCircle className="text-[7px] text-green-300" />
-                  <span className="text-amber-100">online</span>
+                  <span className="text-green-400">online</span>
                 </div>
               </div>
             </div>
@@ -81,7 +74,7 @@ const AgentWidget = () => {
               onClick={() => setIsOpen(false)}
               className="flex h-5 w-6 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-white/20"
             >
-              <FaTimes className="rounded-xl border p-1 text-2xl text-amber-400/70" />
+              <FaTimes className="rounded-xl border p-1 text-2xl text-amber-500/70" />
             </button>
           </div>
 
@@ -120,8 +113,8 @@ const AgentWidget = () => {
                   <div
                     className={`mt-3 -mr-3 -mb-1 max-w-[80%] rounded-2xl px-2 py-1.5 text-sm ${
                       msg.role === 'user'
-                        ? 'rounded-tr-none border-1 border-cyan-500/40 bg-gray-900 bg-gradient-to-br text-white shadow-md shadow-blue-500/20'
-                        : 'rounded-tl-none border-1 border-gray-200/50 bg-white text-gray-800 shadow-sm dark:border-cyan-500/20 dark:bg-gray-800 dark:text-gray-100'
+                        ? 'darkbg-gradient-to-br rounded-tr-none border-1 border-cyan-500/40 shadow-md shadow-blue-500/20 dark:bg-gray-900 dark:text-white'
+                        : 'rounded-tl-none border-1 border-gray-200/50 bg-white text-gray-800 shadow-sm dark:border-cyan-500/30 dark:bg-gray-800 dark:text-gray-100'
                     }`}
                   >
                     <ReactMarkdown
