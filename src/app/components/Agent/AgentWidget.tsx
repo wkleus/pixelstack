@@ -9,17 +9,56 @@ import remarkGfm from 'remark-gfm'
 import { motion, AnimatePresence } from 'framer-motion'
 import { usePathname } from 'next/navigation'
 
+// Returns a proactive message based on the current page
+function getProactiveMessage(pathname: string): string {
+  if (pathname === '/portfolio')
+    return 'Want me to explain any of these projects?'
+  if (pathname === '/connect') return 'Need help filling out the contact form?'
+  if (pathname === '/profile')
+    return "Want to know more about the developer's background or certifications?"
+  return "Hi! I'm PixelStack — ask me anything about this developer's skills or projects."
+}
+
 const AgentWidget = () => {
   const [isOpen, setIsOpen] = useState(false)
-  const { messages, input, setInput, isLoading, sendMessage, handleKeyDown } =
-    useAgent()
+  const [hasShownProactive, setHasShownProactive] = useState(false)
+
+  const {
+    messages,
+    input,
+    setInput,
+    isLoading,
+    sendMessage,
+    handleKeyDown,
+    addMessage,
+  } = useAgent()
   const pathname = usePathname()
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
+  // Auto-scroll to latest message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
+
+  // Proactive behavior — opens widget automatically after 30 seconds
+  // Resets timer on every page change
+  useEffect(() => {
+    if (hasShownProactive) return // do not show again
+    if (isOpen) return // already open → do nothing
+
+    const timer = setTimeout(() => {
+      setIsOpen(true)
+      // Insert proactive message after opening
+      setTimeout(() => {
+        // addMessage function or useAgent hook supports proactive messages
+        addMessage('agent', getProactiveMessage(pathname))
+      }, 300) // small delay for animation
+      setHasShownProactive(true) // only show once per session; set it to false to show per page change
+    }, 30_000)
+
+    return () => clearTimeout(timer)
+  }, [pathname, hasShownProactive, isOpen, addMessage])
 
   return (
     <>

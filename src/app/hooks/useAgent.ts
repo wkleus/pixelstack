@@ -2,6 +2,7 @@ import { useState } from 'react'
 
 // represents a single message in the conversation
 export interface AgentMessage {
+  id?: string | number
   role: 'user' | 'assistant'
   content: string
 }
@@ -64,5 +65,28 @@ export function useAgent() {
     if (e.key === 'Enter') sendMessage()
   }
 
-  return { messages, input, setInput, isLoading, sendMessage, handleKeyDown }
+  // addMessage: insert a message into the conversation (e.g. for proactive messages)
+  // 'agent' is normalized to 'assistant' for consistency.
+  const addMessage = (
+    role: 'user' | 'agent' | 'assistant',
+    content: string,
+  ) => {
+    const normalizedRole = role === 'agent' ? 'assistant' : role
+    const newMessage: AgentMessage = {
+      id: Date.now(),
+      role: normalizedRole,
+      content,
+    }
+    setMessages((prev) => [...prev, newMessage])
+  }
+
+  return {
+    messages,
+    input,
+    setInput,
+    isLoading,
+    sendMessage,
+    handleKeyDown,
+    addMessage,
+  }
 }
