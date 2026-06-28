@@ -6,7 +6,7 @@ import {
   FaRobot,
   FaUser,
   FaPaperPlane,
-  FaChevronDown,
+  //   FaChevronDown,
   FaCircle,
 } from 'react-icons/fa6'
 import { FaTimes } from 'react-icons/fa'
@@ -29,31 +29,28 @@ const AgentWidget = () => {
 
   return (
     <>
-      {/* FLOATING TOGGLE BUTTON - with AnimatePresence and key */}
+      {/* FLOATING TOGGLE BUTTON - only visible when chat is closed */}
       <AnimatePresence mode="wait">
-        <motion.button
-          key={pathname} // key changes when page changes
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 2, ease: 'easeInOut' }}
-          onClick={() => setIsOpen((prev) => !prev)}
-          className="fixed right-5 bottom-5 z-50 flex cursor-pointer items-center gap-3 rounded-xl border border-white/20 bg-gradient-to-r from-cyan-600/30 to-cyan-800/90 px-2 py-2 font-medium text-white shadow-xl shadow-cyan-500/20 transition-all duration-200 hover:scale-103 hover:shadow-2xl hover:shadow-cyan-500/40"
-        >
-          {isOpen ? (
-            <>
-              <FaTimes className="text-sm text-amber-300" />
-              <span className="text-sm text-amber-300">Close</span>
-            </>
-          ) : (
+        {!isOpen && (
+          <motion.button
+            key={pathname}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            onClick={() => setIsOpen((prev) => !prev)}
+            className="fixed right-5 bottom-5 z-50 flex cursor-pointer items-center gap-3 rounded-xl border border-white/20 bg-gradient-to-r from-cyan-600/30 to-cyan-800/90 px-2 py-2 font-medium text-white shadow-xl shadow-cyan-500/20 transition-all duration-200 hover:scale-103 hover:shadow-2xl hover:shadow-cyan-500/40"
+          >
             <div className="flex flex-col items-center gap-0.5 leading-none">
               <FaRobot className="text-3xl text-amber-400" />
               <span className="text-xs tracking-wider text-amber-400">
                 <em className="text-cyan-400">Pixel</em>
                 <em>Stack</em>
               </span>
+              {/* <FaChevronDown className="text-xs text-amber-400 opacity-80" /> */}
             </div>
-          )}
-        </motion.button>
+          </motion.button>
+        )}
       </AnimatePresence>
 
       {/* CHAT WINDOW */}
@@ -62,7 +59,7 @@ const AgentWidget = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.7, ease: 'easeInOut' }}
-          className="animate-in slide-in-from-bottom-4 fade-in fixed right-3 bottom-20 z-50 flex h-[500px] w-[350px] flex-col overflow-hidden rounded-2xl border border-gray-200/50 bg-white shadow-2xl shadow-black/20 transition-all duration-300 dark:border-gray-700/50 dark:bg-gray-900 dark:shadow-black/50"
+          className="fixed right-3 bottom-20 z-50 flex h-[500px] w-[350px] flex-col overflow-hidden rounded-2xl border border-gray-200/50 bg-white shadow-2xl shadow-black/20 transition-all duration-300 dark:border-gray-700/50 dark:bg-gray-900 dark:shadow-black/50"
         >
           {/* HEADER */}
           <div className="flex items-center justify-between bg-gradient-to-r from-cyan-600/30 to-cyan-800/90 px-3 py-3 text-white">
@@ -144,7 +141,7 @@ const AgentWidget = () => {
                           </code>
                         ),
                         a: ({ href, children }) => {
-                          console.log('Link founded:', href) // debug: checking whether links are detected
+                          console.log('Link founded:', href)
                           return (
                             <a
                               href={href}
