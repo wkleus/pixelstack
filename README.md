@@ -14,10 +14,8 @@
 [![Status: Deployed](https://img.shields.io/badge/Status-Deployed-22c55e?style=for-the-badge)](/)
 [![Status: Live](https://img.shields.io/badge/Status-Live-22c55e?style=for-the-badge)](https://pixelstack.me)
 
-An animated and responsive portfolio for web apps — built with **Next.js**, **TypeScript**, **React.js**, **Tailwind CSS**, **Framer Motion** and **Resend**.
-Features: portfolio showcase, blog system, contact form with real email delivery and auto-reply, newsletter subscription with admin notification, search for portfolio and posts, interactive grid hero section with mouse tracking, profile page and dark/light mode. All emails delivered via Resend.
-
-An AI‑powered Agent is currently being developed to help users and clients explore my projects, skills, and IT background.
+An animated and responsive portfolio for web apps — built with **Next.js**, **TypeScript**, **React.js**, **Tailwind CSS**, **Framer Motion**, **Resend** and **DeepSeek**.
+Features: portfolio showcase, blog system, contact form with real email delivery and auto-reply, newsletter subscription with admin notification, search for portfolio and posts, interactive grid hero section with mouse tracking, profile page, dark/light mode and an AI-powered assistant (PixelStack AI). All emails delivered via Resend.
 
 ## Live Demo
 
@@ -61,11 +59,18 @@ The project is deployed on Vercel and IONOS.
 <em>Dark mode theme using custom ThemeContext</em>
 </p>
 
+<p align="center">
+<img src="public/preview/AI_assistant.png" width="700" alt="AI assistant preview" />
+<br />
+<em>AI-powered assistant (right side of the screenshot)</em>
+</p>
+
 ## Table of Contents
 
 - [Features](#features)
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
+- [AI Assistant](#ai-assistant)
 - [Contact Form & Email](#contact-form--email)
 - [Newsletter](#newsletter)
 - [Interactive Grid](#interactive-grid)
@@ -92,6 +97,7 @@ The project is deployed on Vercel and IONOS.
 - **Contact form** with real email delivery via Resend (`/api/connect`)
   -> includes client & server-side validation, XSS sanitization, rate limiting and auto-reply to sender
 - **Newsletter** subscription with admin email notification via Resend (`/api/newsletter`)
+- **PixelStack AI assistant** — floating chat widget powered by DeepSeek, answers questions about skills, projects, tech stack and certifications (`/api/agent`)
 - **Mobile navigation** with hamburger menu
 - **Footer** with social links and branding
 - **Imprint** with privacy policy and legal informations
@@ -101,10 +107,12 @@ The project is deployed on Vercel and IONOS.
 | Layer      | Technology                              |
 | ---------- | --------------------------------------- |
 | Framework  | Next.js 16 (App Router)                 |
-| Language   | TypeScript 5                            |
+| Language   | TypeScript 5 (strict mode)              |
 | UI         | React 19, Tailwind CSS 4, Framer Motion |
 | Icons      | Heroicons, React Icons                  |
 | Email      | Resend SDK                              |
+| AI         | DeepSeek API (OpenAI-compatible)        |
+| Markdown   | react-markdown + remark-gfm             |
 | Testing    | Jest, Playwright                        |
 | Deployment | Vercel + IONOS (custom domain)          |
 
@@ -119,8 +127,10 @@ The project is deployed on Vercel and IONOS.
 │   ├── 📂 app
 │   │   ├── 📂 api
 │   │   │   ├── 📂 newsletter       # Newsletter subscription endpoint
+│   │   │   ├── 📂 agent           # AI assistant endpoint (DeepSeek)
 │   │   │   └── 📂 connect          # Contact form API endpoint with email
 │   │   ├── 📂 components           # Reusable UI components
+│   │   │   ├── 📂 Agent            # AI assistant chat widget
 │   │   │   ├── 📂 Connect          # Contact form (hook + component)
 │   │   │   ├── 📂 Footer           # Footer with social links
 │   │   │   ├── 📂 Header           # Header + theme toggle
@@ -137,8 +147,13 @@ The project is deployed on Vercel and IONOS.
 │   │
 │   ├── 📂 data                     # Static content
 │   │   ├── 📂 content              # Blog post details
+│   │   ├── 📄 agentContext.ts      # AI assistant system prompt
 │   │   ├── 📄 posts.ts             # Blog metadata
 │   │   └── 📄 portfolio.ts         # Portfolio data
+│   │
+│   ├── 📂 hooks                    # Custom React hooks
+│   │   ├── 📄 useAgent.ts          # AI assistant state & fetch logic
+│   │   └── 📄 useSearch.ts         # Generic search/filter hook
 │   │
 │   └── 📂 types                    # TypeScript definitions
 │
@@ -158,6 +173,45 @@ The project is deployed on Vercel and IONOS.
 ```
 
 ---
+
+## AI Assistant
+
+**PixelStack AI** is an AI-powered assistant built into the portfolio as a floating chat widget, visible on every page.
+
+It answers questions about the developer's skills, projects, tech stack, blog posts and certifications — powered by **[DeepSeek](https://deepseek.com)** via an OpenAI-compatible API.
+
+### How it works
+
+The assistant uses a structured system prompt (`agentContext.ts`) containing all portfolio data. This context is sent with every request so DeepSeek has full knowledge of the developer's background.
+
+The full conversation history is included in each API call — giving the assistant memory of the current session.
+
+### Features
+
+- Floating chat button visible on all pages
+- Markdown rendering in responses (`react-markdown` + `remark-gfm`)
+- Custom styling for bold, italic, code and links
+- Animated typing indicator (bouncing dots)
+- Auto-scroll to latest message via `useRef`
+- Sliding window rate limiter with memory cleanup
+- `Retry-After` header on 429 responses
+- Model configurable via `DEEPSEEK_MODEL` environment variable
+- Dynamic context with current date and session info
+
+### Environment Variables
+
+```bash
+DEEPSEEK_API_KEY=sk-xxxxxxxxxxxxxxxxxx
+DEEPSEEK_MODEL=deepseek-v4-flash
+```
+
+### Example Questions
+
+- "What skills do you have?"
+- "What projects have you built?"
+- "Explain HomeSphere."
+- "What certifications do you have?"
+- "What is your tech stack?"
 
 ## Contact Form & Email
 
