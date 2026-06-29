@@ -2,7 +2,13 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useAgent } from '@/app/hooks/useAgent'
-import { FaRobot, FaUser, FaPaperPlane, FaCircle } from 'react-icons/fa6'
+import {
+  FaRobot,
+  FaUser,
+  FaPaperPlane,
+  FaCircle,
+  FaTrash,
+} from 'react-icons/fa6'
 import { FaTimes } from 'react-icons/fa'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -31,6 +37,7 @@ const AgentWidget = () => {
     sendMessage,
     handleKeyDown,
     addMessage,
+    clearMessages,
   } = useAgent()
   const pathname = usePathname()
 
@@ -109,12 +116,27 @@ const AgentWidget = () => {
                 </div>
               </div>
             </div>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="flex h-5 w-6 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-white/20"
-            >
-              <FaTimes className="rounded-xl border p-1 text-2xl text-amber-500/70" />
-            </button>
+            <div className="flex items-center gap-2">
+              {/* Clear chat button — only visible when messages exist */}
+              {messages.length > 0 && (
+                <button
+                  onClick={clearMessages}
+                  aria-label="Clear chat history"
+                  title="Clear chat"
+                  className="flex h-5 w-6 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-white/20"
+                >
+                  <FaTrash className="rounded-xl border p-1 text-2xl text-amber-500/70 hover:text-amber-400" />
+                </button>
+              )}
+
+              {/* Close button */}
+              <button
+                onClick={() => setIsOpen(false)}
+                className="flex h-5 w-6 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-white/20"
+              >
+                <FaTimes className="rounded-xl border p-1 text-2xl text-amber-500/70" />
+              </button>
+            </div>
           </div>
 
           {/* MESSAGES AREA */}
