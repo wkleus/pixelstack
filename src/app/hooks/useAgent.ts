@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+
+const STORAGE_KEY = 'pixelstack-agent-messages'
 
 // represents a single message in the conversation
 export interface AgentMessage {
@@ -12,9 +14,30 @@ export interface AgentMessage {
 //          - input: current text in input field
 //          - isLoading: true while waiting for a response from API
 export function useAgent() {
-  const [messages, setMessages] = useState<AgentMessage[]>([])
+  // load messages from localStorage on first render, fall back to empty array
+  const [messages, setMessages] = useState<AgentMessage[]>(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY)
+      return stored ? (JSON.parse(stored) as AgentMessage[]) : []
+    } catch {
+      return []
+    }
+  })
+
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+
+  // persist messages to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(messages))
+    } catch {
+      // localStorage might be unavailable (e.g. private browsing in some browsers)
+      console.warn(
+        'localStorage unavailable — conversation will not be persisted.',
+      )
+    }
+  }, [messages])
 
   // sendMessage: main function to drive the conversation
   const sendMessage = async () => {
@@ -80,6 +103,12 @@ export function useAgent() {
     setMessages((prev) => [...prev, newMessage])
   }
 
+  // clear conversation history from state and localStorage
+  const clearMessages = () => {
+    setMessages([])
+    localStorage.removeItem(STORAGE_KEY)
+  }
+
   return {
     messages,
     input,
@@ -88,5 +117,6 @@ export function useAgent() {
     sendMessage,
     handleKeyDown,
     addMessage,
+    clearMessages,
   }
 }
