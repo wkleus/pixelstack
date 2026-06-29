@@ -70,27 +70,27 @@ const AgentWidget = () => {
   return (
     <>
       {/* FLOATING TOGGLE BUTTON - only visible when chat is closed */}
-      <AnimatePresence mode="wait">
-        {!isOpen && (
-          <motion.button
-            key={pathname}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
-            onClick={() => setIsOpen((prev) => !prev)}
-            className="fixed right-5 bottom-5 z-50 flex cursor-pointer items-center gap-3 rounded-xl border border-cyan-500 px-2 py-2 font-medium text-white shadow-xl shadow-cyan-500/20 transition-all duration-200 hover:scale-103 hover:shadow-2xl hover:shadow-cyan-500/40 dark:border-cyan-500/60 dark:bg-gradient-to-r dark:from-cyan-600/30 dark:to-cyan-800/90"
-          >
-            <div className="flex flex-col items-center gap-0.5 leading-none">
-              <FaRobot className="text-3xl text-amber-500 dark:text-amber-400" />
-              <span className="text-xs tracking-wider text-amber-400">
-                <em className="text-cyan-600 dark:text-cyan-400">Pixel</em>
-                <em className="text-amber-600 dark:text-amber-400">Stack</em>
-              </span>
-            </div>
-          </motion.button>
-        )}
-      </AnimatePresence>
+      {/* <AnimatePresence mode="wait"> */}
+      {!isOpen && (
+        <motion.button
+          key={pathname}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          transition={{ duration: 1, ease: 'easeInOut' }}
+          onClick={() => setIsOpen((prev) => !prev)}
+          className="fixed right-5 bottom-5 z-50 flex cursor-pointer items-center gap-3 rounded-xl border border-cyan-500 px-2 py-2 font-medium text-white shadow-xl shadow-cyan-500/20 transition-all duration-200 hover:scale-103 hover:shadow-2xl hover:shadow-cyan-500/40 dark:border-cyan-500/60 dark:bg-gradient-to-r dark:from-cyan-600/30 dark:to-cyan-800/90"
+        >
+          <div className="flex flex-col items-center gap-0.5 leading-none">
+            <FaRobot className="text-3xl text-amber-500 dark:text-amber-400" />
+            <span className="text-xs tracking-wider text-amber-400">
+              <em className="text-cyan-600 dark:text-cyan-400">Pixel</em>
+              <em className="text-amber-600 dark:text-amber-400">Stack</em>
+            </span>
+          </div>
+        </motion.button>
+      )}
+      {/* </AnimatePresence> */}
 
       {/* CHAT WINDOW */}
       {isOpen && (
@@ -139,8 +139,8 @@ const AgentWidget = () => {
             </div>
           </div>
 
-          {/* MESSAGES AREA */}
-          <div className="flex-1 space-y-3 overflow-y-auto bg-gray-50/50 px-3 py-6 dark:bg-gray-900/50">
+          {/* MESSAGES AREA - with styled scrollbar */}
+          <div className="flex-1 space-y-3 overflow-y-auto bg-gray-50/50 px-3 py-6 dark:bg-gray-900/50 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-400/40 [&::-webkit-scrollbar-thumb]:transition-colors hover:[&::-webkit-scrollbar-thumb]:bg-cyan-400/60 [&::-webkit-scrollbar-track]:bg-transparent">
             {messages.length === 0 ? (
               <div className="flex h-full flex-col items-center justify-center text-center text-gray-400 dark:text-gray-500">
                 <FaRobot className="mb-3 text-4xl text-cyan-800/90" />
