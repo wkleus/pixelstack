@@ -25,6 +25,33 @@ function getProactiveMessage(pathname: string): string {
   return "Hi! I'm PixelStack — ask me anything about this developer's skills or projects."
 }
 
+// reusable tooltip wrapper
+function Tooltip({
+  text,
+  position = 'top',
+  children,
+}: {
+  text: string
+  position?: 'top' | 'left'
+  children: React.ReactNode
+}) {
+  const positionClass =
+    position === 'left'
+      ? 'right-full top-2 mr-2 -translate-y-1/2'
+      : 'bottom-full -left-2.5 -mb-0.5 -translate-x-1/2'
+
+  return (
+    <div className="group relative flex items-center justify-center">
+      {children}
+      <span
+        className={`pointer-events-none absolute ${positionClass} b-4 z-50 mt-10 -ml-4 rounded-full rounded-br-none border border-cyan-400/50 bg-gray-700/90 px-1.5 py-0.5 text-[10px] whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 dark:bg-gray-800/80 dark:text-gray-200`}
+      >
+        {text}
+      </span>
+    </div>
+  )
+}
+
 const AgentWidget = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [hasShownProactive, setHasShownProactive] = useState(false)
@@ -143,7 +170,7 @@ const AgentWidget = () => {
           exit={{ opacity: 0, scale: 0.8 }}
           transition={{ duration: 1, ease: 'easeInOut' }}
           onClick={handleToggle}
-          className="fixed right-5 bottom-5 z-50 flex cursor-pointer items-center gap-3 rounded-xl border border-cyan-500 px-2 py-2 font-medium text-white shadow-xl shadow-cyan-500/20 transition-all duration-200 hover:scale-103 hover:shadow-2xl hover:shadow-cyan-500/40 dark:border-cyan-500/60 dark:bg-gradient-to-r dark:from-cyan-600/30 dark:to-cyan-800/90"
+          className="group fixed right-5 bottom-5 z-50 flex cursor-pointer items-center gap-3 rounded-xl border border-cyan-500 px-2 py-2 font-medium text-white shadow-xl shadow-cyan-500/20 transition-all duration-200 hover:scale-103 hover:shadow-2xl hover:shadow-cyan-500/40 dark:border-cyan-500/60 dark:bg-gradient-to-r dark:from-cyan-600/30 dark:to-cyan-800/90"
         >
           {/* pulsing ring animation - only when chat is closed */}
           {unreadCount > 0 && (
@@ -164,6 +191,11 @@ const AgentWidget = () => {
               </span>
             )}
           </div>
+
+          {/* tooltip — inline on fixed button */}
+          <span className="pointer-events-none absolute -top-3 right-full -mr-2 -translate-y-1/2 rounded-full rounded-br-none border border-cyan-400/50 bg-gray-200 px-2 py-2 text-[10px] whitespace-nowrap text-gray-700 opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 dark:bg-gray-800 dark:text-gray-200">
+            Chat with <p>PixelStack AI</p>
+          </span>
         </motion.button>
       )}
 
@@ -195,23 +227,27 @@ const AgentWidget = () => {
               <div className="flex items-center gap-2">
                 {/* clear chat button — only visible when messages exist */}
                 {messages.length > 0 && (
-                  <button
-                    onClick={handleClearMessages}
-                    aria-label="Clear chat history"
-                    title="Clear chat"
-                    className="flex h-5 w-6 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-white/20"
-                  >
-                    <FaTrash className="rounded-xl border p-1 text-2xl text-amber-500/70 hover:text-amber-400" />
-                  </button>
+                  <Tooltip text="Clear chat history">
+                    <button
+                      onClick={handleClearMessages}
+                      aria-label="Clear chat history"
+                      title="Clear chat"
+                      className="flex h-5 w-6 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-white/20"
+                    >
+                      <FaTrash className="rounded-xl border p-1 text-2xl text-amber-500/70 hover:text-amber-400" />
+                    </button>
+                  </Tooltip>
                 )}
 
                 {/* close button */}
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="flex h-5 w-6 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-white/20"
-                >
-                  <FaTimes className="rounded-xl border p-1 text-2xl text-amber-500/70" />
-                </button>
+                <Tooltip text="Close chat">
+                  <button
+                    onClick={() => setIsOpen(false)}
+                    className="flex h-5 w-6 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-white/20"
+                  >
+                    <FaTimes className="rounded-xl border p-1 text-2xl text-amber-500/70" />
+                  </button>{' '}
+                </Tooltip>
               </div>
             </div>
 
@@ -336,13 +372,15 @@ const AgentWidget = () => {
                   }
                   className="text-md flex-1 border-none bg-transparent text-gray-800 outline-none placeholder:text-gray-400 disabled:opacity-60 dark:text-gray-200 dark:placeholder:text-gray-500"
                 />
-                <button
-                  onClick={sendMessage}
-                  disabled={!input.trim() || isLoading}
-                  className="m-0.5 flex h-8 w-8 flex-shrink-0 cursor-pointer items-center justify-center rounded-full bg-gradient-to-r from-cyan-600 to-cyan-700/90 text-white transition-all hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/30 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <FaPaperPlane className="text-sm" />
-                </button>
+                <Tooltip text="Send message">
+                  <button
+                    onClick={sendMessage}
+                    disabled={!input.trim() || isLoading}
+                    className="m-0.5 flex h-8 w-8 flex-shrink-0 cursor-pointer items-center justify-center rounded-full bg-gradient-to-r from-cyan-600 to-cyan-700/90 text-white transition-all hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/30 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <FaPaperPlane className="text-sm" />
+                  </button>
+                </Tooltip>
               </div>
               <div className="mt-2 text-center text-[10px] text-gray-400 dark:text-gray-500">
                 <span>Encrypted • Instant answers</span>
