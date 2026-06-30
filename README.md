@@ -45,7 +45,7 @@ The project is deployed on Vercel and IONOS.
 <p align="center">
 <img src="public/preview/contact-page.png" width="700" alt="Contact page preview" />
 <br />
-<em>Contact form with API integration</em>
+<em>Contact form with API integration and Unread-Badge</em>
 </p>
 
 <p align="center">
@@ -61,7 +61,7 @@ The project is deployed on Vercel and IONOS.
 </p>
 
 <p align="center">
-<img src="public/preview/AI_assistant.png" width="700" alt="AI assistant preview" />
+<img src="public/preview/AI-assistant.png" width="700" alt="AI assistant preview" />
 <br />
 <em>AI-powered assistant (right side of the screenshot)</em>
 </p>
