@@ -8,6 +8,7 @@
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![Framer Motion](https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white)](https://www.framer.com/motion/)
 [![React Icons](https://img.shields.io/badge/React_Icons-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react-icons.github.io/react-icons/)
+[![DeepSeek](https://img.shields.io/badge/DeepSeek-4D6BFE?style=for-the-badge&logo=deepseek&logoColor=white)](https://deepseek.com/)
 [![Search](https://img.shields.io/badge/Search-Enabled-22c55e?style=for-the-badge&logo=search&logoColor=white)]()
 [![Jest](https://img.shields.io/badge/Jest-C21325?style=for-the-badge&logo=jest&logoColor=white)](https://jestjs.io/)
 [![Playwright](https://img.shields.io/badge/Playwright-2EADEE?style=for-the-badge&logo=playwright&logoColor=white)](https://playwright.dev/)
@@ -189,14 +190,28 @@ The full conversation history is included in each API call — giving the assist
 ### Features
 
 - Floating chat button visible on all pages
+- Proactive behavior — widget opens automatically after a certain time with a page-aware message
+- Unread message badge with pulsing ring animation when new messages arrive while chat is closed
+- Conversation history persisted via `localStorage` — chat survives page reloads and browser restarts
+- Clear chat button to reset conversation history from state and localStorage
 - Markdown rendering in responses (`react-markdown` + `remark-gfm`)
 - Custom styling for bold, italic, code and links
 - Animated typing indicator (bouncing dots)
 - Auto-scroll to latest message via `useRef`
+- Custom styled scrollbar in messages area
 - Sliding window rate limiter with memory cleanup
 - `Retry-After` header on 429 responses
 - Model configurable via `DEEPSEEK_MODEL` environment variable
 - Dynamic context with current date and session info
+
+### Proactive Messages by Page
+
+| Page           | Message                                                                           |
+| -------------- | --------------------------------------------------------------------------------- |
+| `/` (homepage) | "Hi! I'm PixelStack — ask me anything about this developer's skills or projects." |
+| `/portfolio`   | "Want me to explain any of these projects?"                                       |
+| `/connect`     | "Need help filling out the contact form?"                                         |
+| `/profile`     | "Want to know more about the developer's background or certifications?"           |
 
 ### Environment Variables
 
@@ -305,6 +320,7 @@ The agent will:
 
 ### More Features Planned
 
+- Continuous refinement of the AI agent to deliver smarter, faster, more robust automation
 - Language Switcher (EN/DE)
 - Custom 404 Page
 
