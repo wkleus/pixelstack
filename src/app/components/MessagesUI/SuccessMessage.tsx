@@ -1,22 +1,42 @@
-import { motion } from 'framer-motion'
+import { useEffect } from 'react'
 
 interface Props {
   message: string
+  onDismiss?: () => void
+  autoDismissDelay?: number
 }
 
-const SuccessMessage = ({ message }: Props) => {
+const SuccessMessage = ({
+  message,
+  onDismiss,
+  autoDismissDelay = 5000,
+}: Props) => {
+  // auto-dismiss after delay if onDismiss is provided
+  useEffect(() => {
+    if (onDismiss && autoDismissDelay > 0) {
+      const timer = setTimeout(() => {
+        onDismiss()
+      }, autoDismissDelay)
+
+      return () => clearTimeout(timer)
+    }
+  }, [onDismiss, autoDismissDelay])
+
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 10, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: 10, scale: 0.95 }}
-      transition={{ duration: 0.4, ease: 'easeOut' }}
-      className="inline-flex items-center gap-3 rounded-xl border border-green-500/20 bg-green-500/10 px-6 py-3 text-green-700 backdrop-blur-sm dark:text-green-300"
-    >
-      <span className="text-xl">✓</span>
-      {message}
-    </motion.div>
+    <div className="relative rounded-md bg-green-50 p-4 text-green-800 dark:bg-green-900/20 dark:text-green-200">
+      <div className="flex items-center justify-between">
+        <p className="flex-1">{message}</p>
+        {onDismiss && (
+          <button
+            onClick={onDismiss}
+            className="ml-4 text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-200"
+            aria-label="Dismiss message"
+          >
+            <span className="text-xl font-bold">×</span>
+          </button>
+        )}
+      </div>
+    </div>
   )
 }
 

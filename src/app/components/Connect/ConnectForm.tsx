@@ -9,7 +9,9 @@ import { FaMapLocationDot } from 'react-icons/fa6'
 import Link from 'next/link'
 
 const ConnectForm = () => {
-  const { formData, status, handleChange, handleSubmit } = useConnectForm()
+  const { formData, status, errors, handleChange, handleSubmit, isSubmitting } =
+    useConnectForm()
+
   const email = process.env.NEXT_PUBLIC_EMAIL
   const location = process.env.NEXT_PUBLIC_LOCATION
 
@@ -67,63 +69,122 @@ const ConnectForm = () => {
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Name */}
             <div>
-              <label className="mb-2 block text-sm font-medium">Name</label>
+              <label htmlFor="name" className="mb-2 block text-sm font-medium">
+                Name
+              </label>
               <input
+                id="name"
                 required
+                disabled={isSubmitting}
                 value={formData.name}
                 onChange={handleChange}
                 name="name"
                 placeholder="Your name..."
-                className="dark:bg-dark focus:ring-primary w-full rounded-md border border-gray-300 bg-white px-4 py-2 placeholder:text-gray-400 focus:ring-2 dark:border-gray-700"
+                className="dark:bg-dark focus:ring-primary w-full rounded-md border border-gray-300 bg-white px-4 py-2 placeholder:text-gray-400 focus:ring-2 disabled:opacity-50 dark:border-gray-700"
+                aria-invalid={!!errors.name}
               />
+              {errors.name && (
+                <p className="mt-1 text-sm text-red-500">{errors.name}</p>
+              )}
             </div>
 
             {/* Email */}
             <div>
-              <label className="mb-2 block text-sm font-medium">Email</label>
+              <label htmlFor="email" className="mb-2 block text-sm font-medium">
+                Email
+              </label>
               <input
+                id="email"
                 required
+                disabled={isSubmitting}
                 value={formData.email}
                 onChange={handleChange}
                 type="email"
                 name="email"
                 placeholder="Your email..."
-                className="dark:bg-dark focus:ring-primary w-full rounded-md border border-gray-300 bg-white px-4 py-2 placeholder:text-gray-400 focus:ring-2 dark:border-gray-700"
+                className="dark:bg-dark focus:ring-primary w-full rounded-md border border-gray-300 bg-white px-4 py-2 placeholder:text-gray-400 focus:ring-2 disabled:opacity-50 dark:border-gray-700"
+                aria-invalid={!!errors.email}
               />
+              {errors.email && (
+                <p className="mt-1 text-sm text-red-500">{errors.email}</p>
+              )}
+            </div>
+
+            {/* Topic */}
+            <div>
+              <label htmlFor="topic" className="mb-2 block text-sm font-medium">
+                Topic
+              </label>
+              <select
+                id="topic"
+                disabled={isSubmitting}
+                value={formData.topic || ''}
+                onChange={handleChange}
+                name="topic"
+                className="dark:bg-dark focus:ring-primary w-full rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-400 focus:ring-2 disabled:opacity-50 dark:border-gray-700"
+                aria-invalid={!!errors.topic}
+              >
+                <option value="" disabled>
+                  Select a topic...
+                </option>
+                <option value="project">Project Inquiry</option>
+                <option value="collaboration">Collaboration</option>
+                <option value="job">Job Offer</option>
+                <option value="quote">Request a Quote</option>
+                <option value="feedback">Feedback</option>
+                <option value="other">Other</option>
+              </select>
+              {errors.topic && (
+                <p className="mt-1 text-sm text-red-500">{errors.topic}</p>
+              )}
             </div>
 
             {/* Message */}
             <div>
-              <label className="mb-2 block text-sm font-medium">Message</label>
+              <label
+                htmlFor="message"
+                className="mb-2 block text-sm font-medium"
+              >
+                Message
+              </label>
               <textarea
+                id="message"
                 required
+                disabled={isSubmitting}
                 value={formData.message}
                 onChange={handleChange}
                 name="message"
                 rows={4}
                 minLength={20}
                 placeholder="Your message..."
-                className="dark:bg-dark focus:ring-primary w-full resize-none rounded-md border border-gray-300 bg-white px-4 py-2 placeholder:text-gray-400 focus:ring-2 dark:border-gray-700"
+                className="dark:bg-dark focus:ring-primary w-full resize-none rounded-md border border-gray-300 bg-white px-4 py-2 placeholder:text-gray-400 focus:ring-2 disabled:opacity-50 dark:border-gray-700"
+                aria-invalid={!!errors.message}
               />
+              {errors.message && (
+                <p className="mt-1 text-sm text-red-500">{errors.message}</p>
+              )}
             </div>
 
             {/* Submit */}
             <button
               type="submit"
-              disabled={status.state === 'submitting'}
+              disabled={isSubmitting}
               className="btn w-full bg-cyan-600 text-white hover:bg-cyan-600/80 disabled:bg-cyan-400/50"
             >
-              {status.state === 'submitting' ? 'Sending...' : 'Send Message'}
+              {isSubmitting ? 'Sending...' : 'Send Message'}
             </button>
-            <div className="flex justify-center">
-              {status.state === 'submitted' && (
-                <SuccessMessage message={status.message} />
-              )}
 
-              {status.state === 'failed' && (
+            {status.state === 'submitted' && (
+              <div role="status" aria-live="polite">
+                <SuccessMessage message={status.message} />
+              </div>
+            )}
+
+            {status.state === 'failed' && (
+              <div role="alert" aria-live="assertive">
                 <ErrorMessage message={status.error} />
-              )}
-            </div>
+              </div>
+            )}
           </form>
         </div>
       </div>
