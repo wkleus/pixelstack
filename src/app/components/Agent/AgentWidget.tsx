@@ -80,6 +80,17 @@ const AgentWidget = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const prevMessagesLength = useRef(messages.length)
   const isNavigatingRef = useRef(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  // Auto-focus input when chat opens
+  useEffect(() => {
+    if (isOpen) {
+      // Slight delay to allow the animation to complete
+      setTimeout(() => {
+        inputRef.current?.focus()
+      }, 100)
+    }
+  }, [isOpen])
 
   // auto-scroll to latest message
   useEffect(() => {
@@ -437,6 +448,7 @@ const AgentWidget = () => {
             <div className="border-t border-gray-200/50 bg-white p-4 dark:border-gray-700/50 dark:bg-gray-900">
               <div className="flex items-center gap-2 rounded-xl bg-gray-100 px-4 py-1.5 transition-all focus-within:ring-2 focus-within:ring-cyan-500/50 dark:bg-gray-700/50">
                 <input
+                  ref={inputRef}
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
