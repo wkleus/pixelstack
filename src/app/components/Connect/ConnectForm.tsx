@@ -176,11 +176,15 @@ const ConnectForm = () => {
                   id="topic"
                   disabled={isSubmitting}
                   value={formData.topic || ''}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    handleChange(e)
+                    // reset prefilled state when user manually changes the topic
+                    if (isPrefilled) setIsPrefilled(false)
+                  }}
                   name="topic"
                   className={`dark:bg-dark focus:ring-primary w-full rounded-md border bg-white px-4 py-2 focus:ring-2 disabled:opacity-50 dark:border-gray-700 ${
                     isPrefilled && formData.topic
-                      ? 'border-green-500 bg-green-50 dark:border-green-400 dark:bg-green-900/20'
+                      ? 'border-green-500 dark:border-green-400'
                       : 'border-gray-300 text-gray-400'
                   }`}
                   aria-invalid={!!errors.topic}
