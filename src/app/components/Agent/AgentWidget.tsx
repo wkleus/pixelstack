@@ -19,9 +19,12 @@ import { usePathname, useRouter } from 'next/navigation'
 function getProactiveMessage(pathname: string): string {
   if (pathname === '/portfolio')
     return 'Want me to explain any of these projects?'
+  if (pathname === '/posts')
+    return 'New developer blog posts will appear here from time to time, and if you’d like to receive them directly, you can join the newsletter.'
   if (pathname === '/connect') return 'Need help filling out the contact form?'
   if (pathname === '/profile')
     return "Want to know more about the developer's background or certifications?"
+
   return "Hi! I'm PixelStack — ask me anything about this developer's skills or projects."
 }
 
