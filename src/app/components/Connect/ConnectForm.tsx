@@ -7,13 +7,69 @@ import ErrorMessage from './../MessagesUI/ErrorMessage'
 import { FaEnvelope } from 'react-icons/fa'
 import { FaMapLocationDot } from 'react-icons/fa6'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+import { useEffect, useState, useRef } from 'react'
+
+// valid topic values for the contact form - used for validation and pre-filling
+const VALID_TOPICS = [
+  'job',
+  'project',
+  'collaboration',
+  'quote',
+  'feedback',
+  'support',
+  'interview',
+  'networking',
+  'other',
+] as const
+
+type ValidTopic = (typeof VALID_TOPICS)[number]
 
 const ConnectForm = () => {
+  const email = process.env.NEXT_PUBLIC_EMAIL
+  const location = process.env.NEXT_PUBLIC_LOCATION
+
   const { formData, status, errors, handleChange, handleSubmit, isSubmitting } =
     useConnectForm()
 
-  const email = process.env.NEXT_PUBLIC_EMAIL
-  const location = process.env.NEXT_PUBLIC_LOCATION
+  const searchParams = useSearchParams()
+
+  // initialize state directly from URL params
+  const [isPrefilled, setIsPrefilled] = useState(() => {
+    const topic = searchParams.get('topic')
+    return !!(topic && VALID_TOPICS.includes(topic as ValidTopic))
+  })
+
+  // use a ref to track if the form was already prefilled (prevents infinite loops)
+  const hasPrefilled = useRef(false)
+
+  // pre-fill topic from URL parameter (?topic=job etc.)
+  useEffect(() => {
+    // skip if already prefilled
+    if (hasPrefilled.current) return
+
+    const topic = searchParams.get('topic')
+
+    // only proceed if there is a topic and it's a valid topic
+    if (topic && VALID_TOPICS.includes(topic as ValidTopic)) {
+      console.log(`Pre-filling form with topic: ${topic}`)
+
+      // mark as prefilled IMMEDIATELY to prevent any re-runs
+      hasPrefilled.current = true
+
+      // directly update the form data by calling handleChange
+      // create event object
+      const event = {
+        target: {
+          name: 'topic',
+          value: topic,
+        },
+      } as React.ChangeEvent<HTMLSelectElement>
+
+      // call the form's change handler
+      handleChange(event)
+    }
+  }, [searchParams, handleChange])
 
   return (
     <motion.div
@@ -115,25 +171,41 @@ const ConnectForm = () => {
               <label htmlFor="topic" className="mb-2 block text-sm font-medium">
                 Topic
               </label>
-              <select
-                id="topic"
-                disabled={isSubmitting}
-                value={formData.topic || ''}
-                onChange={handleChange}
-                name="topic"
-                className="dark:bg-dark focus:ring-primary w-full rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-400 focus:ring-2 disabled:opacity-50 dark:border-gray-700"
-                aria-invalid={!!errors.topic}
-              >
-                <option value="" disabled>
-                  Select a topic...
-                </option>
-                <option value="project">Project Inquiry</option>
-                <option value="collaboration">Collaboration</option>
-                <option value="job">Job Offer</option>
-                <option value="quote">Request a Quote</option>
-                <option value="feedback">Feedback</option>
-                <option value="other">Other</option>
-              </select>
+              <div className="relative">
+                <select
+                  id="topic"
+                  disabled={isSubmitting}
+                  value={formData.topic || ''}
+                  onChange={handleChange}
+                  name="topic"
+                  className={`dark:bg-dark focus:ring-primary w-full rounded-md border bg-white px-4 py-2 focus:ring-2 disabled:opacity-50 dark:border-gray-700 ${
+                    isPrefilled && formData.topic
+                      ? 'border-green-500 bg-green-50 dark:border-green-400 dark:bg-green-900/20'
+                      : 'border-gray-300 text-gray-400'
+                  }`}
+                  aria-invalid={!!errors.topic}
+                >
+                  <option value="" disabled>
+                    Select a topic...
+                  </option>
+                  <option value="project">Project Inquiry</option>
+                  <option value="collaboration">Collaboration</option>
+                  <option value="job">Job Offer</option>
+                  <option value="quote">Request a Quote</option>
+                  <option value="feedback">Feedback</option>
+                  <option value="support">Technical Support</option>
+                  <option value="interview">Interview Request</option>
+                  <option value="networking">Networking</option>
+                  <option value="other">Other</option>
+                </select>
+
+                {/* Show pre-filled indicator */}
+                {isPrefilled && formData.topic && (
+                  <span className="absolute top-2.5 right-8 text-xs text-green-600 dark:text-green-400">
+                    ✓ Pre-filled
+                  </span>
+                )}
+              </div>
               {errors.topic && (
                 <p className="mt-1 text-sm text-red-500">{errors.topic}</p>
               )}

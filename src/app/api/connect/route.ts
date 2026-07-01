@@ -98,7 +98,7 @@ export async function POST(request: Request) {
       from: `PixelStack Contact <${process.env.RESEND_FROM}>`,
       to: process.env.RESEND_TO!,
       replyTo: sanitizedData.email,
-      subject: `New message from ${sanitizedData.name}`,
+      subject: `New contact message from ${sanitizedData.name}`,
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #0891b2;">New Contact Message</h2>

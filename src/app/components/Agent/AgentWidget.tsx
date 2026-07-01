@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useAgent } from '@/app/hooks/useAgent'
 import {
   FaRobot,
@@ -13,7 +13,7 @@ import { FaTimes } from 'react-icons/fa'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { motion, AnimatePresence } from 'framer-motion'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 
 // returns a proactive message based on the current page
 function getProactiveMessage(pathname: string): string {
@@ -53,12 +53,15 @@ function Tooltip({
 }
 
 const AgentWidget = () => {
+  const router = useRouter()
+  const pathname = usePathname()
+
   const [isOpen, setIsOpen] = useState(false)
   const [hasShownProactive, setHasShownProactive] = useState(false)
   const [unreadCount, setUnreadCount] = useState(0)
-  // IMPORTANT: This flag is set to true ONLY on first insertion
-  // and NEVER reset - prevents the message from ever coming back
   const [isProactiveDone, setIsProactiveDone] = useState(false)
+  const [isNavigating, setIsNavigating] = useState(false)
+  const [lastSentMessage, setLastSentMessage] = useState<string>('')
 
   const {
     messages,
@@ -70,20 +73,19 @@ const AgentWidget = () => {
     addMessage,
     clearMessages,
   } = useAgent()
-  const pathname = usePathname()
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const prevMessagesLength = useRef(messages.length)
+  const isNavigatingRef = useRef(false)
 
   // auto-scroll to latest message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  // proactive behavior — show unread badge and pulse after 30 seconds
-  // ONLY if the proactive action has NOT been completed yet
+  // proactive behavior
   useEffect(() => {
-    if (isProactiveDone) return // Already done, never again
+    if (isProactiveDone) return
     if (hasShownProactive) return
     if (isOpen) return
 
@@ -95,13 +97,8 @@ const AgentWidget = () => {
     return () => clearTimeout(timer)
   }, [pathname, hasShownProactive, isOpen, isProactiveDone])
 
-  // add proactive message when chat opens - ONLY ONCE
+  // add proactive message when chat opens
   useEffect(() => {
-    // only insert if:
-    // 1. chat is open
-    // 2. proactive message has been shown (badge was there)
-    // 3. proactive action is NOT yet completed
-    // 4. no messages exist
     if (
       isOpen &&
       hasShownProactive &&
@@ -110,7 +107,7 @@ const AgentWidget = () => {
     ) {
       const timer = setTimeout(() => {
         addMessage('agent', getProactiveMessage(pathname))
-        setIsProactiveDone(true) // mark as COMPLETED - never again
+        setIsProactiveDone(true)
       }, 300)
       return () => clearTimeout(timer)
     }
@@ -137,13 +134,11 @@ const AgentWidget = () => {
     prevMessagesLength.current = messages.length
   }, [messages, isOpen])
 
-  // reset unread count when chat opens
   const handleOpenChat = () => {
     setIsOpen(true)
     setUnreadCount(0)
   }
 
-  // handle toggle
   const handleToggle = () => {
     if (isOpen) {
       setIsOpen(false)
@@ -152,12 +147,89 @@ const AgentWidget = () => {
     }
   }
 
-  // custom clear messages function
   const handleClearMessages = () => {
     clearMessages()
-    // nothing to reset! isProactiveDone stays true
-    // this way the message never comes back
   }
+
+  // send handler with loading, navigation and state management
+  const handleSend = useCallback(async () => {
+    // Prevent duplicate sends
+    if (isLoading || isNavigatingRef.current) {
+      console.log('Already loading or navigating, skipping...')
+      return
+    }
+
+    const trimmedInput = input.trim()
+    if (!trimmedInput) {
+      console.log('Empty input, skipping...')
+      return
+    }
+
+    // store the message before sending
+    setLastSentMessage(trimmedInput)
+    console.log(`📤 Sending: "${trimmedInput}"`)
+
+    try {
+      // send message and wait for tool action
+      const toolAction = await sendMessage()
+
+      console.log('📦 Tool action result:', toolAction)
+
+      // handle navigation if tool action is prefill
+      if (toolAction && toolAction.type === 'prefill_contact_form') {
+        const topic = toolAction.topic
+        const targetUrl = `/connect?topic=${topic}`
+
+        console.log(`🎯 Prefill detected! Navigating to: ${targetUrl}`)
+
+        // set navigation state
+        isNavigatingRef.current = true
+        setIsNavigating(true)
+
+        // navigate after delay
+        setTimeout(() => {
+          console.log(`🚀 Executing navigation to: ${targetUrl}`)
+
+          // try for reliability and fallback to window.location if needed
+          try {
+            router.push(targetUrl)
+            // fallback to window.location as backup
+            setTimeout(() => {
+              if (window.location.pathname !== '/connect') {
+                window.location.href = targetUrl
+              }
+            }, 100)
+          } catch (error) {
+            console.error('Navigation error:', error)
+            window.location.href = targetUrl
+          }
+
+          // reset navigation state
+          setTimeout(() => {
+            isNavigatingRef.current = false
+            setIsNavigating(false)
+          }, 500)
+        }, 1500)
+      } else {
+        console.log('No prefill action detected')
+      }
+    } catch (error) {
+      console.error('Error in handleSend:', error)
+      isNavigatingRef.current = false
+      setIsNavigating(false)
+    }
+  }, [input, isLoading, sendMessage, router])
+
+  // handle enter key
+  const onKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault()
+        handleSend()
+      }
+    },
+    [handleSend],
+  )
 
   return (
     <>
@@ -192,7 +264,7 @@ const AgentWidget = () => {
             )}
           </div>
 
-          {/* tooltip — inline on fixed button */}
+          {/* tooltip */}
           <span className="pointer-events-none absolute -top-3 right-full -mr-2 -translate-y-1/2 rounded-full rounded-br-none border border-cyan-400/50 bg-gray-200 px-2 py-2 text-[10px] whitespace-nowrap text-gray-700 opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 dark:bg-gray-800 dark:text-gray-200">
             Chat with <p>PixelStack AI</p>
           </span>
@@ -282,7 +354,7 @@ const AgentWidget = () => {
                       )}
                     </div>
 
-                    {/* Bubble */}
+                    {/* bubble */}
                     <div
                       className={`mt-3 -mr-3 -mb-1 max-w-[80%] rounded-2xl px-2 py-1.5 text-sm ${
                         msg.role === 'user'
@@ -335,7 +407,7 @@ const AgentWidget = () => {
                 ))
               )}
 
-              {/* Loading indicator */}
+              {/* loading indicator */}
               {isLoading && (
                 <div className="flex items-start gap-2.5">
                   <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500 to-blue-500">
@@ -365,20 +437,28 @@ const AgentWidget = () => {
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  disabled={isLoading}
+                  onKeyDown={onKeyDown}
+                  disabled={isLoading || isNavigating}
                   placeholder={
-                    isLoading ? 'PixelStack is thinking...' : 'Enter message...'
+                    isLoading
+                      ? 'PixelStack is thinking...'
+                      : isNavigating
+                        ? 'Opening contact form...'
+                        : 'Enter message...'
                   }
                   className="text-md flex-1 border-none bg-transparent text-gray-800 outline-none placeholder:text-gray-400 disabled:opacity-60 dark:text-gray-200 dark:placeholder:text-gray-500"
                 />
                 <Tooltip text="Send message">
                   <button
-                    onClick={sendMessage}
-                    disabled={!input.trim() || isLoading}
+                    onClick={handleSend}
+                    disabled={!input.trim() || isLoading || isNavigating}
                     className="m-0.5 flex h-8 w-8 flex-shrink-0 cursor-pointer items-center justify-center rounded-full bg-gradient-to-r from-cyan-600 to-cyan-700/90 text-white transition-all hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/30 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    <FaPaperPlane className="text-sm" />
+                    {isNavigating ? (
+                      <FaCircle className="animate-spin text-sm" />
+                    ) : (
+                      <FaPaperPlane className="text-sm" />
+                    )}
                   </button>
                 </Tooltip>
               </div>
