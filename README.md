@@ -67,6 +67,12 @@ The project is deployed on Vercel and IONOS.
 <em>AI-powered assistant (right side of the screenshot)</em>
 </p>
 
+<p align="center">
+<img src="public/preview/not-found.png" width="700" alt="Not Found page preview" />
+<br />
+<em>404 Not Found Page (dark mode) with PixelStack AI Widget</em>
+</p>
+
 ## Table of Contents
 
 - [Features](#features)
@@ -104,6 +110,7 @@ The project is deployed on Vercel and IONOS.
 - **Mobile navigation** with hamburger menu
 - **Footer** with social links and branding
 - **Imprint** with privacy policy and legal informations
+- **Custom 404 Not Found Page**
 
 ### Tech Stack
 
@@ -375,7 +382,6 @@ npm run test:e2e    # Playwright E2E tests
 ### More Features Planned
 
 - Language Switcher (EN/DE)
-- Custom 404 Page
 
 ---
 
