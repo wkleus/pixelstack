@@ -16,7 +16,8 @@
 [![Status: Live](https://img.shields.io/badge/Status-Live-22c55e?style=for-the-badge)](https://pixelstack.me)
 
 An animated and responsive portfolio for web apps — built with **Next.js**, **TypeScript**, **React.js**, **Tailwind CSS**, **Framer Motion**, **Resend** and **DeepSeek**.
-Features: portfolio showcase, blog system, contact form with real email delivery and auto-reply, newsletter subscription with admin notification, search for portfolio and posts, interactive grid hero section with mouse tracking, profile page, dark/light mode and an AI-powered assistant (PixelStack AI). All emails delivered via Resend.
+
+Comes with: portfolio showcase, blog system, contact form with real email delivery and auto-reply, newsletter subscription with admin notification, search for portfolio and posts, interactive grid hero section with mouse tracking, profile page, dark/light mode and an AI-powered assistant (PixelStack AI) that answers questions about skills, projects, and IT education — and intelligently prefills the contact form based on your intent. All emails delivered via Resend.
 
 ## Live Demo
 
@@ -99,23 +100,25 @@ The project is deployed on Vercel and IONOS.
   -> includes client & server-side validation, XSS sanitization, rate limiting and auto-reply to sender
 - **Newsletter** subscription with admin email notification via Resend (`/api/newsletter`)
 - **PixelStack AI assistant** — floating chat widget powered by DeepSeek, answers questions about skills, projects, tech stack and certifications (`/api/agent`)
+- **Contact form prefill** via AI assistant — the AI automatically detects the user's intent and pre-selects the appropriate topic when opening the contact form
 - **Mobile navigation** with hamburger menu
 - **Footer** with social links and branding
 - **Imprint** with privacy policy and legal informations
 
 ### Tech Stack
 
-| Layer      | Technology                              |
-| ---------- | --------------------------------------- |
-| Framework  | Next.js 16 (App Router)                 |
-| Language   | TypeScript 5 (strict mode)              |
-| UI         | React 19, Tailwind CSS 4, Framer Motion |
-| Icons      | Heroicons, React Icons                  |
-| Email      | Resend SDK                              |
-| AI         | DeepSeek API (OpenAI-compatible)        |
-| Markdown   | react-markdown + remark-gfm             |
-| Testing    | Jest, Playwright                        |
-| Deployment | Vercel + IONOS (custom domain)          |
+| Layer           | Technology                              |
+| --------------- | --------------------------------------- |
+| Framework       | Next.js 16 (App Router)                 |
+| Language        | TypeScript 5 (strict mode)              |
+| UI              | React 19, Tailwind CSS 4, Framer Motion |
+| Icons           | Heroicons, React Icons                  |
+| Email           | Resend SDK                              |
+| AI Model        | DeepSeek API (OpenAI-compatible)        |
+| AI Capabilities | Tool Calling, Intent Detection          |
+| Markdown        | react-markdown + remark-gfm             |
+| Testing         | Jest, Playwright                        |
+| Deployment      | Vercel + IONOS (custom domain)          |
 
 ---
 
@@ -183,26 +186,65 @@ It answers questions about the developer's skills, projects, tech stack, blog po
 
 ### How it works
 
-The assistant uses a structured system prompt (`agentContext.ts`) containing all portfolio data. This context is sent with every request so DeepSeek has full knowledge of the developer's background.
+The AI assistant uses a structured system prompt (`agentContext.ts`) containing all portfolio data. This context is sent with every request so DeepSeek has full knowledge of the developer's background.
 
 The full conversation history is included in each API call — giving the assistant memory of the current session.
 
-### Features
+### Contact Form Prefill via Tool Calling
 
-- Floating chat button visible on all pages
-- Proactive behavior — widget opens automatically after a certain time with a page-aware message
-- Unread message badge with pulsing ring animation when new messages arrive while chat is closed
-- Conversation history persisted via `localStorage` — chat survives page reloads and browser restarts
-- Clear chat button to reset conversation history from state and localStorage
-- Markdown rendering in responses (`react-markdown` + `remark-gfm`)
-- Custom styling for bold, italic, code and links
-- Animated typing indicator (bouncing dots)
-- Auto-scroll to latest message via `useRef`
-- Custom styled scrollbar in messages area
-- Sliding window rate limiter with memory cleanup
-- `Retry-After` header on 429 responses
-- Model configurable via `DEEPSEEK_MODEL` environment variable
-- Dynamic context with current date and session info
+The AI assistant has a powerful feature: intelligent contact form prefill. When a user expresses interest in contacting the developer, the AI automatically detects the intent, calls the prefill_contact_form tool, and opens the contact form with the correct topic pre-selected.
+
+This creates a seamless user experience — instead of manually selecting a topic, the user simply tells the AI what they want, and the form is ready for them.
+
+#### How It Works (Technical)
+
+1. Tool Definition: The AI assistant has access to the prefill_contact_form tool, which accepts a topic parameter (job, project, collaboration, quote, feedback, other).
+
+2. Intent Detection: DeepSeek analyzes the user's message and decides whether to call the tool. If the user expresses intent to contact the developer, the tool is triggered.
+
+3. Navigation: The chat widget receives the toolAction from the API and navigates to /connect?topic=[topic].
+
+4. Form Prefill: The contact form reads the topic from the URL parameter and pre-selects the matching dropdown option, with a visual "Pre-filled" indicator.
+
+#### Examples
+
+| User Says                                          | AI Detects           | Topic Prefilled |
+| -------------------------------------------------- | -------------------- | --------------- |
+| "Would you like to collaborate on something?"      | Collaboration intent | `collaboration` |
+| "How much would a website cost?"                   | Quote request        | `quote`         |
+| "I have some feedback about your work"             | Feedback intent      | `feedback`      |
+| "I'm hiring developers"                            | Job offer intent     | `job`           |
+| "I want you for my project"                        | Project inquiry      | `project`       |
+| "Let's work together on open source"               | Collaboration intent | `collaboration` |
+| "I want to give you my thoughts on your portfolio" | Feedback intent      | `feedback`      |
+
+#### Example Chat Flow
+
+User: "I really like your portfolio and I have a job opportunity for you. Can we discuss this?"
+
+AI Assistant: "I've just opened the contact form with "Job Offer" pre-selected for you. You can fill in your details and message there, and the developer will receive it directly..."
+
+→ The user is automatically navigated to the contact form with the topic pre-filled.
+
+### AI Assistant Features in Detail
+
+- **Floating chat button** — visible on all pages with smooth animations
+- **Proactive behavior** — widget opens automatically with a page-aware message
+- **Smart contact form prefill** — automatically selects the right topic based on user intent
+- **Unread message badge** — pulsing ring animation when new messages arrive
+- **Conversation history** — persisted via `localStorage`, survives page reloads
+- **Clear chat button** — reset conversation history with one click
+- **Custom styling** — for bold, italic, code blocks and links
+- **Animated typing indicator** — bouncing dots while AI responds
+- **Auto-scroll** — scrolls to latest message via `useRef`
+- **Custom scrollbar** — styled for better UX in messages area
+- **Rate limiting** — 1 request per 5 seconds per IP, auto-cleanup
+- **Retry-After header** — included on 429 responses, tells clients when to retry
+- **Configurable model** — switch via `DEEPSEEK_MODEL` env var
+- **Dynamic context** — date, timestamp, session ID per request
+- **Markdown rendering** — supports `react-markdown` + `remark-gfm`
+- **Markdown link handling** — opens links safely in new tabs
+- **Tool tips** — hover tooltips on chat buttons (send, clear, close) for better UX
 
 ### Proactive Messages by Page
 
@@ -210,6 +252,7 @@ The full conversation history is included in each API call — giving the assist
 | -------------- | --------------------------------------------------------------------------------- |
 | `/` (homepage) | "Hi! I'm PixelStack — ask me anything about this developer's skills or projects." |
 | `/portfolio`   | "Want me to explain any of these projects?"                                       |
+| `/posts`       | "New developer blog posts will appear here from time to time..."                  |
 | `/connect`     | "Need help filling out the contact form?"                                         |
 | `/profile`     | "Want to know more about the developer's background or certifications?"           |
 
@@ -220,13 +263,20 @@ DEEPSEEK_API_KEY=sk-xxxxxxxxxxxxxxxxxx
 DEEPSEEK_MODEL=deepseek-v4-flash
 ```
 
-### Example Questions
+### Example questions
+
+**AI assistant answers to:**
 
 - "What skills do you have?"
 - "What projects have you built?"
 - "Explain HomeSphere."
 - "What certifications do you have?"
 - "What is your tech stack?"
+
+**Trigger the pre-filling of the contact form via tool calling**:
+
+- "I want ooffer you a job" → prefills contact form with "Job Offer"
+- "How much do you charge?" → prefills contact form with "Quote Request"
 
 ## Contact Form & Email
 
@@ -240,6 +290,14 @@ The API route handles:
 - Sending an automatic confirmation email back to the sender
 
 Both emails are delivered via **[Resend](https://resend.com)**. If the auto-reply fails, the request still returns success — the notification to the inbox was already sent.
+
+### Email Templates
+
+Both the notification email (to the admin) and the confirmation email (to the sender) feature a **clean, professional layout** with:
+
+- PixelStack branding
+- Name, email and topic field displayed prominently
+- Responsive design optimized for all email clients
 
 ---
 
@@ -310,17 +368,12 @@ npm run test:e2e    # Playwright E2E tests
 
 ### AI‑Agent (Portfolio Guide)
 
-This project will soon include an AI‑powered Agent designed for users and clients.  
-The agent will:
-
-- guide users through my software projects
-- explain the technologies I use and the skills I apply
-- highlight my IT education, certifications, and professional experience
-- provide context on how my work reflects my capabilities
+- Continuous refinement of the AI agent to deliver smarter, faster, more robust automation
+- Enhance Tool Calling with additional tools (e.g. project recommendations)
+- Improve intent detection for more accurate topic prefill
 
 ### More Features Planned
 
-- Continuous refinement of the AI agent to deliver smarter, faster, more robust automation
 - Language Switcher (EN/DE)
 - Custom 404 Page
 
