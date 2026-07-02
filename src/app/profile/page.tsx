@@ -1,7 +1,9 @@
 'use client'
 
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import SkillSection from '../components/Profile/SkillSection'
+import SkillModal from '../components/Profile/SkillModal'
 import EducationCard from '../components/Profile/EducationCard'
 import { frontendSkills, backendSkills } from '@/data/skillsData'
 import { education } from '@/data/educationData'
@@ -9,6 +11,8 @@ import { FiMonitor } from 'react-icons/fi'
 import { HiOutlineServer } from 'react-icons/hi'
 
 export default function Profile() {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -29,7 +33,7 @@ export default function Profile() {
       <section>
         <h2 className="section-title">My Technical Skillset</h2>
 
-        <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-2">
           <SkillSection
             title="Frontend Engineering"
             icon={<FiMonitor />}
@@ -42,6 +46,16 @@ export default function Profile() {
             skills={backendSkills}
           />
         </div>
+
+        {/* View full skill set button — centered below the grid */}
+        <div className="mt-8 flex justify-center">
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="mb-10 cursor-pointer rounded-lg border-2 border-cyan-300 px-8 py-3 font-bold text-cyan-500 transition-colors hover:border-amber-500 hover:text-amber-600 dark:border-cyan-700 dark:text-gray-300 dark:hover:text-amber-400"
+          >
+            View full skill set
+          </button>
+        </div>
       </section>
 
       <section className="mb-20">
@@ -53,6 +67,9 @@ export default function Profile() {
           ))}
         </div>
       </section>
+
+      {/* Skill modal */}
+      <SkillModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </motion.div>
   )
 }

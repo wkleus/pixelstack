@@ -1,4 +1,4 @@
-import { AiOutlineCloudSync } from 'react-icons/ai'
+import { AiOutlineCloudSync, AiOutlineRobot } from 'react-icons/ai'
 import { BsColumnsGap, BsDatabaseGear } from 'react-icons/bs'
 import { RiCodeBoxLine } from 'react-icons/ri'
 import { FiPenTool } from 'react-icons/fi'
@@ -27,6 +27,18 @@ export const education = [
       'Developing and deploying AWS-based applications',
       'Building CI/CD pipelines',
       'Monitoring and optimizing distributed systems',
+    ],
+  },
+  {
+    title: 'AI Agents in Typescript/Javascript',
+    icon: AiOutlineRobot,
+    org: 'Vanderbilt University',
+    time: '2026',
+    points: [
+      'Building autonomous AI agents in TypeScript/JavaScript',
+      'Agent architecture: reasoning, planning and tool use',
+      'Prompt engineering for multi-step problem solving',
+      'LLM integration across platforms',
     ],
   },
   {

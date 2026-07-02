@@ -17,10 +17,10 @@ export default function EducationCard({
 }: EducationCardProps) {
   return (
     // Outer card container with styling and hover animation
-    <div className="dark:bg-dark/50 bg-light rounded-lg py-8 pr-12 pl-10 shadow-md transition-transform duration-300 hover:-translate-y-3 hover:rotate-1 hover:shadow-xl hover:shadow-cyan-500/20">
+    <div className="dark:bg-dark/50 bg-light mx-5 rounded-lg py-8 pr-10 pl-7 text-[15px] shadow-md transition-transform duration-300 hover:-translate-y-3 hover:rotate-1 hover:shadow-xl hover:shadow-cyan-500/20 sm:mx-10 sm:py-14 sm:text-[16px] md:mx-0">
       {/* Header section: title + icon */}
       <div className="flex gap-4">
-        <h3 className="mb-2 text-xl font-semibold">{title}</h3>
+        <h3 className="mb-2 text-lg font-semibold sm:text-xl">{title}</h3>
 
         {/* Render the passed icon component */}
         <div className="-mt-2 flex items-center text-3xl text-cyan-500">

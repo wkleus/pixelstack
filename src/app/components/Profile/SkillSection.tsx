@@ -20,7 +20,7 @@ export default function SkillSection({
 }: SkillSectionProps) {
   return (
     // Outer card container with hover animation and theme-aware styling
-    <div className="dark:bg-dark/50 bg-light rounded-lg p-8 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-cyan-500/20">
+    <div className="dark:bg-dark/50 bg-light mx-10 rounded-lg p-8 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-cyan-500/20 sm:mx-25 md:mx-3 lg:mx-5">
       {/* Header: title + icon */}
       <div className="flex gap-4 text-4xl">
         <h3 className="mb-6 text-xl font-semibold">{title}</h3>
