@@ -1,0 +1,28 @@
+// prisma schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Post {
+  id         String   @id @default(cuid())
+  handle     String   @unique
+  name       String
+  overview   String
+  content    String   @db.Text
+  timeToRead String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  // for better management of posts - enable to add a published field to indicate whether the post is published or not, and a tags field to categorize the post
+  published  Boolean  @default(true)
+  tags       String[] @default([])
+  
+  @@index([handle])
+  @@index([createdAt])
+  @@index([published])
+}
