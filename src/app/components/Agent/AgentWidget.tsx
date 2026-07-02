@@ -209,8 +209,8 @@ const AgentWidget = () => {
             router.push(targetUrl)
             isNavigatingRef.current = false
             setIsNavigating(false)
-          }, 300)
-        }, 3500)
+          }, 1000)
+        }, 4000)
       } else {
         console.log('No prefill action detected')
       }

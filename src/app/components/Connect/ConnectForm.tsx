@@ -76,7 +76,7 @@ const ConnectForm = () => {
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.75 }}
-      className="mx-auto max-w-7xl py-10"
+      className="mx-auto mb-20 max-w-7xl"
     >
       <h1 className="mt-16 mb-10 text-center text-4xl font-bold">Contact Me</h1>
 
@@ -121,11 +121,11 @@ const ConnectForm = () => {
         </div>
 
         {/* Right side: form */}
-        <div className="dark:bg-dark/50 mt-3 mr-5 rounded-lg bg-white p-6 shadow-md">
-          <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="dark:bg-dark/50 l mt-3 mr-auto mb-10 ml-auto min-w-100 rounded-lg bg-white p-5 shadow-md sm:min-w-120 md:-ml-15 md:min-w-85 lg:min-w-80 lg:min-w-120 xl:min-w-150">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {/* Name */}
             <div>
-              <label htmlFor="name" className="mb-2 block text-sm font-medium">
+              <label htmlFor="name" className="mb-1 block text-sm font-medium">
                 Name
               </label>
               <input
@@ -146,7 +146,10 @@ const ConnectForm = () => {
 
             {/* Email */}
             <div>
-              <label htmlFor="email" className="mb-2 block text-sm font-medium">
+              <label
+                htmlFor="email"
+                className="mb-1.5 block text-sm font-medium"
+              >
                 Email
               </label>
               <input
@@ -168,7 +171,10 @@ const ConnectForm = () => {
 
             {/* Topic */}
             <div>
-              <label htmlFor="topic" className="mb-2 block text-sm font-medium">
+              <label
+                htmlFor="topic"
+                className="mb-1.5 block text-sm font-medium"
+              >
                 Topic
               </label>
               <div className="relative">
@@ -219,7 +225,7 @@ const ConnectForm = () => {
             <div>
               <label
                 htmlFor="message"
-                className="mb-2 block text-sm font-medium"
+                className="mb-1.5 block text-sm font-medium"
               >
                 Message
               </label>
@@ -230,8 +236,8 @@ const ConnectForm = () => {
                 value={formData.message}
                 onChange={handleChange}
                 name="message"
-                rows={4}
-                minLength={20}
+                rows={3}
+                minLength={15}
                 placeholder="Your message..."
                 className="dark:bg-dark focus:ring-primary w-full resize-none rounded-md border border-gray-300 bg-white px-4 py-2 placeholder:text-gray-400 focus:ring-2 disabled:opacity-50 dark:border-gray-700"
                 aria-invalid={!!errors.message}
