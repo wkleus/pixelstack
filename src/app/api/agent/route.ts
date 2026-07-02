@@ -174,7 +174,7 @@ export async function POST(request: Request) {
       - pricing, costs, quotes → topic: "quote"
       - feedback, suggestions → topic: "feedback"
       - anything else → topic: "other"
-      After calling the tool, tell the user you've opened the contact form for them.
+      After calling the tool, respond with ONE short sentence only — confirm you open the contact form with the pre-selected topic. Nothing else. No project details, no suggestions, no questions. Example: "I've just opened the contact form with 'Job Offer' pre-selected for you — you're all set!"
     `
 
     // log context in development
@@ -253,7 +253,7 @@ export async function POST(request: Request) {
 
       const reply =
         secondResponse.choices[0].message.content?.trim() ??
-        "I've opened the contact form for you!"
+        'I open the contact form for you!'
 
       if (process.env.NODE_ENV === 'development') {
         console.log('Final reply after tool call:', reply.substring(0, 100))

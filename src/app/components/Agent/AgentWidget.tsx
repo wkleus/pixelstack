@@ -72,7 +72,6 @@ const AgentWidget = () => {
     setInput,
     isLoading,
     sendMessage,
-    handleKeyDown,
     addMessage,
     clearMessages,
   } = useAgent()
@@ -181,49 +180,37 @@ const AgentWidget = () => {
 
     // store the message before sending
     setLastSentMessage(trimmedInput)
-    console.log(`📤 Sending: "${trimmedInput}"`)
+    console.log(`Sending: "${trimmedInput}"`)
 
     try {
       // send message and wait for tool action
       const toolAction = await sendMessage()
 
-      console.log('📦 Tool action result:', toolAction)
+      console.log('Tool action result:', toolAction)
 
       // handle navigation if tool action is prefill
       if (toolAction && toolAction.type === 'prefill_contact_form') {
         const topic = toolAction.topic
         const targetUrl = `/connect?topic=${topic}`
 
-        console.log(`🎯 Prefill detected! Navigating to: ${targetUrl}`)
+        console.log(`Prefill detected! Navigating to: ${targetUrl}`)
 
         // set navigation state
         isNavigatingRef.current = true
         setIsNavigating(true)
 
-        // navigate after delay
+        // wait for user to read the reply, then close widget and navigate
         setTimeout(() => {
-          console.log(`🚀 Executing navigation to: ${targetUrl}`)
+          // close widget first so the transition feels smooth
+          setIsOpen(false)
 
-          // try for reliability and fallback to window.location if needed
-          try {
-            router.push(targetUrl)
-            // fallback to window.location as backup
-            setTimeout(() => {
-              if (window.location.pathname !== '/connect') {
-                window.location.href = targetUrl
-              }
-            }, 100)
-          } catch (error) {
-            console.error('Navigation error:', error)
-            window.location.href = targetUrl
-          }
-
-          // reset navigation state
+          // wait for close animation to finish, then navigate
           setTimeout(() => {
+            router.push(targetUrl)
             isNavigatingRef.current = false
             setIsNavigating(false)
-          }, 500)
-        }, 1500)
+          }, 300)
+        }, 3500)
       } else {
         console.log('No prefill action detected')
       }
