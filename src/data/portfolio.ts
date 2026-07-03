@@ -132,42 +132,46 @@ export const portfolios: Portfolio[] = [
     preview: 'https://wkleus.github.io/meta-advanced-react-portfolio/',
     imageSrc: '/portfolio-img/portfolio-frontend.png',
   },
-  {
-    name: 'Luxury Jewels Store',
-    overview: 'A luxury jewelry store frontend with responsive design.',
-    techStack: ['HTML', 'CSS', 'JavaScript', 'Responsive Design'],
-    sourceUrl: 'https://github.com/wkleus/meta-mangata-gallo-frontend',
-    preview: 'https://wkleus.github.io/meta-mangata-gallo-frontend/',
-    imageSrc: '/portfolio-img/mangata-gallo.png',
-  },
-  {
-    name: 'Household Exchange Backend',
-    overview:
-      'Back-end web application, that links people giving away unwanted household items with those seeking free, recycled items.',
-    techStack: ['HTML', 'CSS', 'JavaScript', 'Node.js', 'Express.js'],
-    sourceUrl: 'https://github.com/wkleus/backend-nodejs-capstone',
-    preview: 'https://github.com/wkleus/backend-nodejs-capstone',
-    imageSrc: '/portfolio-img/household-items-exchange.png',
-  },
-  {
-    name: 'Desktop Widget',
-    overview:
-      'A collection of desktop widgets written in Java, using JavaFX and CSS.',
-    techStack: ['Java', 'JavaFX', 'CSS'],
-    sourceUrl:
-      'https://github.com/wkleus/GUI-code-samples/tree/main/WidgetsCollection/src',
-    preview:
-      'https://github.com/wkleus/GUI-code-samples/tree/main/WidgetsCollection/src',
-    imageSrc: '/portfolio-img/desktop-widget.jpg',
-  },
-  {
-    name: 'IP Address Finder',
-    overview: 'A IP address finder written in Java, using JavaFX and CSS.',
-    techStack: ['Java', 'JavaFX', 'FXML', 'CSS'],
-    sourceUrl:
-      'https://github.com/wkleus/GUI-code-samples/tree/main/IpAddressFinderFXGui/src',
-    preview:
-      'https://github.com/wkleus/GUI-code-samples/tree/main/IpAddressFinderFXGui/src',
-    imageSrc: '/portfolio-img/ip-address-finder.jpg',
-  },
+
+  // {
+  //   name: 'Luxury Jewels Store',
+  //   overview: 'A luxury jewelry store frontend with responsive design.',
+  //   techStack: ['HTML', 'CSS', 'JavaScript', 'Responsive Design'],
+  //   sourceUrl: 'https://github.com/wkleus/meta-mangata-gallo-frontend',
+  //   preview: 'https://wkleus.github.io/meta-mangata-gallo-frontend/',
+  //   imageSrc: '/portfolio-img/mangata-gallo.png',
+  // },
+
+  // {
+  //   name: 'Household Exchange Backend',
+  //   overview:
+  //     'Back-end web application, that links people giving away unwanted household items with those seeking free, recycled items.',
+  //   techStack: ['HTML', 'CSS', 'JavaScript', 'Node.js', 'Express.js'],
+  //   sourceUrl: 'https://github.com/wkleus/backend-nodejs-capstone',
+  //   preview: 'https://github.com/wkleus/backend-nodejs-capstone',
+  //   imageSrc: '/portfolio-img/household-items-exchange.png',
+  // },
+
+  // {
+  //   name: 'Desktop Widget',
+  //   overview:
+  //     'A collection of desktop widgets written in Java, using JavaFX and CSS.',
+  //   techStack: ['Java', 'JavaFX', 'CSS'],
+  //   sourceUrl:
+  //     'https://github.com/wkleus/GUI-code-samples/tree/main/WidgetsCollection/src',
+  //   preview:
+  //     'https://github.com/wkleus/GUI-code-samples/tree/main/WidgetsCollection/src',
+  //   imageSrc: '/portfolio-img/desktop-widget.jpg',
+  // },
+
+  // {
+  //   name: 'IP Address Finder',
+  //   overview: 'A IP address finder written in Java, using JavaFX and CSS.',
+  //   techStack: ['Java', 'JavaFX', 'FXML', 'CSS'],
+  //   sourceUrl:
+  //     'https://github.com/wkleus/GUI-code-samples/tree/main/IpAddressFinderFXGui/src',
+  //   preview:
+  //     'https://github.com/wkleus/GUI-code-samples/tree/main/IpAddressFinderFXGui/src',
+  //   imageSrc: '/portfolio-img/ip-address-finder.jpg',
+  // },
 ]

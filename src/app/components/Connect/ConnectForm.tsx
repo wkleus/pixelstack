@@ -78,7 +78,9 @@ const ConnectForm = () => {
       transition={{ duration: 0.75 }}
       className="mx-auto mb-20 max-w-7xl"
     >
-      <h1 className="mt-16 mb-10 text-center text-4xl font-bold">Contact Me</h1>
+      <h1 className="mt-16 mb-10 text-center text-4xl font-bold 2xl:mt-20">
+        Contact Me
+      </h1>
 
       <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
         {/* Left side: contact info */}
