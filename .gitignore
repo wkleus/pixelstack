@@ -43,6 +43,8 @@ yarn-error.log*
 .env*
 .env*.local
 .env.local
+.env.development.local
+.env.test.local
 
 # Agent context files
 agent-prompt.txt
