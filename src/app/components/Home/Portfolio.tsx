@@ -9,7 +9,7 @@ import { HiOutlineGlobeAlt } from 'react-icons/hi'
 
 const Portfolio = () => {
   // Limit the displayed portfolio items to the first 5
-  const limitedPortfolio = portfolios.slice(0, 4)
+  const limitedPortfolio = portfolios.slice(0, 3)
 
   return (
     <section className="dark:bg-dark/30 bg-white py-24">

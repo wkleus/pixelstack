@@ -1,21 +1,25 @@
-import { posts } from '@/data/posts'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { getAllPostHandles, getPostByHandle } from '@/lib/posts'
 
 interface PostProps {
-  params: { handle: string }
+  // Next.js 15+/16: dynamic route params are async
+  params: Promise<{ handle: string }>
 }
 
-export function generateStaticParams() {
-  return posts.map((post) => ({ handle: post.handle }))
+// pre-renders one static page per published post at build time
+export async function generateStaticParams() {
+  const handles = await getAllPostHandles()
+  return handles.map((handle) => ({ handle }))
 }
 
+// per-post SEO metadata (title, description, Open Graph)
 export async function generateMetadata({
   params,
 }: PostProps): Promise<Metadata> {
   const { handle } = await params
-  const post = posts.find((b) => b.handle === handle)
+  const post = await getPostByHandle(handle)
 
   if (!post) {
     return { title: 'Blog post not found' }
@@ -34,12 +38,8 @@ export async function generateMetadata({
 
 const PostDetailsSite = async ({ params }: PostProps) => {
   const { handle } = await params
-  const post = posts
-    .sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    )
-    .find((b) => b.handle === handle)
+  // Only returns published posts — unpublished handles fall through to notFound()
+  const post = await getPostByHandle(handle)
 
   if (!post) {
     return notFound()
@@ -60,6 +60,7 @@ const PostDetailsSite = async ({ params }: PostProps) => {
         {new Date(post.createdAt).toLocaleDateString()} • {post.timeToRead}
       </p>
 
+      {/* Content stored as raw HTML in DB */}
       <div
         className="prose dark:prose-invert max-w-none"
         dangerouslySetInnerHTML={{ __html: post.content }}
