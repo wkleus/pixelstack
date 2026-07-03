@@ -3,6 +3,7 @@
 [![Next.js](https://img.shields.io/badge/Next.js-0070F3?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
 [![Vercel](https://img.shields.io/badge/Vercel-2EAD33?style=for-the-badge&logo=vercel&logoColor=000000)](https://vercel.com/)
 [![Resend](https://img.shields.io/badge/Resend-E93D28?style=for-the-badge&logo=resend&logoColor=white)](https://resend.com/)
+[![Prisma](https://img.shields.io/badge/Prisma_7-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/)
 [![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
@@ -15,9 +16,9 @@
 [![Status: Deployed](https://img.shields.io/badge/Status-Deployed-22c55e?style=for-the-badge)](/)
 [![Status: Live](https://img.shields.io/badge/Status-Live-22c55e?style=for-the-badge)](https://pixelstack.me)
 
-An animated and responsive portfolio for web apps — built with **Next.js**, **TypeScript**, **React.js**, **Tailwind CSS**, **Framer Motion**, **Resend** and **DeepSeek**.
+An animated and responsive portfolio for web apps — built with **Next.js**, **TypeScript**, **React.js**, **Tailwind CSS**, **Framer Motion**, **PostgreSQL** (hosted on **Neon**, via **Prisma 7**), **Resend** and **DeepSeek**.
 
-Comes with: portfolio showcase, blog system, contact form with real email delivery and auto-reply, newsletter subscription with admin notification, search for portfolio and posts, interactive grid hero section with mouse tracking, profile page, dark/light mode and an AI-powered assistant (PixelStack AI) that answers questions about skills, projects, and IT education — and intelligently prefills the contact form based on your intent. All emails delivered via Resend.
+Comes with: portfolio showcase, a database-backed blog system, contact form with real email delivery and auto-reply, newsletter subscription with admin notification, search for portfolio and posts, interactive grid hero section with mouse tracking, profile page, dark/light mode and an AI-powered assistant (PixelStack AI) that answers questions about skills, projects, and IT education — and intelligently prefills the contact form based on your intent. All emails delivered via Resend.
 
 ## Live Demo
 
@@ -77,13 +78,16 @@ The project is deployed on Vercel and IONOS.
 
 - [Features](#features)
 - [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
 - [Project Structure](#project-structure)
+- [Blog & Database](#blog--database)
 - [AI Assistant](#ai-assistant)
 - [Contact Form & Email](#contact-form--email)
 - [Newsletter](#newsletter)
 - [Interactive Grid](#interactive-grid)
 - [Dark Mode](#dark-mode)
 - [Testing](#testing)
+- [Upcoming Work](#upcoming-work)
 - [License](#license)
 
 ---
@@ -100,6 +104,7 @@ The project is deployed on Vercel and IONOS.
 
 - **Hero section** with animated intro, persistent grid background and mouse-following spotlight effect
 - **Portfolio** with project previews, tech stack, and live links
+- **Blog system** backed by **PostgreSQL** via **Prisma 7**, with dynamic routes (`/posts/[handle]`)
 - **Blog system** with dynamic routes (`/posts/[handle]`)
 - **Search bar** filters portfolio items and blog posts by title, keyword in the description or technology
 - **Contact form** with real email delivery via Resend (`/api/connect`)
@@ -114,18 +119,20 @@ The project is deployed on Vercel and IONOS.
 
 ### Tech Stack
 
-| Layer           | Technology                              |
-| --------------- | --------------------------------------- |
-| Framework       | Next.js 16 (App Router)                 |
-| Language        | TypeScript 5 (strict mode)              |
-| UI              | React 19, Tailwind CSS 4, Framer Motion |
-| Icons           | Heroicons, React Icons                  |
-| Email           | Resend SDK                              |
-| AI Model        | DeepSeek API (OpenAI-compatible)        |
-| AI Capabilities | Tool Calling, Intent Detection          |
-| Markdown        | react-markdown + remark-gfm             |
-| Testing         | Jest, Playwright                        |
-| Deployment      | Vercel + IONOS (custom domain)          |
+| Layer           | Technology                                       |
+| --------------- | ------------------------------------------------ |
+| Framework       | Next.js 16 (App Router)                          |
+| Language        | TypeScript 5 (strict mode)                       |
+| UI              | React 19, Tailwind CSS 4, Framer Motion          |
+| Icons           | Heroicons, React Icons                           |
+| Database        | PostgreSQL (hosted on [Neon](https://neon.tech)) |
+| ORM             | Prisma 7 (driver adapter via `pg`)               |
+| Email           | Resend SDK                                       |
+| AI Model        | DeepSeek API (OpenAI-compatible)                 |
+| AI Capabilities | Tool Calling, Intent Detection                   |
+| Markdown        | react-markdown + remark-gfm                      |
+| Testing         | Jest, Playwright                                 |
+| Deployment      | Vercel + IONOS (custom domain)                   |
 
 ---
 
@@ -134,22 +141,30 @@ The project is deployed on Vercel and IONOS.
 ```
 📁 pixelstack
 │
+├── 📂 prisma
+│   ├── 📂 migrations               # Prisma migration history
+│   └── 📄 schema.prisma            # Post model definition
+│
+├── 📂 scripts
+│   ├── 📄 import-posts.ts          # Seeds the DB from src/data/posts.ts
+│   └── 📄 test-db.ts               # Verifies the DB connection
+│
 ├── 📂 src
 │   ├── 📂 app
 │   │   ├── 📂 api
 │   │   │   ├── 📂 newsletter       # Newsletter subscription endpoint
-│   │   │   ├── 📂 agent           # AI assistant endpoint (DeepSeek)
+│   │   │   ├── 📂 agent            # AI assistant endpoint (DeepSeek)
 │   │   │   └── 📂 connect          # Contact form API endpoint with email
 │   │   ├── 📂 components           # Reusable UI components
 │   │   │   ├── 📂 Agent            # AI assistant chat widget
 │   │   │   ├── 📂 Connect          # Contact form (hook + component)
 │   │   │   ├── 📂 Footer           # Footer with social links
 │   │   │   ├── 📂 Header           # Header + theme toggle
-│   │   │   ├── 📂 Home             # Homepage sections
+│   │   │   ├── 📂 Home             # Homepage sections (Posts.tsx fetches from DB)
 │   │   │   ├── 📂 MessageUI        # Error/success messages
 │   │   │   └── 📂 Profile          # About me components
 │   │   ├── 📂 portfolio            # Portfolio overview
-│   │   ├── 📂 posts                # Blog system
+│   │   ├── 📂 posts                # Blog system — pages fetch from PostgreSQL
 │   │   ├── 📂 profile              # Profile page
 │   │   ├── 📂 context              # ThemeContext provider
 │   │   ├── 📄 layout.tsx
@@ -157,14 +172,18 @@ The project is deployed on Vercel and IONOS.
 │   │   └── 📄 page.tsx             # Homepage
 │   │
 │   ├── 📂 data                     # Static content
-│   │   ├── 📂 content              # Blog post details
+│   │   ├── 📂 content              # Blog post seed content (used by import-posts.ts)
 │   │   ├── 📄 agentContext.ts      # AI assistant system prompt
-│   │   ├── 📄 posts.ts             # Blog metadata
+│   │   ├── 📄 posts.ts             # Blog seed data (imported into PostgreSQL, not read live)
 │   │   └── 📄 portfolio.ts         # Portfolio data
 │   │
 │   ├── 📂 hooks                    # Custom React hooks
 │   │   ├── 📄 useAgent.ts          # AI assistant state & fetch logic
 │   │   └── 📄 useSearch.ts         # Generic search/filter hook
+│   │
+│   ├── 📂 lib
+│   │   ├── 📄 prisma.ts            # Prisma Client (pg driver adapter)
+│   │   └── 📄 posts.ts             # DB access layer for blog posts
 │   │
 │   └── 📂 types                    # TypeScript definitions
 │
@@ -177,11 +196,41 @@ The project is deployed on Vercel and IONOS.
 │
 ├── 📂 public                       # Static assets
 │
+├── 📄 prisma.config.ts
 ├── 📄 jest.config.ts
 ├── 📄 playwright.config.ts
 ├── 📄 package.json
 └── 📄 README.md
 ```
+
+---
+
+## Blog & Database
+
+Blog posts are stored in a **PostgreSQL** database (`Post` table) - hosted on **[Neon](https://neon.tech)**, connected via **Vercel's Neon integration** - and served through **Prisma 7**, using the `@prisma/adapter-pg` driver adapter (required since Prisma 7 dropped the bundled Rust query engine). Local development and Vercel production both point at the same Neon database via `DATABASE_URL`.
+
+### Schema
+
+The `Post` model (`prisma/schema.prisma`) includes: `handle` (unique slug), `name`, `overview`, `content` (HTML), `timeToRead`, `createdAt`, `updatedAt`, `published`, and `tags`.
+
+### How pages read the data
+
+`src/lib/posts.ts` centralizes all reads and only ever returns **published** posts:
+
+- `getAllPosts()` — all published posts, newest first (used by `/posts`)
+- `getRecentPosts(limit)` — the most recent posts, up to the given limit (used on the homepage)
+- `getPostByHandle(handle)` — single post (used by `/posts/[handle]`)
+- `getAllPostHandles()` — used by `generateStaticParams`
+
+Pages that display posts (`src/app/posts/page.tsx`, `src/app/posts/[handle]/page.tsx`, `src/app/components/Home/Posts.tsx`) are **Server Components** that fetch via this layer and pass the data down as props to client components handling animation and search.
+
+### Managing content today
+
+Posts can currently be created or edited directly in the database — either through the **[Neon SQL Editor](https://neon.tech/docs/get-started-with-neon/query-with-neon-sql-editor)** or via **pgAdmin4**.
+
+`src/data/posts.ts` + `src/data/content/*.ts` remain in the repo purely as the **original seed source** for `scripts/import-posts.ts`; they are no longer read by the live app.
+
+> An in-app admin panel (with authentication) and a switch from raw HTML to Markdown content are also planned — see [Upcoming Work](#upcoming-work).
 
 ---
 
@@ -372,6 +421,13 @@ npm run test:e2e    # Playwright E2E tests
 ---
 
 ## Upcoming Work
+
+### Blog & Content Management
+
+- In-app admin area for creating, editing and deleting posts (with authentication)
+- Switch post `content` from raw HTML to Markdown
+- Script to export the current DB content back into `src/data/posts.ts` as a versioned snapshot
+- Switch `/posts/[handle]` (and the homepage teaser) from pure SSG to ISR (`revalidate`)
 
 ### AI‑Agent (Portfolio Guide)
 
