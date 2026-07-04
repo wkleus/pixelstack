@@ -232,6 +232,11 @@ const AgentWidget = () => {
     [handleSend],
   )
 
+  // hide AgentWidget on admin pages
+  if (pathname.startsWith('/admin')) {
+    return null
+  }
+
   return (
     <>
       {/* FLOATING TOGGLE BUTTON - only visible when chat is closed */}
