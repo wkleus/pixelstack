@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 const LoginPage = async () => {
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-sm flex-col justify-center px-4">
@@ -26,12 +28,13 @@ const LoginPage = async () => {
           />
         </div>
 
-        <button
+        <Link
+          href="/admin/adminDashboard"
           type="submit"
-          className="mt-2 cursor-pointer rounded-lg bg-cyan-500 px-4 py-2 font-semibold text-white transition-colors hover:bg-cyan-600"
+          className="mt-2 cursor-pointer rounded-lg bg-cyan-500 px-4 py-2 text-center font-semibold text-white transition-colors hover:bg-cyan-600"
         >
           Sign in
-        </button>
+        </Link>
       </form>
     </div>
   )

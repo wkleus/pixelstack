@@ -59,3 +59,29 @@ export async function getAllPostHandles(): Promise<string[]> {
 
   return posts.map((p) => p.handle)
 }
+
+/*
+ * admin-only queries
+ * NOTE - IMPLEMENTATION TODO (later!!!): protecting by admin auth check
+ */
+export interface AdminPostSummary {
+  id: string
+  handle: string
+  name: string
+  published: boolean
+  createdAt: Date
+}
+
+// all posts (published and drafts), newest first — for the admin list view
+export async function getAllPostsForAdmin(): Promise<AdminPostSummary[]> {
+  return prisma.post.findMany({
+    orderBy: { createdAt: 'desc' },
+    select: {
+      id: true,
+      handle: true,
+      name: true,
+      published: true,
+      createdAt: true,
+    },
+  })
+}
