@@ -253,7 +253,7 @@ const ConnectForm = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="btn w-full bg-cyan-600 text-white hover:bg-cyan-600/80 disabled:bg-cyan-400/50"
+              className="btn w-full cursor-pointer bg-cyan-600 text-white hover:bg-cyan-600/80 disabled:bg-cyan-400/50"
             >
               {isSubmitting ? 'Sending...' : 'Send Message'}
             </button>

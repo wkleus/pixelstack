@@ -19,13 +19,24 @@ const FooterLogo = () => {
         © {new Date().getFullYear()} PixelStack&trade; Webfolio. All rights
         reserved.
       </p>
-      <Link
-        href="/imprint"
-        // className="mb-3 text-[11px] text-gray-300 opacity-50 hover:opacity-80"
-        className="mb-3 text-[11px] text-cyan-500 opacity-70 hover:opacity-100"
-      >
-        Imprint
-      </Link>
+
+      <div className="mb-3 flex items-center gap-3">
+        <Link
+          href="/imprint"
+          className="text-[11px] text-cyan-500 opacity-70 hover:opacity-90"
+        >
+          Imprint
+        </Link>
+        <span className="text-[11px] text-cyan-500 opacity-70 hover:opacity-90">
+          |
+        </span>
+        <Link
+          href="/admin/login"
+          className="text-[11px] text-cyan-500 opacity-70 hover:opacity-90"
+        >
+          Admin
+        </Link>
+      </div>
     </div>
   )
 }
