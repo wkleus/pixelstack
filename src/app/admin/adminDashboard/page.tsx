@@ -1,21 +1,43 @@
 import { getAllPostsForAdmin } from '@/lib/posts'
+import { redirect } from 'next/navigation'
+import { auth, signOut } from '@/auth'
 
 const AdminDashboard = async () => {
+  // real access check: no valid session -> straight back to login page
+  const session = await auth()
+  if (!session?.user) {
+    redirect('/admin/login')
+  }
   const posts = await getAllPostsForAdmin()
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12">
       <div className="mb-8 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Posts</h1>
+        <div className="flex items-center gap-4">
+          {/* NOTE: placeholder — not wired up yet: create new post button */}
+          <button
+            type="button"
+            disabled
+            className="cursor-not-allowed rounded-lg bg-cyan-500/50 px-4 py-2 text-sm font-semibold text-white"
+          >
+            + New Post
+          </button>
 
-        {/* NOTE: placeholder — not wired up yet: create new post button */}
-        <button
-          type="button"
-          disabled
-          className="cursor-not-allowed rounded-lg bg-cyan-500/50 px-4 py-2 text-sm font-semibold text-white"
-        >
-          + New Post
-        </button>
+          <form
+            action={async () => {
+              'use server'
+              await signOut({ redirectTo: '/admin/login' })
+            }}
+          >
+            <button
+              type="submit"
+              className="text-sm text-gray-500 transition-colors hover:text-cyan-500"
+            >
+              Sign out
+            </button>
+          </form>
+        </div>
       </div>
 
       <div className="overflow-x-auto">
