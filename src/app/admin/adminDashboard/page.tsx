@@ -1,6 +1,7 @@
 import { getAllPostsForAdmin } from '@/lib/posts'
 import { redirect } from 'next/navigation'
 import { auth, signOut } from '@/auth'
+import DeletePostButton from './DeletePostButton'
 
 const AdminDashboard = async () => {
   // real access check: no valid session -> straight back to login page
@@ -78,14 +79,12 @@ const AdminDashboard = async () => {
                   })}
                 </td>
                 <td className="py-3 pr-4">
-                  {/* NOTE: placeholders — not wired up yet: Edit & Delete buttons */}
-                  <div className="flex items-center justify-end gap-3 opacity-50">
-                    <span className="cursor-not-allowed rounded-lg border border-cyan-500/50 px-2 py-1 font-semibold text-cyan-500">
+                  {/* NOTE: Edit = placeholder <-> but Delete is now wired up */}
+                  <div className="flex items-center justify-end gap-3">
+                    <span className="cursor-not-allowed rounded-lg border border-cyan-500/50 px-2 py-1 font-semibold text-cyan-500 opacity-50">
                       Edit
                     </span>
-                    <span className="cursor-not-allowed rounded-lg border border-red-500/50 px-2 py-1 font-semibold text-red-500">
-                      Delete
-                    </span>
+                    <DeletePostButton postId={post.id} postName={post.name} />
                   </div>
                 </td>
               </tr>
