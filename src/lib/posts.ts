@@ -60,10 +60,7 @@ export async function getAllPostHandles(): Promise<string[]> {
   return posts.map((p) => p.handle)
 }
 
-/*
- * admin-only queries
- * NOTE - IMPLEMENTATION TODO (later!!!): protecting by admin auth check
- */
+/* admin-only queries */
 export interface AdminPostSummary {
   id: string
   handle: string
@@ -84,4 +81,34 @@ export async function getAllPostsForAdmin(): Promise<AdminPostSummary[]> {
       createdAt: true,
     },
   })
+}
+
+export interface AdminPostDetail {
+  id: string
+  handle: string
+  name: string
+  overview: string
+  content: string
+  timeToRead: string
+  tags: string[]
+  published: boolean
+}
+
+/* single post (published or draft) by id - for edit form */
+export async function getPostByIdForAdmin(
+  id: string,
+): Promise<AdminPostDetail | null> {
+  const post = await prisma.post.findUnique({ where: { id } })
+  if (!post) return null
+
+  return {
+    id: post.id,
+    handle: post.handle,
+    name: post.name,
+    overview: post.overview,
+    content: post.content,
+    timeToRead: post.timeToRead,
+    tags: post.tags,
+    published: post.published,
+  }
 }
