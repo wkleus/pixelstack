@@ -7,6 +7,12 @@ export const authConfig = {
   },
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
+      console.log('PROXY DEBUG:', {
+        path: nextUrl.pathname,
+        hasAuth: !!auth,
+        hasUser: !!auth?.user,
+      })
+
       const isLoggedIn = !!auth?.user
       const isOnLoginPage = nextUrl.pathname === '/admin/login'
 
