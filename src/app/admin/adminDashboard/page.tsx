@@ -32,7 +32,7 @@ const AdminDashboard = async () => {
           >
             <button
               type="submit"
-              className="text-sm text-gray-500 transition-colors hover:text-cyan-500"
+              className="cursor-pointer rounded-lg border border-slate-400/40 px-4 py-2 text-sm text-gray-500 transition-colors hover:border-cyan-500 hover:text-cyan-500"
             >
               Sign out
             </button>

@@ -11,7 +11,6 @@ function parseTags(raw: string): string[] {
     .map((tag) => tag.trim())
     .filter(Boolean)
 }
-
 function slugify(input: string): string {
   return input
     .toLowerCase()
