@@ -17,14 +17,12 @@ const AdminDashboard = async () => {
       <div className="mb-8 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Posts</h1>
         <div className="flex items-center gap-4">
-          {/* NOTE: placeholder — not wired up yet: create new post button */}
-          <button
-            type="button"
-            disabled
-            className="cursor-not-allowed rounded-lg bg-cyan-500/50 px-4 py-2 text-sm font-semibold text-white"
+          <Link
+            href="/admin/posts/new"
+            className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-cyan-600"
           >
             + New Post
-          </button>
+          </Link>
 
           <form
             action={async () => {

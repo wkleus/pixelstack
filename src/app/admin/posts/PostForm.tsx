@@ -10,7 +10,7 @@ interface PostFormDefaultValues {
 
 interface PostFormProps {
   action: (formData: FormData) => Promise<void>
-  defaultValues: PostFormDefaultValues
+  defaultValues?: PostFormDefaultValues
 }
 
 const inputClass =
@@ -25,7 +25,7 @@ const PostForm = ({ action, defaultValues }: PostFormProps) => {
           name="name"
           type="text"
           required
-          defaultValue={defaultValues.name}
+          defaultValue={defaultValues?.name}
           className={inputClass}
         />
       </div>
@@ -33,12 +33,14 @@ const PostForm = ({ action, defaultValues }: PostFormProps) => {
       <div>
         <label className="mb-1 block text-sm font-medium">
           Handle (URL slug)
+          {!defaultValues && ' — leave empty to auto-generate from the title'}
         </label>
         <input
           name="handle"
           type="text"
-          required
-          defaultValue={defaultValues.handle}
+          required={!!defaultValues}
+          defaultValue={defaultValues?.handle}
+          placeholder={defaultValues ? undefined : 'fundamentals-of-js'}
           className={inputClass}
         />
       </div>
@@ -49,7 +51,7 @@ const PostForm = ({ action, defaultValues }: PostFormProps) => {
           name="overview"
           required
           rows={2}
-          defaultValue={defaultValues.overview}
+          defaultValue={defaultValues?.overview}
           className={inputClass}
         />
       </div>
@@ -62,7 +64,7 @@ const PostForm = ({ action, defaultValues }: PostFormProps) => {
           name="content"
           required
           rows={18}
-          defaultValue={defaultValues.content}
+          defaultValue={defaultValues?.content}
           className={`${inputClass} font-mono text-sm`}
         />
       </div>
@@ -73,7 +75,8 @@ const PostForm = ({ action, defaultValues }: PostFormProps) => {
           <input
             name="timeToRead"
             type="text"
-            defaultValue={defaultValues.timeToRead}
+            placeholder="5 min read"
+            defaultValue={defaultValues?.timeToRead}
             className={inputClass}
           />
         </div>
@@ -85,7 +88,8 @@ const PostForm = ({ action, defaultValues }: PostFormProps) => {
           <input
             name="tags"
             type="text"
-            defaultValue={defaultValues.tags.join(', ')}
+            placeholder="javascript, fundamentals"
+            defaultValue={defaultValues?.tags?.join(', ')}
             className={inputClass}
           />
         </div>
@@ -95,7 +99,7 @@ const PostForm = ({ action, defaultValues }: PostFormProps) => {
         <input
           name="published"
           type="checkbox"
-          defaultChecked={defaultValues.published}
+          defaultChecked={defaultValues?.published ?? true}
         />
         Published (visible on the live site)
       </label>
