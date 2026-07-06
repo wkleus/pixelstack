@@ -5,15 +5,44 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { FaGithub } from 'react-icons/fa'
 import { motion } from 'framer-motion'
-import { HiOutlineGlobeAlt } from 'react-icons/hi'
+import { HiOutlineGlobeAlt, HiOutlineCode } from 'react-icons/hi'
 import SearchBar from '../components/Search/SearchBar'
 import { useSearch } from '@/app/hooks/useSearch'
+import { useState, useEffect } from 'react'
 
 const Portfolio = () => {
   const { query, setQuery, filtered, totalCount, resultCount } = useSearch(
     portfolios,
     ['name', 'overview', 'techStack'],
   )
+  const [selectedTechStack, setSelectedTechStack] = useState<string[] | null>(
+    null,
+  )
+  const [selectedProjectName, setSelectedProjectName] = useState<string>('')
+
+  const openModal = (techStack: string[], projectName: string) => {
+    setSelectedTechStack(techStack)
+    setSelectedProjectName(projectName)
+  }
+
+  const closeModal = () => {
+    setSelectedTechStack(null)
+    setSelectedProjectName('')
+  }
+
+  // Handle body scroll when modal is open/closed
+  useEffect(() => {
+    if (selectedTechStack) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'auto'
+    }
+
+    // Cleanup function
+    return () => {
+      document.body.style.overflow = 'auto'
+    }
+  }, [selectedTechStack])
 
   return (
     <div className="mx-5 py-28 sm:mx-15 md:mx-5 lg:mx-15 xl:mx-30">
@@ -67,7 +96,7 @@ const Portfolio = () => {
         {filtered.map((portfolio) => (
           <article
             key={portfolio.name}
-            className="dark:bg-dark/50 rounded-lg bg-white p-6 shadow-md transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-cyan-500/20"
+            className="dark:bg-dark/50 grid min-h-[400px] grid-rows-[auto_auto_1fr_auto] rounded-lg bg-white p-6 shadow-md transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-cyan-500/20"
           >
             <div className="relative mb-4 aspect-video h-auto w-full overflow-hidden rounded-lg">
               <Image
@@ -81,11 +110,11 @@ const Portfolio = () => {
               />
             </div>
             <h3 className="mb-2 text-xl font-semibold">{portfolio.name}</h3>
-            <p className="mb-4 text-gray-600 dark:text-gray-300">
+            <p className="mb-5 text-gray-600 dark:text-gray-300">
               {portfolio.overview}
             </p>
-            <div className="mb-4 flex flex-wrap gap-2">
-              {portfolio.techStack.map((tech, index) => (
+            <div className="mb-4 flex min-h-[80px] flex-wrap content-center items-center gap-2">
+              {portfolio.techStack.map((tech: string, index: number) => (
                 <span
                   key={index}
                   className="rounded-full bg-cyan-200/20 px-3 py-1 text-sm text-cyan-600 dark:bg-cyan-600/20 dark:text-cyan-300"
@@ -94,7 +123,18 @@ const Portfolio = () => {
                 </span>
               ))}
             </div>
-            <div className="mt-2 flex gap-4">
+            <div className="mt-4 flex gap-6">
+              {portfolio.showFullTechStack && portfolio.fullTechStack && (
+                <button
+                  onClick={() =>
+                    openModal(portfolio.fullTechStack!, portfolio.name)
+                  }
+                  className="text-secondary flex cursor-pointer items-center gap-2 transition-colors hover:text-cyan-500"
+                >
+                  <HiOutlineCode className="h-6 w-6" />
+                  <span>Tech Stack</span>
+                </button>
+              )}
               <Link
                 href={portfolio.preview}
                 target="_blank"
@@ -120,6 +160,70 @@ const Portfolio = () => {
         <p className="mt-16 text-center text-gray-400">
           No projects match your search.
         </p>
+      )}
+
+      {/* Modal */}
+      {selectedTechStack && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+          onClick={closeModal}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.3 }}
+            className="relative max-h-[80vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-8 shadow-2xl dark:bg-gray-900"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close button */}
+            <button
+              onClick={closeModal}
+              className="absolute top-4 right-4 cursor-pointer text-gray-400 transition-colors hover:text-gray-600 dark:hover:text-gray-200"
+            >
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+
+            <h2 className="mb-8 text-2xl font-bold text-cyan-600 dark:text-cyan-100">
+              Full Tech Stack – {selectedProjectName}
+            </h2>
+
+            <div className="flex flex-wrap gap-3">
+              {selectedTechStack.map((tech, index) => (
+                <motion.span
+                  key={index}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.02 }}
+                  className="rounded-full bg-cyan-100 px-4 py-2 text-sm font-medium text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300"
+                >
+                  {tech}
+                </motion.span>
+              ))}
+            </div>
+
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={closeModal}
+                className="cursor-pointer rounded-lg bg-cyan-600 px-6 py-2 font-semibold text-white transition-colors hover:bg-cyan-700"
+              >
+                Close
+              </button>
+            </div>
+          </motion.div>
+        </div>
       )}
     </div>
   )

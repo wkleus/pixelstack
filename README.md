@@ -69,6 +69,24 @@ The project is deployed on Vercel and IONOS.
 </p>
 
 <p align="center">
+<img src="public/preview/login-page.png" width="700" alt="Admin Login page preview" />
+<br />
+<em>Admin Login page</em>
+</p>
+
+<p align="center">
+<img src="public/preview/admin-dashboard-page.png" width="700" alt="Admin Dashboard page preview" />
+<br />
+<em>Admin Dashboard page with buttons for create, edit, delete posts</em>
+</p>
+
+<p align="center">
+<img src="public/preview/create-post-page.png" width="700" alt="Create New Post page preview" />
+<br />
+<em>Form for creating a new post by Admin</em>
+</p>
+
+<p align="center">
 <img src="public/preview/not-found.png" width="700" alt="Not Found page preview" />
 <br />
 <em>404 Not Found Page (dark mode) with PixelStack AI Widget</em>

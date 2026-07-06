@@ -21,4 +21,6 @@ export interface Portfolio {
   techStack: string[]
   preview: string
   sourceUrl: string
+  fullTechStack?: string[]
+  showFullTechStack?: boolean
 }
