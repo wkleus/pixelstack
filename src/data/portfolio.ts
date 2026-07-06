@@ -12,7 +12,16 @@ export const portfolios: Portfolio[] = [
 
     // Short description of the project
     overview:
-      'A full-stack site for discovering residential properties across Europe - from city apartments to alpine chalets',
+      'A full-stack real estate platform featuring property browsing, filtering, favorites, email contact, admin dashboard, and multilingual support (EN/DE) – built with React, Node.js, Express, PostgreSQL, Supabase Auth and Resend',
+
+    // How the project works
+    howItWorks: `HomeSphere is a full-stack real estate platform. Here's how it works:
+
+        1. Browse Listings – Users can explore residential properties across Europe.
+        2. Filter & Search – Properties can be filtered by category and deal type.
+        3. Save Favorites – Users can save properties to their favorites list.
+        4. Contact Agents – Users can send inquiries via email through the contact form (powered by Resend).
+        5. Admin Dashboard – Administrators can manage the entire property catalog through a protected dashboard.`,
 
     // Technologies used in the project
     techStack: [
@@ -69,8 +78,17 @@ export const portfolios: Portfolio[] = [
   },
   {
     name: 'Linguify',
+
     overview:
-      'Web application to support users in working with multilingual text',
+      'A client‑side web application for multilingual text processing, featuring translation, synonym lookup, and automation settings. Built with React, TailwindCSS, and Vite, it consumes external language APIs and stores user preferences locally via localStorage',
+
+    howItWorks: `Linguify is a client-side web application for multilingual text processing. Here's how it works:
+
+      1. Translation – Enter text and select a target language to translate.
+      2. Synonym Lookup – Find alternative words for text revision.
+      3. Automation Features – Configure auto-clear and auto-copy in the settings.
+      4. Language Switching – Switch between supported languages with a single click.`,
+
     techStack: [
       'React',
       'Vite',
@@ -83,6 +101,7 @@ export const portfolios: Portfolio[] = [
       'REST APIs',
       'localStorage',
     ],
+
     fullTechStack: [
       'React 19+',
       'Vite 7+',
@@ -97,15 +116,19 @@ export const portfolios: Portfolio[] = [
       'GitHub Pages',
       'Vercel',
     ],
+
     sourceUrl: 'https://github.com/wkleus/linguify',
+
     preview: 'https://linguify-web.vercel.app/',
+
     imageSrc: '/portfolio-img/linguify.png',
+
     showFullTechStack: true,
   },
   {
     name: 'PixelStack Portfolio',
     overview:
-      'A full-stack portfolio app built with TypeScript, Next.js & Tailwind CSS.',
+      'An animated and responsive portfolio with Next.js, TypeScript, Tailwind CSS, Framer Motion, PostgreSQL, Resend, and DeepSeek AI – featuring a blog, contact form, newsletter, search, dark mode, and an AI assistant that prefills the contact form',
     techStack: [
       'Next.js',
       'TypeScript',

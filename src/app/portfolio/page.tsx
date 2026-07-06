@@ -5,7 +5,11 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { FaGithub } from 'react-icons/fa'
 import { motion } from 'framer-motion'
-import { HiOutlineGlobeAlt, HiOutlineCode } from 'react-icons/hi'
+import {
+  HiOutlineGlobeAlt,
+  HiOutlineCode,
+  HiOutlineInformationCircle,
+} from 'react-icons/hi'
 import SearchBar from '../components/Search/SearchBar'
 import { useSearch } from '@/app/hooks/useSearch'
 import { useState, useEffect } from 'react'
@@ -19,6 +23,9 @@ const Portfolio = () => {
     null,
   )
   const [selectedProjectName, setSelectedProjectName] = useState<string>('')
+  const [selectedHowItWorks, setSelectedHowItWorks] = useState<string | null>(
+    null,
+  )
 
   const openModal = (techStack: string[], projectName: string) => {
     setSelectedTechStack(techStack)
@@ -30,9 +37,19 @@ const Portfolio = () => {
     setSelectedProjectName('')
   }
 
+  const openHowItWorks = (howItWorks: string, projectName: string) => {
+    setSelectedHowItWorks(howItWorks)
+    setSelectedProjectName(projectName)
+  }
+
+  const closeHowItWorks = () => {
+    setSelectedHowItWorks(null)
+    setSelectedProjectName('')
+  }
+
   // Handle body scroll when modal is open/closed
   useEffect(() => {
-    if (selectedTechStack) {
+    if (selectedTechStack || selectedHowItWorks) {
       document.body.style.overflow = 'hidden'
     } else {
       document.body.style.overflow = 'auto'
@@ -42,10 +59,10 @@ const Portfolio = () => {
     return () => {
       document.body.style.overflow = 'auto'
     }
-  }, [selectedTechStack])
+  }, [selectedTechStack, selectedHowItWorks])
 
   return (
-    <div className="mx-5 py-28 sm:mx-15 md:mx-5 lg:mx-15 xl:mx-30">
+    <div className="py-28 sm:mx-15 md:mx-5 lg:mx-15 xl:mx-30">
       <motion.h1
         initial={{ opacity: 0, y: -25 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -59,7 +76,7 @@ const Portfolio = () => {
         initial={{ opacity: 0, y: 0, x: 120 }}
         animate={{ opacity: 1, y: 0, x: 0 }}
         transition={{ duration: 1.0 }}
-        className="mt-6 mb-10 text-center text-lg text-gray-500"
+        className="mx-5 mt-6 mb-10 text-center text-lg text-gray-500"
       >
         Here are some of my Web App Portfolio Works. Click on the links below to
         view them. You can find more of them on my{' '}
@@ -77,6 +94,7 @@ const Portfolio = () => {
         initial={{ opacity: 0, x: -120 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 1, ease: 'easeOut' }}
+        style={{ margin: '0 2rem' }}
       >
         <SearchBar
           value={query}
@@ -91,12 +109,12 @@ const Portfolio = () => {
         initial={{ opacity: 0, y: 120 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1.2 }}
-        className="grid grid-cols-1 gap-8 md:grid-cols-2 2xl:grid-cols-3"
+        className="grid grid-cols-1 gap-6 md:mx-25 lg:mx-0 lg:grid-cols-2 2xl:grid-cols-3"
       >
         {filtered.map((portfolio) => (
           <article
             key={portfolio.name}
-            className="dark:bg-dark/50 grid min-h-[400px] grid-rows-[auto_auto_1fr_auto] rounded-lg bg-white p-6 shadow-md transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-cyan-500/20"
+            className="dark:bg-dark/50 mx-1 grid min-h-[400px] grid-rows-[auto_auto_1fr_auto] rounded-lg bg-white p-4 shadow-md transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-cyan-500/20"
           >
             <div className="relative mb-4 aspect-video h-auto w-full overflow-hidden rounded-lg">
               <Image
@@ -109,7 +127,22 @@ const Portfolio = () => {
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
             </div>
-            <h3 className="mb-2 text-xl font-semibold">{portfolio.name}</h3>
+            <div className="flex">
+              <h3 className="mb-2 text-xl font-semibold">{portfolio.name}</h3>
+              {/* howItWorks (for Linguify & HomeSphere only) */}
+              {portfolio.howItWorks && (
+                <button
+                  onClick={() =>
+                    openHowItWorks(portfolio.howItWorks!, portfolio.name)
+                  }
+                  className="transition-colorstext-cyan-500 -mt-5 flex cursor-pointer items-center gap-2 text-gray-500 hover:text-cyan-600 dark:text-cyan-400 dark:hover:text-cyan-300"
+                  aria-label={`How ${portfolio.name} works`}
+                  title={`How ${portfolio.name} works`}
+                >
+                  <HiOutlineInformationCircle className="h-6 w-6" />
+                </button>
+              )}
+            </div>
             <p className="mb-5 text-gray-600 dark:text-gray-300">
               {portfolio.overview}
             </p>
@@ -123,13 +156,13 @@ const Portfolio = () => {
                 </span>
               ))}
             </div>
-            <div className="mt-4 flex gap-6">
+            <div className="mt-4 flex flex-wrap items-center gap-6 md:text-sm lg:text-base">
               {portfolio.showFullTechStack && portfolio.fullTechStack && (
                 <button
                   onClick={() =>
                     openModal(portfolio.fullTechStack!, portfolio.name)
                   }
-                  className="text-secondary flex cursor-pointer items-center gap-2 transition-colors hover:text-cyan-500"
+                  className="text-secondary flex cursor-pointer items-center gap-1 transition-colors hover:text-cyan-500"
                 >
                   <HiOutlineCode className="h-6 w-6" />
                   <span>Tech Stack</span>
@@ -138,7 +171,7 @@ const Portfolio = () => {
               <Link
                 href={portfolio.preview}
                 target="_blank"
-                className="text-secondary flex items-center gap-2 transition-colors hover:text-cyan-500"
+                className="text-secondary flex items-center gap-1 transition-colors hover:text-cyan-500"
               >
                 <HiOutlineGlobeAlt className="h-6 w-6" />
                 <span>Preview</span>
@@ -146,7 +179,7 @@ const Portfolio = () => {
               <Link
                 href={portfolio.sourceUrl}
                 target="_blank"
-                className="text-secondary flex items-center gap-2 transition-colors hover:text-cyan-500"
+                className="text-secondary flex items-center gap-1 transition-colors hover:text-cyan-500"
               >
                 <FaGithub className="h-5 w-5" />
                 <span>Source</span>
@@ -162,7 +195,79 @@ const Portfolio = () => {
         </p>
       )}
 
-      {/* Modal */}
+      {/* How it works Modal */}
+      {selectedHowItWorks && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+          onClick={closeHowItWorks}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.3 }}
+            className="relative max-h-[80vh] w-full max-w-3xl overflow-y-auto rounded-xl bg-white p-8 shadow-2xl dark:bg-gray-900"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={closeHowItWorks}
+              className="absolute top-4 right-4 cursor-pointer text-gray-400 transition-colors hover:text-gray-600 dark:hover:text-gray-200"
+            >
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+
+            <h2 className="mb-6 text-2xl font-bold text-cyan-600 dark:text-cyan-100">
+              How {selectedProjectName} works
+            </h2>
+
+            <div className="prose prose-cyan dark:prose-invert max-w-none">
+              {selectedHowItWorks.split('\n').map((paragraph, index) => {
+                if (paragraph.trim().match(/^(\d+\.|\*|-)\s/)) {
+                  return (
+                    <li key={index} className="ml-6 list-disc">
+                      {paragraph.trim().replace(/^(\d+\.|\*|-)\s/, '')}
+                    </li>
+                  )
+                }
+                if (paragraph.trim()) {
+                  return (
+                    <p
+                      key={index}
+                      className="mb-3 text-gray-700 dark:text-gray-300"
+                    >
+                      {paragraph.trim()}
+                    </p>
+                  )
+                }
+                return null
+              })}
+            </div>
+
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={closeHowItWorks}
+                className="cursor-pointer rounded-lg bg-cyan-600 px-6 py-2 font-semibold text-white transition-colors hover:bg-cyan-700"
+              >
+                Close
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Tech Stack Modal */}
       {selectedTechStack && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"

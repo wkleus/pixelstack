@@ -23,4 +23,5 @@ export interface Portfolio {
   sourceUrl: string
   fullTechStack?: string[]
   showFullTechStack?: boolean
+  howItWorks?: string
 }

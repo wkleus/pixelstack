@@ -47,7 +47,7 @@ const PostsView = ({ posts }: PostsViewProps) => {
               </Link>
 
               {/* Short excerpt of the post */}
-              <p className="mb-6 line-clamp-3 text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+              <p className="text-md mb-6 line-clamp-3 leading-relaxed text-gray-600 dark:text-gray-300">
                 {post.overview}
               </p>
 
