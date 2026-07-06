@@ -4,6 +4,7 @@
 [![Vercel](https://img.shields.io/badge/Vercel-2EAD33?style=for-the-badge&logo=vercel&logoColor=000000)](https://vercel.com/)
 [![Resend](https://img.shields.io/badge/Resend-E93D28?style=for-the-badge&logo=resend&logoColor=white)](https://resend.com/)
 [![Prisma](https://img.shields.io/badge/Prisma_7-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
@@ -18,7 +19,7 @@
 
 An animated and responsive portfolio for web apps — built with **Next.js**, **TypeScript**, **React.js**, **Tailwind CSS**, **Framer Motion**, **PostgreSQL** (hosted on **Neon**, via **Prisma 7**), **Resend** and **DeepSeek**.
 
-Comes with: portfolio showcase, a database-backed blog system, contact form with real email delivery and auto-reply, newsletter subscription with admin notification, search for portfolio and posts, interactive grid hero section with mouse tracking, profile page, dark/light mode and an AI-powered assistant (PixelStack AI) that answers questions about skills, projects, and IT education — and intelligently prefills the contact form based on your intent. All emails delivered via Resend.
+Comes with: portfolio showcase, a **database-backed blog system**, contact form with real email delivery and auto-reply, newsletter subscription with admin notification, search for portfolio and posts, interactive grid hero section with mouse tracking, profile page, dark/light mode and an AI-powered assistant (PixelStack AI) that answers questions about skills, projects, and IT education — and intelligently prefills the contact form based on your intent. All emails delivered via Resend.
 
 ## Live Demo
 
@@ -96,9 +97,9 @@ The project is deployed on Vercel and IONOS.
 
 - [Features](#features)
 - [Tech Stack](#tech-stack)
-- [Getting Started](#getting-started)
 - [Project Structure](#project-structure)
 - [Blog & Database](#blog--database)
+- [Admin Area](#admin-area)
 - [AI Assistant](#ai-assistant)
 - [Contact Form & Email](#contact-form--email)
 - [Newsletter](#newsletter)
@@ -123,11 +124,11 @@ The project is deployed on Vercel and IONOS.
 - **Hero section** with animated intro, persistent grid background and mouse-following spotlight effect
 - **Portfolio** with project previews, tech stack, and live links
 - **Blog system** backed by **PostgreSQL** via **Prisma 7**, with dynamic routes (`/posts/[handle]`)
-- **Blog system** with dynamic routes (`/posts/[handle]`)
 - **Search bar** filters portfolio items and blog posts by title, keyword in the description or technology
 - **Contact form** with real email delivery via Resend (`/api/connect`)
   -> includes client & server-side validation, XSS sanitization, rate limiting and auto-reply to sender
 - **Newsletter** subscription with admin email notification via Resend (`/api/newsletter`)
+- **Admin Login** and **Admin Dashboard** to create, edit, delete blog posts
 - **PixelStack AI assistant** — floating chat widget powered by DeepSeek, answers questions about skills, projects, tech stack and certifications (`/api/agent`)
 - **Contact form prefill** via AI assistant — the AI automatically detects the user's intent and pre-selects the appropriate topic when opening the contact form
 - **Mobile navigation** with hamburger menu
@@ -137,20 +138,22 @@ The project is deployed on Vercel and IONOS.
 
 ### Tech Stack
 
-| Layer           | Technology                                       |
-| --------------- | ------------------------------------------------ |
-| Framework       | Next.js 16 (App Router)                          |
-| Language        | TypeScript 5 (strict mode)                       |
-| UI              | React 19, Tailwind CSS 4, Framer Motion          |
-| Icons           | Heroicons, React Icons                           |
-| Database        | PostgreSQL (hosted on [Neon](https://neon.tech)) |
-| ORM             | Prisma 7 (driver adapter via `pg`)               |
-| Email           | Resend SDK                                       |
-| AI Model        | DeepSeek API (OpenAI-compatible)                 |
-| AI Capabilities | Tool Calling, Intent Detection                   |
-| Markdown        | react-markdown + remark-gfm                      |
-| Testing         | Jest, Playwright                                 |
-| Deployment      | Vercel + IONOS (custom domain)                   |
+| Layer            | Technology                                       |
+| ---------------- | ------------------------------------------------ |
+| Framework        | Next.js 16 (App Router)                          |
+| Language         | TypeScript 5 (strict mode)                       |
+| UI               | React 19, Tailwind CSS 4, Framer Motion          |
+| Icons            | Heroicons, React Icons                           |
+| Database         | PostgreSQL (hosted on [Neon](https://neon.tech)) |
+| ORM              | Prisma 7 (driver adapter via `pg`)               |
+| Auth             | Auth.js v5 (Credentials, single admin account)   |
+| Password Hashing | bcryptjs                                         |
+| Email            | Resend SDK                                       |
+| AI Model         | DeepSeek API (OpenAI-compatible)                 |
+| AI Capabilities  | Tool Calling, Intent Detection                   |
+| Markdown         | react-markdown + remark-gfm + rehype-raw         |
+| Testing          | Jest, Playwright                                 |
+| Deployment       | Vercel + IONOS (custom domain)                   |
 
 ---
 
@@ -169,21 +172,30 @@ The project is deployed on Vercel and IONOS.
 │
 ├── 📂 src
 │   ├── 📂 app
+│   │   ├── 📂 admin                # Password-protected post management (see Admin Area)
+│   │   │   ├── 📂 adminDashboard   # /admin/adminDashboard — list, sign-out
+│   │   │   ├── 📂 login            # /admin/login
+│   │   │   ├── 📂 posts
+│   │   │   │   ├── 📂 new          # /admin/posts/new
+│   │   │   │   ├── 📂 [id]/edit    # /admin/posts/[id]/edit
+│   │   │   │   └── 📄 PostForm.tsx # Shared create/edit form (Markdown textarea)
+│   │   │   └── 📄 actions.ts       # Server Actions: createPost, updatePost, deletePost
 │   │   ├── 📂 api
+│   │   │   ├── 📂 auth              # Auth.js route handler
 │   │   │   ├── 📂 newsletter       # Newsletter subscription endpoint
-│   │   │   ├── 📂 agent            # AI assistant endpoint (DeepSeek)
+│   │   │   ├── 📂 agent           # AI assistant endpoint (DeepSeek)
 │   │   │   └── 📂 connect          # Contact form API endpoint with email
 │   │   ├── 📂 components           # Reusable UI components
 │   │   │   ├── 📂 Agent            # AI assistant chat widget
 │   │   │   ├── 📂 Connect          # Contact form (hook + component)
-│   │   │   ├── 📂 Footer           # Footer with social links
+│   │   │   ├── 📂 Footer           # Footer with social links (incl. discreet Admin link)
 │   │   │   ├── 📂 Header           # Header + theme toggle
 │   │   │   ├── 📂 Home             # Homepage sections (Posts.tsx fetches from DB)
 │   │   │   ├── 📂 MessageUI        # Error/success messages
 │   │   │   └── 📂 Profile          # About me components
 │   │   ├── 📂 portfolio            # Portfolio overview
-│   │   ├── 📂 posts                # Blog system — pages fetch from PostgreSQL
-│   │   ├── 📂 profile              # Profile page
+│   │   ├── 📂 posts                # Blog system — pages fetch from PostgreSQL, render Markdown
+│   │   ├── 📂 profile               # Profile page
 │   │   ├── 📂 context              # ThemeContext provider
 │   │   ├── 📄 layout.tsx
 │   │   ├── 📄 globals.css
@@ -201,7 +213,11 @@ The project is deployed on Vercel and IONOS.
 │   │
 │   ├── 📂 lib
 │   │   ├── 📄 prisma.ts            # Prisma Client (pg driver adapter)
-│   │   └── 📄 posts.ts             # DB access layer for blog posts
+│   │   └── 📄 posts.ts             # DB access layer for blog posts (incl. admin queries)
+│   │
+│   ├── 📄 auth.ts                  # Auth.js: Credentials provider, session config
+│   ├── 📄 auth.config.ts           # Edge-safe Auth.js config, shared with middleware.ts
+│   ├── 📄 middleware.ts            # Route protection for /admin (see Admin Area)
 │   │
 │   └── 📂 types                    # TypeScript definitions
 │
@@ -244,11 +260,47 @@ Pages that display posts (`src/app/posts/page.tsx`, `src/app/posts/[handle]/page
 
 ### Managing content today
 
-Posts can currently be created or edited directly in the database — either through the **[Neon SQL Editor](https://neon.tech/docs/get-started-with-neon/query-with-neon-sql-editor)** or via **pgAdmin4**.
+Posts are managed through the **[Admin Area](#admin-area)** at `/admin` — no more hand-editing HTML in a database cell. For one-off tweaks or bulk edits, the **[Neon SQL Editor](https://neon.tech/docs/get-started-with-neon/query-with-neon-sql-editor)** or pgAdmin4 (connected to the remote Neon connection string) still work directly against the `Post` table.
 
 `src/data/posts.ts` + `src/data/content/*.ts` remain in the repo purely as the **original seed source** for `scripts/import-posts.ts`; they are no longer read by the live app.
 
-> An in-app admin panel (with authentication) and a switch from raw HTML to Markdown content are also planned — see [Upcoming Work](#upcoming-work).
+---
+
+## Admin Area
+
+A password-protected area at `/admin/adminDashboard` for creating, editing, deleting and (un)publishing posts — no more editing raw HTML/Markdown in a database cell.
+
+### Authentication
+
+- **[Auth.js v5](https://authjs.dev)** with a **Credentials** provider - single admin account
+- The admin identity lives entirely in environment variables: `ADMIN_EMAIL` + `ADMIN_PASSWORD_HASH_B64` (a **Base64-encoded** bcrypt hash - the plaintext password is never stored anywhere).
+- Sessions are JWT-based (`session: { strategy: 'jwt' }`), signed with `AUTH_SECRET`.
+
+> **Why Base64 and not the raw bcrypt hash?** A raw hash looks like `$2b$12$abc...` — the `$`-prefixed segments get silently corrupted by `.env` variable expansion and by some shells' quoting rules. Base64 contains no `$` at all, so it survives copy-pasting into `.env` and into Vercel's environment variables intact. `src/auth.ts` decodes it back to the real hash at runtime before comparing.
+
+### Route protection
+
+`/admin/*` is protected in **two independent layers**:
+
+1. **`src/middleware.ts`** — redirects unauthenticated requests before the page even starts rendering, based on the `authorized` callback in `src/auth.config.ts`.
+2. **Every protected page itself** (`adminDashboard/page.tsx`, `posts/new/page.tsx`, `posts/[id]/edit/page.tsx`) re-checks the session server-side via `auth()`. Server Actions in `src/app/admin/actions.ts` do the same before touching the database.
+
+### Content format: Markdown
+
+Post `content` is authored as **Markdown** in a plain `<textarea>` — no rich-text editor needed. Rendering uses:
+
+- `react-markdown` + `remark-gfm` for the Markdown itself
+- `rehype-raw` so any raw HTML tags still pass through — this keeps the original posts (written in full HTML before the Markdown switch) rendering correctly without needing to be rewritten
+
+### What the admin area can do
+
+- **`/admin/adminDashboard`** — list all posts (published **and** drafts) with status, handle and creation date, plus a sign-out button
+- **`/admin/posts/new`** — create a new post (title, handle/slug — auto-generated from the title if left blank —, overview, Markdown content, time-to-read, tags, published toggle)
+- **`/admin/posts/[id]/edit`** — edit an existing post, pre-filled with its current values
+- **Delete** — with a browser confirmation prompt before submitting
+- **`published` toggle** — hide/show a post on the live site without deleting it
+
+Every create/update/delete Server Action calls `revalidatePath()` for the affected routes (`/admin/adminDashboard`, `/posts`, `/`, `/posts/[handle]`).
 
 ---
 
@@ -439,13 +491,6 @@ npm run test:e2e    # Playwright E2E tests
 ---
 
 ## Upcoming Work
-
-### Blog & Content Management
-
-- In-app admin area for creating, editing and deleting posts (with authentication)
-- Switch post `content` from raw HTML to Markdown
-- Script to export the current DB content back into `src/data/posts.ts` as a versioned snapshot
-- Switch `/posts/[handle]` (and the homepage teaser) from pure SSG to ISR (`revalidate`)
 
 ### AI‑Agent (Portfolio Guide)
 
