@@ -23,6 +23,28 @@ export const portfolios: Portfolio[] = [
         4. Contact Agents – Users can send inquiries via email through the contact form (powered by Resend).
         5. Admin Dashboard – Administrators can manage the entire property catalog through a protected dashboard.`,
 
+    // In-depth case study: problem, challenges, solution & tech
+    caseStudy: `Project Period
+        May – July 2026 (including planning phase in May; active development from June)
+        Goal
+        The goal was to develop a modern, scalable, and user-friendly real estate platform for both property seekers and administrators. The application provides intuitive property browsing with advanced filtering, detailed views, interactive maps, mortgage calculations, and a secure admin dashboard for complete property management.
+        Technical Challenges
+        1. Implementing secure authentication and protected admin routes
+        2. Building efficient category and deal-type filtering
+        3. Integrating third-party services (maps, email delivery, financial calculator)
+        4. Managing separate frontend and backend deployments (Vercel + Render)
+        5. Ensuring secure server-side validation while using Supabase only for authentication
+        Solution & Technologies Used
+        I built a clean three-tier architecture:
+        - Frontend: React 19 + Vite 8, React Router 7, Framer Motion, Leaflet, react-i18next (EN/DE), Yup for validation
+        - Backend: Node.js / Express REST API with raw pg (node-postgres) driver for database queries
+        - Database: PostgreSQL hosted on Supabase
+        - Auth: Supabase Auth (JWT) + custom middleware using Supabase Admin Client for server-side token validation
+        - Additional Tools: Resend, express-rate-limit, he (XSS sanitization)
+        
+        A notable technical aspect was the hybrid Supabase setup: Supabase is used exclusively for authentication and JWT issuance, while all CRUD operations are performed directly via the pg driver. This provided fine-grained control over database queries while maintaining secure token validation on the backend.
+        The platform is fully responsive and includes robust data fetching with a custom useFetch hook and AbortController to prevent race conditions and memory leaks.`,
+
     // Technologies used in the project
     techStack: [
       'React 19',

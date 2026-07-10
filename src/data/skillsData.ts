@@ -13,7 +13,7 @@ export const frontendSkills = [
     level: 90,
     delay: 1.0,
   },
-  { label: 'UX/UI • Responsive Design', level: 85, delay: 1.2 },
+  { label: 'UX/UI • Responsive Design • Figma', level: 85, delay: 1.2 },
 ]
 
 /**
@@ -21,7 +21,11 @@ export const frontendSkills = [
  */
 export const backendSkills = [
   { label: 'Node.js • Express.js', level: 80, delay: 0.2 },
-  { label: 'Java • Spring Boot', level: 65, delay: 0.4 },
+  {
+    label: 'Java • Spring Boot • Spring Data JPA',
+    level: 60,
+    delay: 0.4,
+  },
   { label: 'Python • Flask • Django', level: 50, delay: 0.6 },
   {
     label: 'Databases (MongoDB • PostgreSQL • MySQL • SQL/NoSQL)',
@@ -72,41 +76,24 @@ export const fullSkillSet = [
     ],
   },
   {
-    category: 'Backend & API Development',
-    skills: [
-      'Node.js',
-      'Express.js',
-      'Spring Boot',
-      'Django',
-      'Flask',
-      'RESTful APIs',
-      'API Security',
-      'JWT Authentication',
-      'JSON & HTTP',
-      'Client-Server Communication',
-      'Postman',
-      'OpenAPI Documentation',
-      'Model View Controller (MVC)',
-      'Unit Testing',
-      'Integration Testing',
-    ],
+    category: 'Backend Frameworks',
+    skills: ['Node.js', 'Express.js', 'Spring Boot', 'Django', 'Flask'],
   },
   {
-    category: 'Databases & Data Management',
+    category: 'API & Testing',
     skills: [
-      'MongoDB (NoSQL)',
-      'PostgreSQL',
-      'MySQL',
-      'SQLite',
-      'Spring Data JPA (ORM)',
-      'Database Design',
+      'RESTful APIs',
+      'JWT',
+      'Postman',
+      'Unit Testing',
+      'Integration Testing',
+      'Debugging',
     ],
   },
   {
     category: 'DevOps, Cloud & Deployment',
     skills: [
       'Docker',
-      'Kubernetes',
       'Serverless Computing',
       'Microservices Architecture',
       'AWS Cloud (EC2, VPC, S3, RDS, IAM)',
@@ -119,16 +106,19 @@ export const fullSkillSet = [
     ],
   },
   {
-    category: 'Build Tools & Development',
+    category: 'Build Tools, Editors & Development',
     skills: [
+      'Git',
+      'GitHub',
+      'Command Line (CLI)',
+      'VS Code',
+      'IntelliJ IDEA',
       'Vite',
       'Webpack',
       'Babel',
       'ESLint',
-      'Prettier',
       'npm',
       'yarn',
-      'pnpm',
     ],
   },
   {
@@ -139,14 +129,6 @@ export const fullSkillSet = [
       'CSS Variables & Animations',
       'UX/UI Design',
       'Figma (Wireframing, Prototyping, Mockups)',
-      'Jest (Unit Testing)',
-      'Chrome DevTools',
-      'Debugging',
-      'Git',
-      'GitHub',
-      'Command Line (CLI)',
-      'VS Code',
-      'IntelliJ IDEA',
     ],
   },
   {
@@ -160,6 +142,16 @@ export const fullSkillSet = [
       'DeepSeek API',
       'OpenAI-compatible APIs',
       'Multi-step Planning',
+    ],
+  },
+  {
+    category: 'Databases & Data Management',
+    skills: [
+      'MongoDB (NoSQL)',
+      'PostgreSQL',
+      'MySQL',
+      'Spring Data JPA (ORM)',
+      'Database Design',
     ],
   },
 ]

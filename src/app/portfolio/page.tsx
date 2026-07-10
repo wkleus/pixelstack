@@ -9,6 +9,7 @@ import {
   HiOutlineGlobeAlt,
   HiOutlineCode,
   HiOutlineInformationCircle,
+  HiOutlineDocumentText,
 } from 'react-icons/hi'
 import SearchBar from '../components/Search/SearchBar'
 import { useSearch } from '@/app/hooks/useSearch'
@@ -24,6 +25,9 @@ const Portfolio = () => {
   )
   const [selectedProjectName, setSelectedProjectName] = useState<string>('')
   const [selectedHowItWorks, setSelectedHowItWorks] = useState<string | null>(
+    null,
+  )
+  const [selectedCaseStudy, setSelectedCaseStudy] = useState<string | null>(
     null,
   )
 
@@ -47,9 +51,19 @@ const Portfolio = () => {
     setSelectedProjectName('')
   }
 
+  const openCaseStudy = (caseStudy: string, projectName: string) => {
+    setSelectedCaseStudy(caseStudy)
+    setSelectedProjectName(projectName)
+  }
+
+  const closeCaseStudy = () => {
+    setSelectedCaseStudy(null)
+    setSelectedProjectName('')
+  }
+
   // Handle body scroll when modal is open/closed
   useEffect(() => {
-    if (selectedTechStack || selectedHowItWorks) {
+    if (selectedTechStack || selectedHowItWorks || selectedCaseStudy) {
       document.body.style.overflow = 'hidden'
     } else {
       document.body.style.overflow = 'auto'
@@ -59,7 +73,7 @@ const Portfolio = () => {
     return () => {
       document.body.style.overflow = 'auto'
     }
-  }, [selectedTechStack, selectedHowItWorks])
+  }, [selectedTechStack, selectedHowItWorks, selectedCaseStudy])
 
   return (
     <div className="py-28 sm:mx-15 md:mx-5 lg:mx-15 xl:mx-30">
@@ -129,17 +143,41 @@ const Portfolio = () => {
             </div>
             <div className="flex">
               <h3 className="mb-2 text-xl font-semibold">{portfolio.name}</h3>
-              {/* howItWorks (for Linguify & HomeSphere only) */}
+              {/* howItWorks */}
               {portfolio.howItWorks && (
                 <button
                   onClick={() =>
                     openHowItWorks(portfolio.howItWorks!, portfolio.name)
                   }
-                  className="transition-colorstext-cyan-500 -mt-5 flex cursor-pointer items-center gap-2 text-gray-500 hover:text-cyan-600 dark:text-cyan-400 dark:hover:text-cyan-300"
+                  className="group relative -mt-5 flex cursor-pointer items-center gap-2 text-gray-500 transition-colors hover:text-cyan-600 dark:text-cyan-400 dark:hover:text-cyan-300"
                   aria-label={`How ${portfolio.name} works`}
-                  title={`How ${portfolio.name} works`}
                 >
-                  <HiOutlineInformationCircle className="h-6 w-6" />
+                  <HiOutlineInformationCircle className="h-5.5 w-5.5" />
+                  {/* custom tooltip */}
+                  <span className="absolute bottom-full left-9 -mb-2 -translate-x-1/2 rounded-lg bg-gray-900 px-2 py-1 text-[11px] font-medium whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 dark:bg-yellow-100 dark:text-black">
+                    How HomeSphere works
+                    {/* small arrow */}
+                    <span className="absolute top-full left-1/3 -translate-x-1/2 border-7 border-transparent border-t-gray-900 dark:border-t-yellow-100"></span>
+                  </span>
+                </button>
+              )}
+
+              {/* caseStudy  */}
+              {portfolio.caseStudy && (
+                <button
+                  onClick={() =>
+                    openCaseStudy(portfolio.caseStudy!, portfolio.name)
+                  }
+                  className="group relative -mt-5 flex cursor-pointer items-center gap-2 text-gray-500 transition-colors hover:text-cyan-600 dark:text-cyan-400 dark:hover:text-cyan-300"
+                  aria-label={`Case study for ${portfolio.name}`}
+                >
+                  <HiOutlineDocumentText className="h-5 w-5" />
+                  {/* custom tooltip */}
+                  <span className="absolute bottom-full left-8 -mb-2.5 -translate-x-1/2 rounded-lg bg-gray-900 px-2 py-1 text-[11px] font-medium whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 dark:bg-yellow-100 dark:text-black">
+                    Open Case Study
+                    {/* with small arrow */}
+                    <span className="absolute top-full left-1/3 -translate-x-1/2 border-7 border-transparent border-t-gray-900 dark:border-t-gray-100"></span>
+                  </span>
                 </button>
               )}
             </div>
@@ -258,6 +296,101 @@ const Portfolio = () => {
             <div className="mt-6 flex justify-end">
               <button
                 onClick={closeHowItWorks}
+                className="cursor-pointer rounded-lg bg-cyan-600 px-6 py-2 font-semibold text-white transition-colors hover:bg-cyan-700"
+              >
+                Close
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Case Study Modal */}
+      {selectedCaseStudy && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+          onClick={closeCaseStudy}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.3 }}
+            className="relative max-h-[80vh] w-full max-w-3xl overflow-y-auto rounded-xl bg-white p-8 shadow-2xl dark:border dark:border-gray-100/10 dark:bg-gray-900 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-400/40 [&::-webkit-scrollbar-thumb]:transition-colors hover:[&::-webkit-scrollbar-thumb]:bg-cyan-400/60 [&::-webkit-scrollbar-track]:bg-transparent"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={closeCaseStudy}
+              className="absolute top-4 right-4 cursor-pointer text-gray-400 transition-colors hover:text-gray-600 dark:hover:text-gray-200"
+            >
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+
+            <h2 className="mb-6 text-2xl font-bold text-cyan-600 dark:text-cyan-100">
+              Case Study – {selectedProjectName}
+            </h2>
+
+            <div className="prose prose-cyan dark:prose-invert max-w-none">
+              {selectedCaseStudy.split('\n').map((paragraph, index) => {
+                const trimmed = paragraph.trim()
+
+                if (trimmed.match(/^(\d+\.|\*|-)\s/)) {
+                  return (
+                    <li key={index} className="ml-6 list-disc">
+                      {trimmed.replace(/^(\d+\.|\*|-)\s/, '')}
+                    </li>
+                  )
+                }
+
+                // Short, capitalized, punctuation-free lines are treated as
+                // section headings (e.g. "Problem / Goal", "Technical Challenges")
+                if (
+                  trimmed &&
+                  trimmed.length < 40 &&
+                  /^[A-Z]/.test(trimmed) &&
+                  !trimmed.endsWith('.')
+                ) {
+                  return (
+                    <h3
+                      key={index}
+                      className="mt-5 mb-2 text-lg font-semibold text-gray-900 first:mt-0 dark:text-white"
+                    >
+                      {trimmed}
+                    </h3>
+                  )
+                }
+
+                if (trimmed) {
+                  return (
+                    <p
+                      key={index}
+                      className="mb-3 text-gray-700 dark:text-gray-300"
+                    >
+                      {trimmed}
+                    </p>
+                  )
+                }
+                // blank lines in the source become visible spacing here,
+                // instead of being silently dropped
+                return <div key={index} className="h-3" />
+              })}
+            </div>
+
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={closeCaseStudy}
                 className="cursor-pointer rounded-lg bg-cyan-600 px-6 py-2 font-semibold text-white transition-colors hover:bg-cyan-700"
               >
                 Close
