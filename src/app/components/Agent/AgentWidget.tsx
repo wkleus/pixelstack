@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, Component } from 'react'
 import { useAgent } from '@/app/hooks/useAgent'
 import {
   FaRobot,
@@ -14,6 +14,33 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { motion, AnimatePresence } from 'framer-motion'
 import { usePathname, useRouter } from 'next/navigation'
+
+// --- Error Boundary to prevent chat crashes from affecting the whole site ---
+class AgentErrorBoundary extends Component<
+  { children: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props)
+    this.state = { hasError: false }
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true }
+  }
+
+  componentDidCatch(error: Error) {
+    console.error('Agent widget crashed:', error)
+  }
+
+  render() {
+    if (this.state.hasError) {
+      // render nothing (or a minimal fallback) to keep the rest of the page intact
+      return null
+    }
+    return this.props.children
+  }
+}
 
 // returns a proactive message based on the current page
 function getProactiveMessage(pathname: string): string {
@@ -55,16 +82,9 @@ function Tooltip({
   )
 }
 
-const AgentWidget = () => {
+const AgentWidgetInner = () => {
   const router = useRouter()
   const pathname = usePathname()
-
-  const [isOpen, setIsOpen] = useState(false)
-  const [hasShownProactive, setHasShownProactive] = useState(false)
-  const [unreadCount, setUnreadCount] = useState(0)
-  const [isProactiveDone, setIsProactiveDone] = useState(false)
-  const [isNavigating, setIsNavigating] = useState(false)
-  const [lastSentMessage, setLastSentMessage] = useState<string>('')
 
   const {
     messages,
@@ -76,7 +96,22 @@ const AgentWidget = () => {
     clearMessages,
   } = useAgent()
 
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const [isOpen, setIsOpen] = useState(false)
+  const [hasShownProactive, setHasShownProactive] = useState(false)
+  const [unreadCount, setUnreadCount] = useState(0)
+  const [isProactiveDone, setIsProactiveDone] = useState(false)
+  const [isNavigating, setIsNavigating] = useState(false)
+  const [lastSentMessage, setLastSentMessage] = useState<string>('')
+  // true when the last assistant message has content during loading
+  const firstTokenReceived =
+    isLoading &&
+    messages.length > 0 &&
+    messages[messages.length - 1].role === 'assistant' &&
+    messages[messages.length - 1].content.length > 0
+
+  // refs for auto‑scroll
+  const messagesContainerRef = useRef<HTMLDivElement>(null)
+  const isUserScrollingRef = useRef(false)
   const prevMessagesLength = useRef(messages.length)
   const isNavigatingRef = useRef(false)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -84,17 +119,42 @@ const AgentWidget = () => {
   // Auto-focus input when chat opens
   useEffect(() => {
     if (isOpen) {
-      // Slight delay to allow the animation to complete
       setTimeout(() => {
         inputRef.current?.focus()
       }, 100)
     }
   }, [isOpen])
 
-  // auto-scroll to latest message
+  // auto‑scroll to bottom whenever messages change (new message, streaming update, etc.)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    const container = messagesContainerRef.current
+    if (!container) return
+
+    // if user manually scrolled up, don't auto‑scroll
+    if (isUserScrollingRef.current) return
+
+    // use requestAnimationFrame to ensure we scroll after the DOM has updated
+    requestAnimationFrame(() => {
+      container.scrollTop = container.scrollHeight
+    })
   }, [messages])
+
+  // manual scroll detection – stop auto‑scrolling while user interacts
+  useEffect(() => {
+    const container = messagesContainerRef.current
+    if (!container) return
+
+    const handleScroll = () => {
+      const tolerance = 30 // pixels from bottom
+      const isAtBottom =
+        container.scrollHeight - container.scrollTop - container.clientHeight <
+        tolerance
+      isUserScrollingRef.current = !isAtBottom
+    }
+
+    container.addEventListener('scroll', handleScroll, { passive: true })
+    return () => container.removeEventListener('scroll', handleScroll)
+  }, [])
 
   // proactive behavior
   useEffect(() => {
@@ -182,8 +242,11 @@ const AgentWidget = () => {
     setLastSentMessage(trimmedInput)
     console.log(`Sending: "${trimmedInput}"`)
 
+    // force auto‑scroll after sending a new message
+    isUserScrollingRef.current = false
+
     try {
-      // send message and wait for tool action
+      // send message and wait for tool action (resolves after stream finishes)
       const toolAction = await sendMessage()
 
       console.log('Tool action result:', toolAction)
@@ -324,13 +387,16 @@ const AgentWidget = () => {
                     className="flex h-5 w-6 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-white/20"
                   >
                     <FaTimes className="rounded-xl border p-1 text-2xl text-amber-500/70" />
-                  </button>{' '}
+                  </button>
                 </Tooltip>
               </div>
             </div>
 
-            {/* MESSAGES AREA - with styled scrollbar */}
-            <div className="flex-1 space-y-3 overflow-y-auto bg-gray-50/50 px-3 py-6 dark:bg-gray-900/50 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-400/40 [&::-webkit-scrollbar-thumb]:transition-colors hover:[&::-webkit-scrollbar-thumb]:bg-cyan-400/60 [&::-webkit-scrollbar-track]:bg-transparent">
+            {/* MESSAGES AREA - with ref for scrolling */}
+            <div
+              ref={messagesContainerRef}
+              className="flex-1 space-y-3 overflow-y-auto bg-gray-50/50 px-3 py-6 dark:bg-gray-900/50 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-400/40 [&::-webkit-scrollbar-thumb]:transition-colors hover:[&::-webkit-scrollbar-thumb]:bg-cyan-400/60 [&::-webkit-scrollbar-track]:bg-transparent"
+            >
               {messages.length === 0 ? (
                 <div className="flex h-full flex-col items-center justify-center text-center text-gray-400 dark:text-gray-500">
                   <FaRobot className="mb-3 text-4xl text-cyan-800/90" />
@@ -386,35 +452,28 @@ const AgentWidget = () => {
                               {children}
                             </code>
                           ),
-                          a: ({ href, children }) => {
-                            console.log('Link founded:', href)
-                            return (
-                              <a
-                                href={href}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-cyan-400 underline transition-colors hover:text-cyan-300 hover:underline-offset-2"
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  console.log('Link clicked:', href)
-                                }}
-                              >
-                                {children}
-                              </a>
-                            )
-                          },
+                          a: ({ href, children }) => (
+                            <a
+                              href={href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-cyan-400 underline transition-colors hover:text-cyan-300 hover:underline-offset-2"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {children}
+                            </a>
+                          ),
                         }}
                       >
                         {msg.content}
                       </ReactMarkdown>
                     </div>
-                    <div ref={messagesEndRef} />
                   </div>
                 ))
               )}
 
-              {/* loading indicator */}
-              {isLoading && (
+              {/* loading indicator – only shown while loading and no token has arrived yet */}
+              {isLoading && !firstTokenReceived && (
                 <div className="flex items-start gap-2.5">
                   <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500 to-blue-500">
                     <FaRobot className="text-xs text-white" />
@@ -479,5 +538,12 @@ const AgentWidget = () => {
     </>
   )
 }
+
+// wrap with error boundary
+const AgentWidget = () => (
+  <AgentErrorBoundary>
+    <AgentWidgetInner />
+  </AgentErrorBoundary>
+)
 
 export default AgentWidget

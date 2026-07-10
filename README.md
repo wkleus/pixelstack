@@ -245,7 +245,7 @@ Blog posts are stored in a **PostgreSQL** database (`Post` table) - hosted on **
 
 ### Schema
 
-The `Post` model (`prisma/schema.prisma`) includes: `handle` (unique slug), `name`, `overview`, `content` (HTML), `timeToRead`, `createdAt`, `updatedAt`, `published`, and `tags`.
+The `Post` model (`prisma/schema.prisma`) includes: `handle` (unique slug), `name`, `overview`, `content` (Markdown), `timeToRead`, `createdAt`, `updatedAt`, `published`, and `tags`.
 
 ### How pages read the data
 

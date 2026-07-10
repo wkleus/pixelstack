@@ -16,6 +16,12 @@ const rateLimitMap = new Map<string, { count: number; timestamp: number }>()
 const RATE_LIMIT_WINDOW_MS = 5_000 // 5 seconds
 const MAX_REQUESTS_PER_WINDOW = 1 // 1 request per 5 seconds
 
+// stream delay in milliseconds – set via STREAM_DELAY_MS env variable, 0 = no delay
+const STREAM_DELAY_MS = parseInt(process.env.STREAM_DELAY_MS || '0', 10)
+
+// helper: pause for a given duration
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
 interface Message {
   role: 'user' | 'assistant'
   content: string
@@ -63,32 +69,7 @@ const TOPIC_LABELS: Record<string, string> = {
   other: 'Other',
 }
 
-// type definition for ToolCall in OpenAI SDK v6.45.0
-type ToolCallWithFunction = {
-  id: string
-  type: 'function'
-  function: {
-    name: string
-    arguments: string
-  }
-}
-
-// type guard to check if tool call has the expected structure
-function isToolCallWithFunction(
-  toolCall: OpenAI.Chat.ChatCompletionMessageToolCall,
-): toolCall is ToolCallWithFunction {
-  return (
-    toolCall &&
-    typeof toolCall === 'object' &&
-    'function' in toolCall &&
-    toolCall.function !== null &&
-    typeof toolCall.function === 'object' &&
-    'name' in toolCall.function &&
-    'arguments' in toolCall.function
-  )
-}
-
-// POST /api/agent - handles chat requests with portfolio context
+// POST /api/agent - handles chat requests with portfolio context (streaming)
 export async function POST(request: Request) {
   // rate limiting
   const ip = request.headers.get('x-forwarded-for') ?? 'unknown'
@@ -183,111 +164,171 @@ export async function POST(request: Request) {
       console.log('Messages received:', messages.length)
     }
 
-    // first DeepSeek API call — DeepSeek decides whether to call a tool or answer directly
-    const firstResponse = await client.chat.completions.create({
+    // start streaming DeepSeek API call
+    const deepseekStream = await client.chat.completions.create({
       model: MODEL,
       max_tokens: 1024,
       temperature: 0.7,
       tools,
       tool_choice: 'auto', // DeepSeek decides on its own
+      stream: true, // enable streaming
       messages: [
         { role: 'system', content: enhancedSystemPrompt },
         ...messages,
       ],
     })
 
-    const firstChoice = firstResponse.choices[0]
+    // prepare streaming response
+    const encoder = new TextEncoder()
+    const decoder = new TextDecoder()
 
-    /* TOOL CALL PATH */
-    if (
-      firstChoice.finish_reason === 'tool_calls' &&
-      firstChoice.message.tool_calls
-    ) {
-      const toolCall = firstChoice.message.tool_calls[0]
+    // accumulator for potential tool call (DeepSeek sends fragments in separate chunks)
+    let accumulatedToolCall: {
+      id: string
+      name: string
+      arguments: string
+    } | null = null
 
-      // validate the tool call structure using the type guard
-      if (!isToolCallWithFunction(toolCall)) {
-        console.error('Invalid tool call structure:', toolCall)
-        return NextResponse.json(
-          { message: 'Invalid tool call structure.' },
-          { status: 400 },
-        )
-      }
+    const stream = new ReadableStream({
+      async start(controller) {
+        try {
+          for await (const chunk of deepseekStream) {
+            const delta = chunk.choices[0]?.delta
 
-      const toolName = toolCall.function.name
-      const toolArgs = JSON.parse(toolCall.function.arguments) as {
-        topic: string
-      }
+            // case 1: tool call fragments – accumulate them
+            if (delta?.tool_calls) {
+              for (const tc of delta.tool_calls) {
+                if (!accumulatedToolCall) {
+                  accumulatedToolCall = {
+                    id: tc.id ?? '',
+                    name: '',
+                    arguments: '',
+                  }
+                }
+                if (tc.function?.name)
+                  accumulatedToolCall.name += tc.function.name
+                if (tc.function?.arguments)
+                  accumulatedToolCall.arguments += tc.function.arguments
+              }
+            }
 
-      const topic = toolArgs.topic
-      const topicLabel = TOPIC_LABELS[topic] ?? 'Other'
+            // case 2: text content – send as SSE data event (with optional delay)
+            if (delta?.content) {
+              const payload = JSON.stringify({ content: delta.content })
+              controller.enqueue(encoder.encode(`data: ${payload}\n\n`))
+              if (STREAM_DELAY_MS > 0) await delay(STREAM_DELAY_MS)
+            }
 
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`Tool called: "${toolName}" with topic: "${topic}"`)
-      }
+            // normal completion without tool call
+            if (
+              chunk.choices[0]?.finish_reason === 'stop' &&
+              !accumulatedToolCall
+            ) {
+              controller.enqueue(encoder.encode('data: [DONE]\n\n'))
+              if (STREAM_DELAY_MS > 0) await delay(STREAM_DELAY_MS)
+              controller.close()
+              return
+            }
+          }
 
-      // second API call — send tool result back to DeepSeek for final reply
-      const secondResponse = await client.chat.completions.create({
-        model: MODEL,
-        max_tokens: 1024,
-        temperature: 0.7,
-        tools,
-        messages: [
-          { role: 'system', content: enhancedSystemPrompt },
-          ...messages,
-          // DeepSeek's tool call decision
-          firstChoice.message,
-          // tool execution result
-          {
-            role: 'tool',
-            tool_call_id: toolCall.id,
-            content: JSON.stringify({
-              success: true,
-              topic,
-              topicLabel,
-              message: `Contact form opened with topic "${topicLabel}" pre-selected.`,
-            }),
-          },
-        ],
-      })
+          // stream ended – check if we have an accumulated tool call
+          if (accumulatedToolCall) {
+            if (!accumulatedToolCall.name || !accumulatedToolCall.arguments) {
+              controller.enqueue(encoder.encode('data: [DONE]\n\n'))
+              if (STREAM_DELAY_MS > 0) await delay(STREAM_DELAY_MS)
+              controller.close()
+              return
+            }
 
-      const reply =
-        secondResponse.choices[0].message.content?.trim() ??
-        'I open the contact form for you!'
+            const toolName = accumulatedToolCall.name
+            const toolArgs = JSON.parse(accumulatedToolCall.arguments) as {
+              topic: string
+            }
+            const topic = toolArgs.topic
+            const topicLabel = TOPIC_LABELS[topic] ?? 'Other'
 
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Final reply after tool call:', reply.substring(0, 100))
-      }
+            if (process.env.NODE_ENV === 'development') {
+              console.log(`Tool called: "${toolName}" with topic: "${topic}"`)
+            }
 
-      // return reply + toolAction so the frontend knows to navigate
-      return NextResponse.json({
-        reply,
-        toolAction: {
-          type: 'prefill_contact_form',
-          topic,
-        },
-        metadata: {
-          timestamp: new Date().toISOString(),
-          model: secondResponse.model,
-        },
-      })
-    }
+            // second API call (non‑streaming) to get the final reply after tool execution
+            const secondResponse = await client.chat.completions.create({
+              model: MODEL,
+              max_tokens: 1024,
+              temperature: 0.7,
+              tools,
+              messages: [
+                { role: 'system', content: enhancedSystemPrompt },
+                ...messages,
+                // assistant message that triggered the tool call
+                {
+                  role: 'assistant',
+                  content: null,
+                  tool_calls: [
+                    {
+                      id: accumulatedToolCall.id,
+                      type: 'function',
+                      function: {
+                        name: accumulatedToolCall.name,
+                        arguments: accumulatedToolCall.arguments,
+                      },
+                    },
+                  ],
+                },
+                // tool execution result
+                {
+                  role: 'tool',
+                  tool_call_id: accumulatedToolCall.id,
+                  content: JSON.stringify({
+                    success: true,
+                    topic,
+                    topicLabel,
+                    message: `Contact form opened with topic "${topicLabel}" pre-selected.`,
+                  }),
+                },
+              ],
+            })
 
-    /* NORMAL REPLY PATH */
-    const reply =
-      firstChoice.message.content?.trim() ??
-      'Sorry, I could not generate a response.'
+            const reply =
+              secondResponse.choices[0].message.content?.trim() ??
+              'I open the contact form for you!'
 
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Normal reply:', reply.substring(0, 100))
-      console.log('Token usage:', firstResponse.usage)
-    }
+            if (process.env.NODE_ENV === 'development') {
+              console.log(
+                'Final reply after tool call:',
+                reply.substring(0, 100),
+              )
+            }
 
-    return NextResponse.json({
-      reply,
-      metadata: {
-        timestamp: new Date().toISOString(),
-        model: firstResponse.model,
+            // send tool action metadata + reply as a special SSE event (with optional delay)
+            const toolEvent = JSON.stringify({
+              type: 'tool_action',
+              toolAction: { type: 'prefill_contact_form', topic },
+              reply,
+            })
+            controller.enqueue(
+              encoder.encode(`event: tool_result\ndata: ${toolEvent}\n\n`),
+            )
+            if (STREAM_DELAY_MS > 0) await delay(STREAM_DELAY_MS)
+          }
+
+          // signal end of stream (with optional delay)
+          controller.enqueue(encoder.encode('data: [DONE]\n\n'))
+          if (STREAM_DELAY_MS > 0) await delay(STREAM_DELAY_MS)
+          controller.close()
+        } catch (error) {
+          console.error('Stream processing error:', error)
+          controller.error(error)
+        }
+      },
+    })
+
+    // return SSE response
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        Connection: 'keep-alive',
       },
     })
   } catch (error) {
@@ -315,15 +356,3 @@ export async function POST(request: Request) {
     )
   }
 }
-
-// For Testing Purposes:
-// alternative to using Postman -> Terminal: Example Test Request with curl:
-/*
-    curl -X POST http://localhost:4000/api/agent \
-    -H "Content-Type: application/json" \
-    -d '{"messages": [{"role": "user", "content": "What skills do you have?"}]}'
-
-    curl -X POST http://localhost:4000/api/agent \
-    -H "Content-Type: application/json" \
-    -d '{"messages": [{"role": "user", "content": "I want to discuss a job opportunity"}]}'
-*/
