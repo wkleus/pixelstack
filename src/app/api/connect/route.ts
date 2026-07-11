@@ -1,15 +1,10 @@
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { isAllowedOrigin } from '@/lib/origin'
+import { connectRateLimit } from '@/lib/rateLimit'
 
 // Resend client
 const resend = new Resend(process.env.RESEND_API_KEY)
-
-// In-memory rate limiter
-// Stores the timestamp of the last request per IP address.
-// Resets when the server restarts
-const rateLimitMap = new Map<string, number>()
-const RATE_LIMIT_WINDOW_MS = 60_000 // 1 request per IP per minute
 
 interface ContactRequestBody {
   name: string
@@ -36,20 +31,19 @@ function sanitizeString(str: string): string {
 
 // POST /api/connect
 export async function POST(request: Request) {
-  // block cross-origin abuse from other websites' fetch() calls — this
+  // Block cross-origin abuse from other websites' fetch() calls — this
   // route has no session, so Auth.js/Server-Action CSRF protection doesn't
-  // apply here (-> src/lib/origin.ts s)
+  // apply here -> src/lib/origin.ts
   const origin = request.headers.get('origin')
   if (!isAllowedOrigin(origin)) {
     return NextResponse.json({ message: 'Forbidden.' }, { status: 403 })
   }
 
-  // Rate limiting
-  // Extract the caller's IP from the proxy header
+  // Rate limiting — backed by Upstash Redis
   const ip = request.headers.get('x-forwarded-for') ?? 'unknown'
-  const lastRequest = rateLimitMap.get(ip) ?? 0
+  const { success } = await connectRateLimit.limit(ip)
 
-  if (Date.now() - lastRequest < RATE_LIMIT_WINDOW_MS) {
+  if (!success) {
     return NextResponse.json(
       {
         message: 'Too many requests. Please wait a moment before trying again.',
@@ -57,9 +51,6 @@ export async function POST(request: Request) {
       { status: 429 },
     )
   }
-
-  // Record the timestamp before processing so even failed requests count
-  rateLimitMap.set(ip, Date.now())
 
   try {
     // Parse body

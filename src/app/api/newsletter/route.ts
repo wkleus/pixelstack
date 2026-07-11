@@ -1,11 +1,9 @@
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { isAllowedOrigin } from '@/lib/origin'
+import { newsletterRateLimit } from '@/lib/rateLimit'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
-
-const rateLimitMap = new Map<string, number>()
-const RATE_LIMIT_WINDOW_MS = 60_000
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -21,7 +19,7 @@ function sanitizeString(str: string): string {
 
 // POST /api/newsletter
 export async function POST(request: Request) {
-  // block cross-origin abuse from other websites' fetch() calls (-> src/lib/origin.ts s)
+  // Block cross-origin abuse from other websites' fetch() calls  -> see src/lib/origin.ts
   const origin = request.headers.get('origin')
   if (!isAllowedOrigin(origin)) {
     return NextResponse.json({ message: 'Forbidden.' }, { status: 403 })
@@ -29,9 +27,9 @@ export async function POST(request: Request) {
 
   // Rate limiting
   const ip = request.headers.get('x-forwarded-for') ?? 'unknown'
-  const lastRequest = rateLimitMap.get(ip) ?? 0
+  const { success } = await newsletterRateLimit.limit(ip)
 
-  if (Date.now() - lastRequest < RATE_LIMIT_WINDOW_MS) {
+  if (!success) {
     return NextResponse.json(
       {
         message: 'Too many requests. Please wait a moment before trying again.',
@@ -39,8 +37,6 @@ export async function POST(request: Request) {
       { status: 429 },
     )
   }
-
-  rateLimitMap.set(ip, Date.now())
 
   try {
     // Parse body

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { getAgentContext, logAgentContext } from '@/data/agentContext'
+import { agentRateLimit } from '@/lib/rateLimit'
 
 // cheapest deepseek model: 'deepseek-v4-flash'
 const MODEL = process.env.DEEPSEEK_MODEL || 'deepseek-v4-flash'
@@ -10,11 +11,6 @@ const client = new OpenAI({
   baseURL: 'https://api.deepseek.com',
   apiKey: process.env.DEEPSEEK_API_KEY,
 })
-
-// rate limiting configuration - prevents abuse by limiting requests per IP
-const rateLimitMap = new Map<string, { count: number; timestamp: number }>()
-const RATE_LIMIT_WINDOW_MS = 5_000 // 5 seconds
-const MAX_REQUESTS_PER_WINDOW = 1 // 1 request per 5 seconds
 
 // stream delay in milliseconds – set via STREAM_DELAY_MS env variable, 0 = no delay
 const STREAM_DELAY_MS = parseInt(process.env.STREAM_DELAY_MS || '0', 10)
@@ -73,54 +69,23 @@ const TOPIC_LABELS: Record<string, string> = {
 export async function POST(request: Request) {
   // rate limiting
   const ip = request.headers.get('x-forwarded-for') ?? 'unknown'
-  const now = Date.now()
-  const clientData = rateLimitMap.get(ip)
+  const { success, reset } = await agentRateLimit.limit(ip)
 
-  if (clientData) {
-    // reset counter if window expired
-    if (now - clientData.timestamp > RATE_LIMIT_WINDOW_MS) {
-      rateLimitMap.set(ip, { count: 1, timestamp: now })
-    }
-    // check if limit exceeded
-    else if (clientData.count >= MAX_REQUESTS_PER_WINDOW) {
-      return NextResponse.json(
-        {
-          message: 'Too many requests. Please wait a moment.',
-          retryAfter: Math.ceil(
-            (RATE_LIMIT_WINDOW_MS - (now - clientData.timestamp)) / 1000,
-          ),
-        },
-        {
-          status: 429,
-          headers: {
-            'Retry-After': String(
-              Math.ceil(
-                (RATE_LIMIT_WINDOW_MS - (now - clientData.timestamp)) / 1000,
-              ),
-            ),
-          },
-        },
-      )
-    } else {
-      // increment counter
-      rateLimitMap.set(ip, {
-        count: clientData.count + 1,
-        timestamp: clientData.timestamp,
-      })
-    }
-  } else {
-    // first request from this IP
-    rateLimitMap.set(ip, { count: 1, timestamp: now })
-  }
+  if (!success) {
+    const retryAfter = Math.max(1, Math.ceil((reset - Date.now()) / 1000))
 
-  // clean up old entries (prevent memory leak)
-  if (rateLimitMap.size > 100) {
-    const expiryTime = now - RATE_LIMIT_WINDOW_MS
-    for (const [key, value] of rateLimitMap.entries()) {
-      if (value.timestamp < expiryTime) {
-        rateLimitMap.delete(key)
-      }
-    }
+    return NextResponse.json(
+      {
+        message: 'Too many requests. Please wait a moment.',
+        retryAfter,
+      },
+      {
+        status: 429,
+        headers: {
+          'Retry-After': String(retryAfter),
+        },
+      },
+    )
   }
 
   // parse and validate request
