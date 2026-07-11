@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
+import { isAllowedOrigin } from '@/lib/origin'
 
 // Resend client
 const resend = new Resend(process.env.RESEND_API_KEY)
@@ -35,6 +36,14 @@ function sanitizeString(str: string): string {
 
 // POST /api/connect
 export async function POST(request: Request) {
+  // block cross-origin abuse from other websites' fetch() calls — this
+  // route has no session, so Auth.js/Server-Action CSRF protection doesn't
+  // apply here (-> src/lib/origin.ts s)
+  const origin = request.headers.get('origin')
+  if (!isAllowedOrigin(origin)) {
+    return NextResponse.json({ message: 'Forbidden.' }, { status: 403 })
+  }
+
   // Rate limiting
   // Extract the caller's IP from the proxy header
   const ip = request.headers.get('x-forwarded-for') ?? 'unknown'

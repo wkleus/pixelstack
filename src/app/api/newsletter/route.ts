@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
+import { isAllowedOrigin } from '@/lib/origin'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -20,13 +21,21 @@ function sanitizeString(str: string): string {
 
 // POST /api/newsletter
 export async function POST(request: Request) {
+  // block cross-origin abuse from other websites' fetch() calls (-> src/lib/origin.ts s)
+  const origin = request.headers.get('origin')
+  if (!isAllowedOrigin(origin)) {
+    return NextResponse.json({ message: 'Forbidden.' }, { status: 403 })
+  }
+
   // Rate limiting
   const ip = request.headers.get('x-forwarded-for') ?? 'unknown'
   const lastRequest = rateLimitMap.get(ip) ?? 0
 
   if (Date.now() - lastRequest < RATE_LIMIT_WINDOW_MS) {
     return NextResponse.json(
-      { message: 'Too many requests. Please wait a moment before trying again.' },
+      {
+        message: 'Too many requests. Please wait a moment before trying again.',
+      },
       { status: 429 },
     )
   }
@@ -93,7 +102,6 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ message: 'Subscribed successfully.' })
-
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
       console.error('Unexpected error in /api/newsletter:', error)
