@@ -347,7 +347,7 @@ const AgentWidgetInner = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.7, ease: 'easeInOut' }}
-            className="fixed right-3 bottom-20 z-50 flex h-[500px] w-[350px] flex-col overflow-hidden rounded-2xl border border-gray-200/50 bg-white shadow-2xl shadow-black/20 transition-all duration-300 dark:border-gray-700/50 dark:bg-gray-900 dark:shadow-black/50"
+            className="fixed right-3 bottom-20 z-50 flex h-[480px] w-[calc(100vw-1.5rem)] max-w-[350px] flex-col overflow-hidden rounded-2xl border border-gray-200/50 bg-white shadow-2xl shadow-black/20 transition-all duration-300 dark:border-gray-700/50 dark:bg-gray-900 dark:shadow-black/50"
           >
             {/* HEADER */}
             <div className="flex items-center justify-between border-b-1 border-gray-500/40 px-3 py-3 text-white dark:bg-gradient-to-r dark:from-cyan-600/30 dark:to-cyan-800/90">

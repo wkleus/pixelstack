@@ -82,11 +82,11 @@ const ConnectForm = () => {
         Contact Me
       </h1>
 
-      <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-12 px-4 sm:px-6 md:grid-cols-2 lg:px-8">
         {/* Left side: contact info */}
-        <div className="ml-24 space-y-8">
-          <h2 className="mt-16 mb-4 text-2xl font-semibold">Get in Touch</h2>
-          <p className="mr-10 text-lg text-gray-600 dark:text-gray-400">
+        <div className="space-y-8 pt-4">
+          <h2 className="text-2xl font-semibold">Get in Touch</h2>
+          <p className="text-lg text-gray-600 dark:text-gray-400">
             If you have any questions or inquiries, feel free to reach out.
           </p>
 
@@ -123,7 +123,7 @@ const ConnectForm = () => {
         </div>
 
         {/* Right side: form */}
-        <div className="dark:bg-dark/50 l mt-3 mr-auto mb-10 ml-auto min-w-100 rounded-lg bg-white p-5 shadow-md sm:min-w-120 md:-ml-15 md:min-w-85 lg:min-w-80 lg:min-w-120 xl:min-w-150">
+        <div className="mt-3 rounded-2xl border border-gray-200 bg-white p-6 shadow-lg dark:border-gray-700 dark:bg-gray-900/70">
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Name */}
             <div>
