@@ -109,7 +109,8 @@ export const portfolios: Portfolio[] = [
       1. Translation – Enter text and select a target language to translate.
       2. Synonym Lookup – Find alternative words for text revision.
       3. Automation Features – Configure auto-clear and auto-copy in the settings.
-      4. Language Switching – Switch between supported languages with a single click.`,
+      4. Language Switching – Switch between supported languages with a single click.
+      5. AI Post‑Editing – Refine translations using Quick Actions or custom prompts with AI Studio`,
 
     techStack: [
       'React',
@@ -131,11 +132,17 @@ export const portfolios: Portfolio[] = [
       'React Router',
       'Context API',
       'Custom Hooks',
-      'Jest 30+',
-      'React Testing Library',
+      'Framer Motion',
+      'Web Speech API',
+      'DeepSeek v4 Flash (AI Post-Editing)',
+      'Vercel Serverless Functions',
+      'Express.js (local dev backend)',
+      'Upstash Redis (rate limiting)',
+      'Resend API (email sending)',
       'REST APIs (MyMemory Translation API, Datamuse API)',
       'localStorage',
-      'GitHub Pages',
+      'Jest 30+',
+      'React Testing Library',
       'Vercel',
     ],
 
@@ -151,6 +158,16 @@ export const portfolios: Portfolio[] = [
     name: 'PixelStack Portfolio',
     overview:
       'An animated and responsive portfolio with Next.js, TypeScript, Tailwind CSS, Framer Motion, PostgreSQL, Resend, and DeepSeek AI – featuring a blog, contact form, newsletter, search, dark mode, and an AI assistant that prefills the contact form',
+    howItWorks: `PixelStack is a full‑stack portfolio platform with dynamic content, AI assistance, and real email delivery. Here’s how it works:
+
+      1. Portfolio & Projects – Explore showcased apps with descriptions, tech stacks and live links
+      2. Blog System – Read developer posts with clean formatting and easy navigation
+      3. Search – Filter portfolio items and blog posts by title, tags, or keywords
+      4. AI Assistant – Ask questions about skills, projects, or tech stack; the AI can also prefill the contact form based on your intent
+      5. Contact Form – Send real messages with validation, sanitization and automatic reply
+      6. Newsletter – Subscribe to updates; admin receives notifications instantly
+      7. Admin Area – Create, edit, publish, or delete posts through a protected dashboard
+      8. Dark Mode – Switch themes with a persisteSnt preference`,
     techStack: [
       'Next.js',
       'TypeScript',
@@ -164,22 +181,43 @@ export const portfolios: Portfolio[] = [
       'Jest',
     ],
     fullTechStack: [
+      // Core Framework & Language
       'Next.js 16 (App Router)',
       'TypeScript 5 (strict mode)',
       'React 19',
+
+      // Styling & UI
       'Tailwind CSS 4',
-      'Prisma 7 (driver adapter via pg)',
-      'PostgreSQL (hosted on Neon)',
-      'Resend SDK',
-      'DeepSeek API (OpenAI-compatible)',
       'Framer Motion',
       'Heroicons',
       'React Icons',
+
+      // Database & ORM
+      'PostgreSQL (hosted on Neon)',
+      'Prisma 7 (driver adapter via pg)',
+
+      // Authentication & Security
+      'Auth.js v5 (Credentials)',
+      'bcryptjs (password hashing)',
+
+      // AI & Assistant
+      'DeepSeek API (OpenAI-compatible)',
+      'Tool Calling',
+      'Intent Detection',
+
+      // Email & Communication
+      'Resend SDK',
+
+      // Markdown Rendering
+      'react-markdown + remark-gfm + rehype-raw',
+
+      // Testing
       'Jest',
       'Playwright',
+
+      // Deployment
       'Vercel (deployment)',
       'IONOS (custom domain)',
-      'react-markdown + remark-gfm',
     ],
     sourceUrl: 'https://github.com/wkleus',
     preview: 'https://pixelstack-me.vercel.app/',
