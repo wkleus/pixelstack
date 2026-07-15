@@ -28,6 +28,8 @@ test.describe('Contact Form', () => {
     await page
       .locator('input[name="email"]')
       .fill('max.mustermann@test-example.com')
+    // Topic is a required field (select) — form won't submit without it
+    await page.locator('select[name="topic"]').selectOption('other')
     await page
       .locator('textarea[name="message"]')
       .fill('Hey hey! This is a test message.')
