@@ -60,6 +60,26 @@ describe('useConnectForm Hook', () => {
   test('can submit the form', async () => {
     const { result } = renderHook(() => useConnectForm())
 
+    // Fill in all required fields first — handleSubmit validates the form
+    // client-side before calling fetch, so an empty form never reaches it
+    act(() => {
+      result.current.handleChange({
+        target: { name: 'name', value: 'Max Mustermann' },
+      } as React.ChangeEvent<HTMLInputElement>)
+      result.current.handleChange({
+        target: { name: 'email', value: 'max@example.com' },
+      } as React.ChangeEvent<HTMLInputElement>)
+      result.current.handleChange({
+        target: { name: 'topic', value: 'other' },
+      } as React.ChangeEvent<HTMLSelectElement>)
+      result.current.handleChange({
+        target: {
+          name: 'message',
+          value: 'This is a valid message with more than 20 characters.',
+        },
+      } as React.ChangeEvent<HTMLTextAreaElement>)
+    })
+
     // Mock successful API response
     const mockFetch = global.fetch as jest.Mock
     mockFetch.mockResolvedValueOnce({

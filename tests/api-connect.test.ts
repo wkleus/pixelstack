@@ -7,9 +7,9 @@
 /* MOCKS for Node.js test environment */
 
 // 1. TextEncoder/TextDecoder for Resend
-const { TextEncoder, TextDecoder } = require('util')
+import { TextEncoder, TextDecoder } from 'util'
 global.TextEncoder = TextEncoder
-global.TextDecoder = TextDecoder
+global.TextDecoder = TextDecoder as typeof global.TextDecoder
 
 // 2. Mock Resend to prevent actual API calls during tests
 jest.mock('resend', () => ({
@@ -32,13 +32,32 @@ jest.mock('next/server', () => ({
   },
 }))
 
+// 4. Mock Upstash-based rate limiter — unit tests shouldn't depend on
+// real Redis (slow, needs network etc.) -> each test controls success/failure explicitly via mockLimit below
+const mockLimit = jest.fn()
+jest.mock('@/lib/rateLimit', () => ({
+  connectRateLimit: {
+    limit: (...args: unknown[]) => mockLimit(...args),
+  },
+}))
+
 /* TESTS */
 
 import { POST } from '@/app/api/connect/route'
 import { NextRequest } from 'next/server'
 
+interface ConnectRequestBody {
+  name?: string
+  email?: string
+  topic?: string
+  message?: string
+}
+
 // Helper to create a mock request with custom IP
-const createRequest = (body: any, ip: string = '127.0.0.1'): NextRequest => {
+const createRequest = (
+  body: ConnectRequestBody,
+  ip: string = '127.0.0.1',
+): NextRequest => {
   const headers = new Headers()
   headers.set('x-forwarded-for', ip)
   return {
@@ -50,6 +69,8 @@ const createRequest = (body: any, ip: string = '127.0.0.1'): NextRequest => {
 describe('Contact API', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    // Default: rate limit allows the request through
+    mockLimit.mockResolvedValue({ success: true })
   })
 
   // Test 1: Happy path - valid form submission
@@ -57,6 +78,7 @@ describe('Contact API', () => {
     const validData = {
       name: 'Max Mustermann',
       email: 'max@example.com',
+      topic: 'other',
       message: 'This is a valid message with more than 20 characters.',
     }
 
@@ -77,6 +99,7 @@ describe('Contact API', () => {
       {
         name: 'Max',
         email: 'wrong',
+        topic: 'other',
         message: 'Valid message with 20+ characters...',
       },
       'Invalid email format.',
@@ -84,7 +107,12 @@ describe('Contact API', () => {
     ],
     [
       'short message',
-      { name: 'Max', email: 'max@example.com', message: 'short' },
+      {
+        name: 'Max',
+        email: 'max@example.com',
+        topic: 'other',
+        message: 'short',
+      },
       'Message must be between 20 and 300 characters.',
       '192.168.2.3', // Unique IP for this test case
     ],
@@ -101,15 +129,18 @@ describe('Contact API', () => {
     const validData = {
       name: 'Max Mustermann',
       email: 'max@example.com',
+      topic: 'other',
       message: 'This is a valid message with more than 20 characters.',
     }
     const ip = '10.0.0.99'
 
-    // First request from IP - should succeed
+    // First request from IP - rate limiter allows it - should succeed
+    mockLimit.mockResolvedValueOnce({ success: true })
     const firstResponse = await POST(createRequest(validData, ip))
     expect(firstResponse.status).toBe(200)
 
-    // Second request from same IP within rate limit window - should be blocked
+    // Second request from same IP - rate limiter blocks it - should be blocked
+    mockLimit.mockResolvedValueOnce({ success: false })
     const secondResponse = await POST(createRequest(validData, ip))
     expect(secondResponse.status).toBe(429)
 
