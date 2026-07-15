@@ -7,23 +7,21 @@ export const authConfig = {
   },
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
-      console.log('PROXY DEBUG:', {
-        path: nextUrl.pathname,
-        hasAuth: !!auth,
-        hasUser: !!auth?.user,
-      })
-
       const isLoggedIn = !!auth?.user
       const isOnLoginPage = nextUrl.pathname === '/admin/login'
+      const isOnAdminPage = nextUrl.pathname.startsWith('/admin')
 
-      if (isOnLoginPage) {
-        // if signed in -> skip login form & go directly to dashboard
-        if (isLoggedIn) {
-          return Response.redirect(new URL('/admin/adminDashboard', nextUrl))
-        }
-        return true
+      // if signed in -> skip login form & go directly to dashboard
+      if (isOnLoginPage && isLoggedIn) {
+        return Response.redirect(new URL('/admin/adminDashboard', nextUrl))
       }
 
+      // not signed in + trying to access any /admin page (but not the login page itself)  → redirect to login
+      if (isOnAdminPage && !isOnLoginPage && !isLoggedIn) {
+        return Response.redirect(new URL('/admin/login', nextUrl))
+      }
+
+      // all other cases → allow
       return true
     },
   },
