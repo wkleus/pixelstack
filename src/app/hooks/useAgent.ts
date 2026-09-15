@@ -2,19 +2,25 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 
 const STORAGE_KEY = 'pixelstack-agent-messages'
 
-// represents a single message in the conversation
+// Typewriter display speed
+// effective chars/sec = CHARS_PER_TICK / (TICK_MS / 1000)
+// e.g. 4 chars / 20 ms = 200 chars/s
+const CHARS_PER_TICK = 4
+const TICK_MS = 20
+
 export interface AgentMessage {
   id?: string | number
   role: 'user' | 'assistant'
   content: string
 }
 
-// manage state and logic for AI chat agent
-// state:   - messages: full conversation history of user + assistant to give the agent conversation context with every request
-//          - input: current text in input field
-//          - isLoading: true while waiting for a response from API
+/**
+ * Manages chat state and streaming logic for the AI agent
+ * - messages: conversation history
+ * - input: current input field value
+ * - isLoading: true while waiting for / receiving a response
+ */
 export function useAgent() {
-  // load messages from localStorage on first render, fall back to empty array
   const [messages, setMessages] = useState<AgentMessage[]>(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY)
@@ -27,36 +33,76 @@ export function useAgent() {
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
-  // ref to hold the AbortController for the current stream
   const abortControllerRef = useRef<AbortController | null>(null)
 
-  // persist messages to localStorage whenever they change
+  // Typewriter buffers: full text from the server vs. currently displayed length
+  const fullTextRef = useRef('')
+  const displayedLengthRef = useRef(0)
+  const typewriterRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(messages))
     } catch {
-      // localStorage might be unavailable (e.g. private browsing in some browsers)
       console.warn(
         'localStorage unavailable — conversation will not be persisted.',
       )
     }
   }, [messages])
 
-  // cleanup on unmount: abort any ongoing request
   useEffect(() => {
     return () => {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort()
       }
+      if (typewriterRef.current) {
+        clearInterval(typewriterRef.current)
+        typewriterRef.current = null
+      }
     }
   }, [])
 
-  // wrap sendMessage in useCallback to prevent recreation on every render
+  /** Updates the last assistant message with the given text */
+  const renderAssistantContent = useCallback((text: string) => {
+    setMessages((prev) => {
+      const copy = [...prev]
+      const lastIdx = copy.length - 1
+      if (copy[lastIdx]?.role === 'assistant') {
+        copy[lastIdx] = { ...copy[lastIdx], content: text }
+      }
+      return copy
+    })
+  }, [])
+
+  /** Starts the typewriter interval (idempotent) */
+  const startTypewriter = useCallback(() => {
+    if (typewriterRef.current) return
+    typewriterRef.current = setInterval(() => {
+      const full = fullTextRef.current
+      const displayed = displayedLengthRef.current
+      if (displayed >= full.length) return
+
+      const nextLength = Math.min(displayed + CHARS_PER_TICK, full.length)
+      displayedLengthRef.current = nextLength
+      renderAssistantContent(full.slice(0, nextLength))
+    }, TICK_MS)
+  }, [renderAssistantContent])
+
+  const stopTypewriter = useCallback(() => {
+    if (typewriterRef.current) {
+      clearInterval(typewriterRef.current)
+      typewriterRef.current = null
+    }
+  }, [])
+
+  /**
+   * Sends the current input to /api/agent and streams the response
+   * Returns a tool action (e.g. prefill_contact_form) if one was triggered
+   */
   const sendMessage = useCallback(async (): Promise<{
     type: string
     topic: string
   } | null> => {
-    // use local copy of input to prevent race conditions
     const currentInput = input.trim()
     if (!currentInput || isLoading) {
       console.log('Cannot send: input empty or loading')
@@ -65,33 +111,37 @@ export function useAgent() {
 
     console.log(`Sending message: "${currentInput}"`)
 
-    // append current input as user message to conversation history
     const updated: AgentMessage[] = [
       ...messages,
       { role: 'user', content: currentInput },
     ]
 
     setMessages(updated)
-    setInput('') // clear input immediately
+    setInput('')
     setIsLoading(true)
 
-    // abort any previous request still in flight
+    fullTextRef.current = ''
+    displayedLengthRef.current = 0
+    stopTypewriter()
+
     if (abortControllerRef.current) {
       abortControllerRef.current.abort()
     }
     const abortController = new AbortController()
     abortControllerRef.current = abortController
 
+    // Keep only the last 3 user/assistant pairs to limit token usage
+    const MAX_HISTORY_MESSAGES = 6
+    const recentMessages = updated.slice(-MAX_HISTORY_MESSAGES)
+
     try {
-      // send full conversation history to API route /api/agent (streaming)
       const res = await fetch('/api/agent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: updated }),
+        body: JSON.stringify({ messages: recentMessages }),
         signal: abortController.signal,
       })
 
-      // handle non-200 responses
       if (!res.ok) {
         const errorData = await res.json().catch(() => null)
         throw new Error(errorData?.message || 'Failed to get response')
@@ -99,16 +149,15 @@ export function useAgent() {
 
       if (!res.body) throw new Error('No response body')
 
-      // prepare to read the SSE stream
       const reader = res.body.getReader()
       const decoder = new TextDecoder()
       let buffer = ''
-      let assistantContent = ''
       let toolAction: { type: string; topic: string } | null = null
       let streamCompleted = false
 
-      // insert an empty assistant message placeholder that we'll update as tokens arrive
+      // Placeholder that the typewriter fills as chunks arrive
       setMessages((prev) => [...prev, { role: 'assistant', content: '' }])
+      startTypewriter()
 
       while (!streamCompleted) {
         try {
@@ -117,7 +166,7 @@ export function useAgent() {
 
           buffer += decoder.decode(value, { stream: true })
           const events = buffer.split('\n\n')
-          buffer = events.pop() || '' // keep incomplete event in buffer
+          buffer = events.pop() || ''
 
           for (const event of events) {
             if (event.startsWith('data: ')) {
@@ -129,20 +178,8 @@ export function useAgent() {
 
               try {
                 const parsed = JSON.parse(data)
-                // text token – append to accumulated content
                 if (parsed.content) {
-                  assistantContent += parsed.content
-                  setMessages((prev) => {
-                    const copy = [...prev]
-                    const lastIdx = copy.length - 1
-                    if (copy[lastIdx]?.role === 'assistant') {
-                      copy[lastIdx] = {
-                        ...copy[lastIdx],
-                        content: assistantContent,
-                      }
-                    }
-                    return copy
-                  })
+                  fullTextRef.current += parsed.content
                 }
               } catch {
                 // ignore malformed data events
@@ -154,47 +191,44 @@ export function useAgent() {
               if (dataLine) {
                 const jsonStr = dataLine.slice(6)
                 const parsed = JSON.parse(jsonStr)
-                assistantContent = parsed.reply || assistantContent
                 toolAction = parsed.toolAction || null
 
-                // update the assistant message with the final reply
-                setMessages((prev) => {
-                  const copy = [...prev]
-                  const lastIdx = copy.length - 1
-                  if (copy[lastIdx]?.role === 'assistant') {
-                    copy[lastIdx] = {
-                      ...copy[lastIdx],
-                      content: assistantContent,
-                    }
-                  }
-                  return copy
-                })
+                // Non-empty reply replaces the buffer (contact-form case)
+                // Empty reply keeps the already-streamed text (project-details case)
+                if (parsed.reply) {
+                  fullTextRef.current = parsed.reply
+                }
                 streamCompleted = true
               }
             }
           }
         } catch (streamError) {
           console.error('Stream read error:', streamError)
-          setMessages((prev) => {
-            const copy = [...prev]
-            const lastIdx = copy.length - 1
-            if (
-              copy[lastIdx]?.role === 'assistant' &&
-              copy[lastIdx].content === ''
-            ) {
-              copy[lastIdx] = {
-                ...copy[lastIdx],
-                content: 'Connection lost. Please try again.',
-              }
-            }
-            return copy
-          })
+          if (displayedLengthRef.current === 0) {
+            fullTextRef.current = 'Connection lost. Please try again.'
+            displayedLengthRef.current = 0
+          }
           streamCompleted = true
         }
       }
 
-      // debug: log response to console
-      console.log('Agent response (streaming complete):', assistantContent)
+      // Wait for the typewriter to catch up before clearing isLoading
+      await new Promise<void>((resolve) => {
+        const check = setInterval(() => {
+          if (displayedLengthRef.current >= fullTextRef.current.length) {
+            clearInterval(check)
+            resolve()
+          }
+        }, 20)
+        setTimeout(() => {
+          clearInterval(check)
+          resolve()
+        }, 15000)
+      })
+
+      stopTypewriter()
+
+      console.log('Agent response (streaming complete):', fullTextRef.current)
       console.log('Tool action received:', toolAction)
 
       return toolAction
@@ -204,12 +238,10 @@ export function useAgent() {
         return null
       }
 
-      // enhanced error handling
       console.error('Error sending message:', error)
 
       let errorMessage = 'Something went wrong. Please try again.'
       if (error instanceof Error) {
-        // check for specific error types
         if (error.message.includes('rate limit')) {
           errorMessage =
             'Too many requests. Please wait a moment before trying again.'
@@ -223,7 +255,6 @@ export function useAgent() {
       }
 
       setMessages((prev) => {
-        // replace the empty placeholder with the error message, or append if missing
         const copy = [...prev]
         const lastIdx = copy.length - 1
         if (
@@ -238,21 +269,20 @@ export function useAgent() {
       })
       return null
     } finally {
+      stopTypewriter()
       setIsLoading(false)
       abortControllerRef.current = null
     }
-  }, [input, isLoading, messages])
+  }, [input, isLoading, messages, startTypewriter, stopTypewriter])
 
-  // send message on enter key press
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      e.preventDefault() // prevent form submission
+      e.preventDefault()
       sendMessage()
     }
   }
 
-  // addMessage: insert a message into the conversation (e.g. for proactive messages)
-  // 'agent' is normalized to 'assistant' for consistency.
+  /** Inserts a message into the conversation (e.g. proactive greetings) */
   const addMessage = useCallback(
     (role: 'user' | 'agent' | 'assistant', content: string) => {
       const normalizedRole = role === 'agent' ? 'assistant' : role
@@ -266,7 +296,6 @@ export function useAgent() {
     [],
   )
 
-  // clear conversation history from state and localStorage
   const clearMessages = useCallback(() => {
     setMessages([])
     localStorage.removeItem(STORAGE_KEY)

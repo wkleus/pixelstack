@@ -1,44 +1,59 @@
 import { NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import * as Sentry from '@sentry/nextjs'
-import { getAgentContext, logAgentContext } from '@/data/agentContext'
+import {
+  getAgentContext,
+  logAgentContext,
+  getProjectDetails,
+  getDeveloperBackground,
+  projectNames,
+} from '@/data/agentContext'
 import { agentRateLimit } from '@/lib/rateLimit'
 
-// cheapest deepseek model: 'deepseek-v4-flash'
 const MODEL = process.env.DEEPSEEK_MODEL || 'deepseek-v4-flash'
 
-// DeepSeek API client (OpenAI-compatible)
 const client = new OpenAI({
   baseURL: 'https://api.deepseek.com',
   apiKey: process.env.DEEPSEEK_API_KEY,
 })
 
-// stream delay in milliseconds – set via STREAM_DELAY_MS env variable, 0 = no delay
-const STREAM_DELAY_MS = parseInt(process.env.STREAM_DELAY_MS || '0', 10)
+// Throttles streaming speed in development only (chars/sec)
+// Production always streams at API speed; the typing effect lives in the frontend
+const STREAM_CHARS_PER_SECOND =
+  process.env.NODE_ENV === 'development'
+    ? parseInt(process.env.STREAM_CHARS_PER_SECOND || '0', 10)
+    : 0
 
-// helper: pause for a given duration
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+/** Pauses long enough to emit text at STREAM_CHARS_PER_SECOND. */
+const delayForText = async (text: string) => {
+  if (STREAM_CHARS_PER_SECOND <= 0) return
+  const ms = (text.length / STREAM_CHARS_PER_SECOND) * 1000
+  if (ms > 0) await delay(ms)
+}
 
 interface Message {
   role: 'user' | 'assistant'
   content: string
 }
 
-// tool definition — tells DeepSeek what tools it can use
-// DeepSeek will decide on its own when to call this tool
+// Tool definitions; usage instructions live in the descriptions so the
+// system prompt stays small and cache-friendly
 const tools: OpenAI.Chat.ChatCompletionTool[] = [
   {
     type: 'function',
     function: {
       name: 'prefill_contact_form',
       description:
-        'Opens the contact form and pre-selects a topic. Use this when the user expresses intent to contact the developer — for a job offer, collaboration, project inquiry, quote request, feedback, or any other reason.',
+        'Opens the contact form and pre-selects a topic. Use this when the user expresses intent to contact the developer — for a job offer, collaboration, project inquiry, quote request, feedback, or any other reason. ' +
+        'IMPORTANT: After calling this tool, respond with ONE short sentence only — confirm you opened the contact form with the pre-selected topic. Nothing else. No project details, no suggestions, no questions. ' +
+        "Example: \"I've just opened the contact form with 'Job Offer' pre-selected for you — you're all set!\"",
       parameters: {
         type: 'object',
         properties: {
           topic: {
             type: 'string',
-            // must match the exact values in ConnectForm's <select>
             enum: [
               'job',
               'project',
@@ -47,16 +62,58 @@ const tools: OpenAI.Chat.ChatCompletionTool[] = [
               'feedback',
               'other',
             ],
-            description: "The topic that best matches the user's intent",
+            description:
+              "The topic that best matches the user's intent. Mapping: job offers/hiring/recruitment → 'job'; project requests/building something → 'project'; collaboration/working together → 'collaboration'; pricing/costs/quotes → 'quote'; feedback/suggestions → 'feedback'; anything else → 'other'.",
           },
         },
         required: ['topic'],
       },
     },
   },
+  {
+    type: 'function',
+    function: {
+      name: 'get_project_details',
+      description:
+        "Fetches the full how-it-works explanation, in-depth case study (challenges, architecture, tech decisions), and complete tech stack for one specific project. The system prompt only contains a one-line overview per project — call this before giving an in-depth answer about a project's architecture, technical challenges, or full tech stack. Do NOT call it for a general 'what projects have you built' overview question; the overview section already covers that.",
+      parameters: {
+        type: 'object',
+        properties: {
+          projectName: {
+            type: 'string',
+            enum: projectNames,
+            description: 'The exact name of the project to get details for',
+          },
+        },
+        required: ['projectName'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'get_developer_background',
+      description:
+        'Fetches the full skills list (with proficiency levels) and/or the full education & certificates details. The system prompt only contains a short overview (category names / titles) — call this before answering any detailed question about skills, proficiency, technologies, education, certificates, courses, or IT training.',
+      parameters: {
+        type: 'object',
+        properties: {
+          sections: {
+            type: 'array',
+            items: {
+              type: 'string',
+              enum: ['skills', 'education'],
+            },
+            description:
+              'Which sections to fetch. Pass both if the question covers both.',
+          },
+        },
+        required: ['sections'],
+      },
+    },
+  },
 ]
 
-// maps topic values to human-readable labels for the tool result message
 const TOPIC_LABELS: Record<string, string> = {
   job: 'Job Offer',
   project: 'Project Inquiry',
@@ -66,11 +123,16 @@ const TOPIC_LABELS: Record<string, string> = {
   other: 'Other',
 }
 
-// POST /api/agent - handles chat requests with portfolio context (streaming)
+/** Handles chat requests with portfolio context via SSE streaming */
 export async function POST(request: Request) {
-  // rate limiting
+  const tStart = Date.now()
+
   const ip = request.headers.get('x-forwarded-for') ?? 'unknown'
+  const tRL = Date.now()
   const { success, reset } = await agentRateLimit.limit(ip)
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`[timing] rate-limit: ${Date.now() - tRL}ms`)
+  }
 
   if (!success) {
     const retryAfter = Math.max(1, Math.ceil((reset - Date.now()) / 1000))
@@ -89,7 +151,6 @@ export async function POST(request: Request) {
     )
   }
 
-  // parse and validate request
   try {
     const { messages } = (await request.json()) as { messages: Message[] }
 
@@ -100,187 +161,311 @@ export async function POST(request: Request) {
       )
     }
 
-    // get agent context with dynamic data
-    const { systemPrompt, currentDate, timestamp } = getAgentContext()
+    const tCtx = Date.now()
+    const { systemPrompt, currentDate } = getAgentContext()
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[timing] context-build: ${Date.now() - tCtx}ms`)
+    }
 
-    // enhanced system prompt with dynamic context and tool instructions
-    const enhancedSystemPrompt = `
-      ${systemPrompt}
+    // Keep the system prompt byte-identical across requests so DeepSeek
+    // can cache the prompt prefix; dynamic values (date) go into a
+    // separate user message instead
+    const enhancedSystemPrompt = systemPrompt
 
-      === DYNAMIC CONTEXT ===
-      Current Date: ${currentDate}
-      Timestamp: ${timestamp}
-      Session ID: ${ip.substring(0, 8)}
-
-      === TOOL USAGE INSTRUCTIONS ===
-      You have access to the prefill_contact_form tool.
-      Use it whenever the user expresses ANY intent to contact the developer:
-      - job offers, hiring, recruitment, positions → topic: "job"
-      - project requests, building something → topic: "project"
-      - collaboration, working together → topic: "collaboration"
-      - pricing, costs, quotes → topic: "quote"
-      - feedback, suggestions → topic: "feedback"
-      - anything else → topic: "other"
-      After calling the tool, respond with ONE short sentence only — confirm you open the contact form with the pre-selected topic. Nothing else. No project details, no suggestions, no questions. Example: "I've just opened the contact form with 'Job Offer' pre-selected for you — you're all set!"
-    `
-
-    // log context in development
     if (process.env.NODE_ENV === 'development') {
       logAgentContext()
       console.log('Messages received:', messages.length)
+      console.log('Session:', ip.substring(0, 8))
+      console.log(
+        'STREAM_CHARS_PER_SECOND effective value:',
+        STREAM_CHARS_PER_SECOND,
+      )
     }
 
-    // start streaming DeepSeek API call
+    // Inject the current date just before the last user message
+    const messagesWithContext: Message[] = [
+      ...messages.slice(0, -1),
+      {
+        role: 'user' as const,
+        content: `(Context: today is ${currentDate})`,
+      },
+      messages[messages.length - 1],
+    ]
+
+    const tCall1 = Date.now()
     const deepseekStream = await client.chat.completions.create({
       model: MODEL,
       max_tokens: 1024,
       temperature: 0.7,
       tools,
-      tool_choice: 'auto', // DeepSeek decides on its own
-      stream: true, // enable streaming
+      reasoning_effort: 'low',
+      tool_choice: 'auto',
+      stream: true,
+      stream_options: { include_usage: true },
       messages: [
         { role: 'system', content: enhancedSystemPrompt },
-        ...messages,
+        ...messagesWithContext,
       ],
     })
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[timing] deepseek-call-1 TTFB: ${Date.now() - tCall1}ms`)
+    }
 
-    // prepare streaming response
     const encoder = new TextEncoder()
 
-    // accumulator for potential tool call (DeepSeek sends fragments in separate chunks)
-    let accumulatedToolCall: {
-      id: string
-      name: string
-      arguments: string
-    } | null = null
+    /** Emits one SSE data chunk for a piece of streamed text */
+    const emitContent = async (
+      controller: ReadableStreamDefaultController,
+      content: string,
+    ) => {
+      const payload = JSON.stringify({ content })
+      controller.enqueue(encoder.encode(`data: ${payload}\n\n`))
+      await delayForText(content)
+    }
+
+    // Accumulates tool-call fragments keyed by index (multiple tools
+    // can be called in the same turn)
+    const toolCallsAcc = new Map<
+      number,
+      { id: string; name: string; arguments: string }
+    >()
 
     const stream = new ReadableStream({
       async start(controller) {
         try {
           for await (const chunk of deepseekStream) {
-            const delta = chunk.choices[0]?.delta
+            if (chunk.usage && process.env.NODE_ENV === 'development') {
+              console.log('Usage:', chunk.usage)
+            }
 
-            // case 1: tool call fragments – accumulate them
+            const choice = chunk.choices[0]
+            const delta = choice?.delta
+
             if (delta?.tool_calls) {
               for (const tc of delta.tool_calls) {
-                if (!accumulatedToolCall) {
-                  accumulatedToolCall = {
+                const index = tc.index ?? 0
+                if (!toolCallsAcc.has(index)) {
+                  toolCallsAcc.set(index, {
                     id: tc.id ?? '',
                     name: '',
                     arguments: '',
-                  }
+                  })
                 }
-                if (tc.function?.name)
-                  accumulatedToolCall.name += tc.function.name
+                const acc = toolCallsAcc.get(index)!
+                if (tc.function?.name) acc.name += tc.function.name
                 if (tc.function?.arguments)
-                  accumulatedToolCall.arguments += tc.function.arguments
+                  acc.arguments += tc.function.arguments
               }
             }
 
-            // case 2: text content – send as SSE data event (with optional delay)
             if (delta?.content) {
-              const payload = JSON.stringify({ content: delta.content })
-              controller.enqueue(encoder.encode(`data: ${payload}\n\n`))
-              if (STREAM_DELAY_MS > 0) await delay(STREAM_DELAY_MS)
+              await emitContent(controller, delta.content)
             }
 
-            // normal completion without tool call
-            if (
-              chunk.choices[0]?.finish_reason === 'stop' &&
-              !accumulatedToolCall
-            ) {
+            if (choice?.finish_reason === 'stop' && toolCallsAcc.size === 0) {
               controller.enqueue(encoder.encode('data: [DONE]\n\n'))
-              if (STREAM_DELAY_MS > 0) await delay(STREAM_DELAY_MS)
               controller.close()
+              if (process.env.NODE_ENV === 'development') {
+                console.log(`[timing] TOTAL: ${Date.now() - tStart}ms`)
+              }
               return
             }
           }
 
-          // stream ended – check if we have an accumulated tool call
-          if (accumulatedToolCall) {
-            if (!accumulatedToolCall.name || !accumulatedToolCall.arguments) {
-              controller.enqueue(encoder.encode('data: [DONE]\n\n'))
-              if (STREAM_DELAY_MS > 0) await delay(STREAM_DELAY_MS)
-              controller.close()
-              return
-            }
+          const toolCalls = Array.from(toolCallsAcc.values()).filter(
+            (tc) => tc.name && tc.arguments,
+          )
 
-            const toolName = accumulatedToolCall.name
-            const toolArgs = JSON.parse(accumulatedToolCall.arguments) as {
-              topic: string
-            }
-            const topic = toolArgs.topic
-            const topicLabel = TOPIC_LABELS[topic] ?? 'Other'
-
-            if (process.env.NODE_ENV === 'development') {
-              console.log(`Tool called: "${toolName}" with topic: "${topic}"`)
-            }
-
-            // second API call (non‑streaming) to get the final reply after tool execution
-            const secondResponse = await client.chat.completions.create({
-              model: MODEL,
-              max_tokens: 1024,
-              temperature: 0.7,
-              tools,
-              messages: [
-                { role: 'system', content: enhancedSystemPrompt },
-                ...messages,
-                // assistant message that triggered the tool call
-                {
-                  role: 'assistant',
-                  content: null,
-                  tool_calls: [
-                    {
-                      id: accumulatedToolCall.id,
-                      type: 'function',
-                      function: {
-                        name: accumulatedToolCall.name,
-                        arguments: accumulatedToolCall.arguments,
-                      },
-                    },
-                  ],
-                },
-                // tool execution result
-                {
-                  role: 'tool',
-                  tool_call_id: accumulatedToolCall.id,
-                  content: JSON.stringify({
-                    success: true,
-                    topic,
-                    topicLabel,
-                    message: `Contact form opened with topic "${topicLabel}" pre-selected.`,
-                  }),
-                },
-              ],
-            })
-
-            const reply =
-              secondResponse.choices[0].message.content?.trim() ??
-              'I open the contact form for you!'
+          if (toolCalls.length > 0) {
+            const contactFormCall = toolCalls.find(
+              (tc) => tc.name === 'prefill_contact_form',
+            )
+            const projectDetailCalls = toolCalls.filter(
+              (tc) => tc.name === 'get_project_details',
+            )
+            const backgroundCalls = toolCalls.filter(
+              (tc) => tc.name === 'get_developer_background',
+            )
 
             if (process.env.NODE_ENV === 'development') {
               console.log(
-                'Final reply after tool call:',
-                reply.substring(0, 100),
+                'Tools called:',
+                toolCalls.map((tc) => tc.name).join(', '),
               )
             }
 
-            // send tool action metadata + reply as a special SSE event (with optional delay)
-            const toolEvent = JSON.stringify({
-              type: 'tool_action',
-              toolAction: { type: 'prefill_contact_form', topic },
-              reply,
+            const assistantToolCallMessage = {
+              role: 'assistant' as const,
+              content: null,
+              tool_calls: toolCalls.map((tc) => ({
+                id: tc.id,
+                type: 'function' as const,
+                function: { name: tc.name, arguments: tc.arguments },
+              })),
+            }
+
+            // One tool-result message per call, in the same order
+            const toolResultMessages = toolCalls.map((tc) => {
+              if (tc.name === 'get_project_details') {
+                const { projectName } = JSON.parse(tc.arguments) as {
+                  projectName: string
+                }
+                const details = getProjectDetails(projectName)
+                return {
+                  role: 'tool' as const,
+                  tool_call_id: tc.id,
+                  content: details
+                    ? JSON.stringify(details)
+                    : JSON.stringify({
+                        success: false,
+                        message: `No project named "${projectName}" found.`,
+                      }),
+                }
+              }
+
+              if (tc.name === 'get_developer_background') {
+                const { sections } = JSON.parse(tc.arguments) as {
+                  sections: ('skills' | 'education')[]
+                }
+                const background = getDeveloperBackground(sections)
+                return {
+                  role: 'tool' as const,
+                  tool_call_id: tc.id,
+                  content: JSON.stringify(background),
+                }
+              }
+
+              // prefill_contact_form
+              const { topic } = JSON.parse(tc.arguments) as { topic: string }
+              const topicLabel = TOPIC_LABELS[topic] ?? 'Other'
+              return {
+                role: 'tool' as const,
+                tool_call_id: tc.id,
+                content: JSON.stringify({
+                  success: true,
+                  topic,
+                  topicLabel,
+                  message: `Contact form opened with topic "${topicLabel}" pre-selected.`,
+                }),
+              }
             })
-            controller.enqueue(
-              encoder.encode(`event: tool_result\ndata: ${toolEvent}\n\n`),
-            )
-            if (STREAM_DELAY_MS > 0) await delay(STREAM_DELAY_MS)
+
+            const baseMessages = [
+              { role: 'system' as const, content: enhancedSystemPrompt },
+              ...messagesWithContext,
+              assistantToolCallMessage,
+              ...toolResultMessages,
+            ]
+
+            const hasContentToolCall =
+              projectDetailCalls.length > 0 || backgroundCalls.length > 0
+
+            if (hasContentToolCall) {
+              // Content tools need a potentially long follow-up — stream it
+              // Raise max_tokens to 2048 if answers get truncated (finish_reason: 'length')
+              const tCall2 = Date.now()
+              const followUpStream = await client.chat.completions.create({
+                model: MODEL,
+                max_tokens: 1024,
+                temperature: 0.7,
+                reasoning_effort: 'low',
+                stream: true,
+                stream_options: { include_usage: true },
+                messages: baseMessages,
+              })
+              if (process.env.NODE_ENV === 'development') {
+                console.log(
+                  `[timing] deepseek-call-2 TTFB: ${Date.now() - tCall2}ms`,
+                )
+              }
+
+              for await (const chunk of followUpStream) {
+                if (chunk.usage && process.env.NODE_ENV === 'development') {
+                  console.log('Usage (follow-up call):', chunk.usage)
+                }
+
+                const finishReason = chunk.choices[0]?.finish_reason
+                if (finishReason && process.env.NODE_ENV === 'development') {
+                  console.log('Follow-up finish_reason:', finishReason)
+                  if (finishReason === 'length') {
+                    console.warn(
+                      '⚠️ Follow-up response truncated — consider raising max_tokens',
+                    )
+                  }
+                }
+
+                const followUpDelta = chunk.choices[0]?.delta
+                if (followUpDelta?.content) {
+                  await emitContent(controller, followUpDelta.content)
+                }
+              }
+
+              // Still fire the UI action if prefill was also called this turn
+              // Empty reply so the client keeps the text already streamed above
+              if (contactFormCall) {
+                const { topic } = JSON.parse(contactFormCall.arguments) as {
+                  topic: string
+                }
+                const toolEvent = JSON.stringify({
+                  type: 'tool_action',
+                  toolAction: { type: 'prefill_contact_form', topic },
+                  reply: '',
+                })
+                controller.enqueue(
+                  encoder.encode(`event: tool_result\ndata: ${toolEvent}\n\n`),
+                )
+              }
+            } else if (contactFormCall) {
+              // Contact-form only: one short non-streamed confirmation
+              // Raise max_tokens to 250 if the reply gets truncated
+              const { topic } = JSON.parse(contactFormCall.arguments) as {
+                topic: string
+              }
+
+              const tCall2 = Date.now()
+              const secondResponse = await client.chat.completions.create({
+                model: MODEL,
+                max_tokens: 150,
+                temperature: 0.7,
+                reasoning_effort: 'low',
+                stream: false,
+                tools,
+                messages: baseMessages,
+              })
+              if (process.env.NODE_ENV === 'development') {
+                console.log(
+                  `[timing] deepseek-call-2 (non-stream): ${Date.now() - tCall2}ms`,
+                )
+              }
+
+              const reply =
+                secondResponse.choices[0].message.content?.trim() ??
+                'I open the contact form for you!'
+
+              if (process.env.NODE_ENV === 'development') {
+                console.log(
+                  'Final reply after tool call:',
+                  reply.substring(0, 150),
+                )
+                console.log('Usage (second call):', secondResponse.usage)
+              }
+
+              const toolEvent = JSON.stringify({
+                type: 'tool_action',
+                toolAction: { type: 'prefill_contact_form', topic },
+                reply,
+              })
+              controller.enqueue(
+                encoder.encode(`event: tool_result\ndata: ${toolEvent}\n\n`),
+              )
+            }
           }
 
-          // signal end of stream (with optional delay)
           controller.enqueue(encoder.encode('data: [DONE]\n\n'))
-          if (STREAM_DELAY_MS > 0) await delay(STREAM_DELAY_MS)
           controller.close()
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`[timing] TOTAL: ${Date.now() - tStart}ms`)
+          }
         } catch (error) {
           console.error('Stream processing error:', error)
           Sentry.captureException(error, {
@@ -291,7 +476,6 @@ export async function POST(request: Request) {
       },
     })
 
-    // return SSE response
     return new Response(stream, {
       headers: {
         'Content-Type': 'text/event-stream',
@@ -300,7 +484,6 @@ export async function POST(request: Request) {
       },
     })
   } catch (error) {
-    // error handling
     console.error('Agent API error:', error)
     Sentry.captureException(error, { tags: { route: 'api/agent' } })
 

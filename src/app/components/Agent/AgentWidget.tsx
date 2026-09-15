@@ -148,7 +148,7 @@ const AgentWidgetInner = () => {
     // Don't auto-scroll if user manually scrolled up
     if (isUserScrollingRef.current) return
 
-    // Use requestAnimationFrame to ensure we scroll after DOM updates
+    // Use requestAnimationFrame to ensure that scrolling occurs after DOM updates
     requestAnimationFrame(() => {
       container.scrollTop = container.scrollHeight
     })
