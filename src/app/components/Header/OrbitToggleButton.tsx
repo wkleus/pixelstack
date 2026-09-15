@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react'
 import { useMotion } from '@/app/context/MotionContext'
 import { Pause, Play } from 'lucide-react'
 import { usePathname } from 'next/navigation'
+import Tooltip from '@/app/components/ui/Tooltip'
 
 export default function OrbitToggleButton() {
   const { orbitEnabled, toggleOrbit } = useMotion()
@@ -25,19 +26,25 @@ export default function OrbitToggleButton() {
   if (pathname !== '/' || !isLargeScreen) return null
 
   return (
-    <button
-      type="button"
-      onClick={toggleOrbit}
-      className="cursor-pointer rounded-lg p-2 transition-colors hover:bg-gray-100 hover:text-cyan-500 dark:text-white dark:hover:bg-gray-800"
-      aria-pressed={orbitEnabled}
-      aria-label={orbitEnabled ? 'Pause orbit animation' : 'Play orbit animation'}
-      title={orbitEnabled ? 'Pause orbit animation' : 'Play orbit animation'}
+    <Tooltip
+      text={orbitEnabled ? 'Pause orbit animation' : 'Play orbit animation'}
     >
-      {orbitEnabled ? (
-        <Pause className="h-5 w-5" />
-      ) : (
-        <Play className="h-5 w-5" />
-      )}
-    </button>
+      <button
+        type="button"
+        onClick={toggleOrbit}
+        className="cursor-pointer rounded-lg p-2 transition-colors hover:bg-gray-100 hover:text-cyan-500 dark:text-white dark:hover:bg-gray-800"
+        aria-pressed={orbitEnabled}
+        aria-label={
+          orbitEnabled ? 'Pause orbit animation' : 'Play orbit animation'
+        }
+        title={orbitEnabled ? 'Pause orbit animation' : 'Play orbit animation'}
+      >
+        {orbitEnabled ? (
+          <Pause className="h-5 w-5" />
+        ) : (
+          <Play className="h-5 w-5" />
+        )}
+      </button>
+    </Tooltip>
   )
 }
