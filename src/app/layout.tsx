@@ -6,6 +6,7 @@ import { AgentProvider } from './context/AgentContext'
 import Footer from './components/Footer/Footer'
 import AgentWidget from './components/Agent/AgentWidget'
 import Script from 'next/script'
+import { MotionProvider } from './context/MotionContext'
 
 const ionosWebsite = process.env.NEXT_PUBLIC_IONOS_WEBSITE
 
@@ -38,21 +39,23 @@ export default function RootLayout({
       >
         {/* ThemeProvider makes the theme accessible across the entire app */}
         <ThemeProvider>
-          {/* AgentProvider gives HeaderNav and AgentWidget one shared
+          <MotionProvider>
+            {/* AgentProvider gives HeaderNav and AgentWidget one shared
               conversation/unread state instead of two independent copies */}
-          <AgentProvider>
-            {/* Global navigation bar */}
-            <HeaderNav />
+            <AgentProvider>
+              {/* Global navigation bar */}
+              <HeaderNav />
 
-            {/* Main content area with spacing below the fixed header */}
-            <main className="min-h-screen pt-24">{children}</main>
+              {/* Main content area with spacing below the fixed header */}
+              <main className="min-h-screen pt-24">{children}</main>
 
-            {/* Global footer */}
-            <Footer />
+              {/* Global footer */}
+              <Footer />
 
-            {/* AI-powered agent — floating widget visible on all pages */}
-            <AgentWidget />
-          </AgentProvider>
+              {/* AI-powered agent — floating widget visible on all pages */}
+              <AgentWidget />
+            </AgentProvider>
+          </MotionProvider>
         </ThemeProvider>
 
         {/* Self-hosted Umami analytics — tracks visits across both the

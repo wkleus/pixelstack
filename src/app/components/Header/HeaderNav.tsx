@@ -9,6 +9,7 @@ import MobileMenu from './MobileMenu'
 import { FaRobot } from 'react-icons/fa6'
 import { useState, useEffect } from 'react'
 import { useAgentContext } from '@/app/context/AgentContext'
+import OrbitToggleButton from './OrbitToggleButton'
 
 const HeaderNav = () => {
   // Access the current theme from the custom ThemeContext
@@ -92,6 +93,8 @@ const HeaderNav = () => {
               )
             })}
 
+            {/* Orbit toggle button */}
+            <OrbitToggleButton />
             {/* Theme toggle button (light/dark mode) */}
             <ThemeSwitchButton />
           </ul>

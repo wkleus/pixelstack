@@ -11,6 +11,7 @@ import {
   SiTypescript,
   SiAiohttp,
 } from 'react-icons/si'
+import { useMotion } from '@/app/context/MotionContext'
 
 // Tech Orbit Component: Displays tech icons orbiting around a central point
 const TechOrbit = () => {
@@ -22,6 +23,8 @@ const TechOrbit = () => {
     { icon: SiTypescript, label: 'TypeScript' },
     { icon: SiAiohttp, label: 'AI HTTP' },
   ]
+
+  const { orbitEnabled } = useMotion()
 
   // Same radii for SVG and icons
   const orbitRadiusX = 620
@@ -39,6 +42,9 @@ const TechOrbit = () => {
       const y = Math.sin(currentAngle) * orbitRadiusY
 
       const el = iconRefs.current[index]
+
+      if (!orbitEnabled) return
+
       if (el) {
         el.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`
       }
@@ -100,6 +106,8 @@ const Intro = () => {
   const [isDark, setIsDark] = useState(false)
   const [isLargeScreen, setIsLargeScreen] = useState(false)
 
+  const { orbitEnabled } = useMotion()
+
   useEffect(() => {
     const root = document.documentElement
     const checkDark = () => setIsDark(root.classList.contains('dark'))
@@ -141,7 +149,7 @@ const Intro = () => {
       onMouseMove={handleMouseMove}
     >
       {/* Orbit Background */}
-      {isDark && isLargeScreen && (
+      {isDark && isLargeScreen && orbitEnabled && (
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
