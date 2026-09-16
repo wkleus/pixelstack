@@ -50,3 +50,43 @@ a {
 .animate-fill {
   animation: fill 2.2s ease-out forwards;
 }
+
+/* Falling blog-icon background (Posts page) */
+@keyframes icon-fall {
+  from {
+    transform: translateY(-10vh);
+  }
+  to {
+    transform: translateY(110vh);
+  }
+}
+
+@keyframes icon-sway {
+  0%,
+  100% {
+    transform: translateX(-10px);
+  }
+  50% {
+    transform: translateX(10px);
+  }
+}
+
+.icon-rain-item {
+  animation-name: icon-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.icon-rain-sway {
+  animation-name: icon-sway;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+/* Respect reduced-motion preference: hide the purely decorative rain */
+@media (prefers-reduced-motion: reduce) {
+  .icon-rain {
+    display: none;
+  }
+}
