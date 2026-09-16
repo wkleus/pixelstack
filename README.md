@@ -181,7 +181,8 @@ The project is deployed on Vercel and IONOS.
 │
 ├── 📂 scripts
 │   ├── 📄 import-posts.ts          # Seeds the DB from src/data/posts.ts
-│   └── 📄 test-db.ts               # Verifies the DB connection
+│   ├── 📄 test-db.ts               # Verifies the DB connection
+│   └── 📄 hash-password.ts         # Generates ADMIN_PASSWORD_HASH_B64 from a plaintext password
 │
 ├── 📂 src
 │   ├── 📂 app
@@ -339,15 +340,19 @@ The full conversation history is included in each API call — giving the assist
 
 Responses are streamed via **Server-Sent Events (SSE)** for a responsive typing experience.
 
-When the model decides to call a tool:
+The model has access to **three tools** (`src/app/api/agent/route.ts`):
 
-1. DeepSeek streams tool-call fragments (name + arguments).
-2. The API accumulates them and executes the tool (`prefill_contact_form`).
-3. A second (non-streaming) call is made with the tool result.
-4. The final reply + a special `tool_action` event is sent to the client.
-5. The chat widget navigates to `/connect?topic=...` and the form pre-selects the topic.
+- **`prefill_contact_form`** — see [Contact Form Prefill via Tool Calling](#contact-form-prefill-via-tool-calling) below.
+- **`get_project_details`** — the system prompt only ships a one-line overview per project (to keep it small and cache-friendly); this tool fetches the full case study (challenges, architecture, tech decisions) for one named project on demand.
+- **`get_developer_background`** — likewise fetches the full skills list (with proficiency levels) and/or education & certificate details, which aren't fully spelled out in the base system prompt.
+  When the model decides to call a tool:
 
-This keeps the UI snappy while still allowing reliable tool execution.
+1. DeepSeek streams tool-call fragments (name + arguments); multiple tools can be called in the same turn.
+2. The API accumulates the fragments and executes each tool.
+3. If `get_project_details` and/or `get_developer_background` were called, a **second streamed call** is made with the tool results so the model can weave the fetched content into a full answer.
+4. If only `prefill_contact_form` was called, a short **non-streamed** follow-up call produces a single confirmation sentence instead (the tool's own instructions forbid adding project details or questions there).
+5. A special `tool_action` SSE event carries the topic to the client; the chat widget navigates to `/connect?topic=...` and the form pre-selects it. This event is still sent even when `prefill_contact_form` was called alongside a content tool in the same turn.
+   This keeps the UI snappy while still allowing reliable, potentially multi-step tool execution.
 
 ### Contact Form Prefill via Tool Calling
 
@@ -358,11 +363,8 @@ This creates a seamless user experience — instead of manually selecting a topi
 #### How It Works (Technical)
 
 1. Tool Definition: The AI assistant has access to the prefill_contact_form tool, which accepts a topic parameter (job, project, collaboration, quote, feedback, other).
-
 2. Intent Detection: DeepSeek analyzes the user's message and decides whether to call the tool. If the user expresses intent to contact the developer, the tool is triggered.
-
 3. Navigation: The chat widget receives the toolAction from the API and navigates to /connect?topic=[topic].
-
 4. Form Prefill: The contact form reads the topic from the URL parameter and pre-selects the matching dropdown option, with a visual "Pre-filled" indicator.
 
 #### Examples
@@ -424,8 +426,7 @@ AI Assistant: "I've just opened the contact form with "Job Offer" pre-selected f
 - "Explain HomeSphere."
 - "What certifications do you have?"
 - "What is your tech stack?"
-
-**Trigger the pre-filling of the contact form via tool calling**:
+  **Trigger the pre-filling of the contact form via tool calling**:
 
 - "I want to offer you a job" → prefills contact form with "Job Offer"
 - "How much do you charge?" → prefills contact form with "Quote Request"
@@ -594,16 +595,27 @@ Create a `.env.local` (or set the values in the Vercel dashboard).
 
 ### Optional
 
-| Variable                    | Description                                                          |
-| --------------------------- | -------------------------------------------------------------------- |
-| `DEEPSEEK_MODEL`            | Model name (default: `deepseek-v4-flash`)                            |
-| `NEXT_PUBLIC_SENTRY_DSN`    | Sentry DSN (client-side error tracking)                              |
-| `SENTRY_ORG`                | Sentry organization (for source map uploads)                         |
-| `SENTRY_PROJECT`            | Sentry project name                                                  |
-| `SENTRY_AUTH_TOKEN`         | Sentry auth token for source maps                                    |
-| `NEXT_PUBLIC_IONOS_WEBSITE` | Base URL used for `metadataBase` / Open Graph                        |
-| `AGENT_CONTEXT_1` … `_4`    | Production system prompt for the AI (split because of length limits) |
-| `STREAM_DELAY_MS`           | Artificial delay (ms) for AI streaming – useful only in development  |
+| Variable                        | Description                                                                                                            |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `DEEPSEEK_MODEL`                | Model name (default: `deepseek-v4-flash`)                                                                              |
+| `STREAM_CHARS_PER_SECOND`       | Throttles AI streaming speed (chars/sec) in development only; ignored in production (default: `0`, i.e. no throttling) |
+| `NEXT_PUBLIC_SENTRY_DSN`        | Sentry DSN (client-side error tracking)                                                                                |
+| `NEXT_PUBLIC_IONOS_WEBSITE`     | Base URL used for `metadataBase` / Open Graph                                                                          |
+| `NEXT_PUBLIC_EMAIL`             | Public contact email shown in the UI (e.g. footer)                                                                     |
+| `NEXT_PUBLIC_LOCATION`          | Public location string shown in the UI                                                                                 |
+| `AGENT_CONTEXT_1` … `_4`        | Production system prompt for the AI (split because of length limits)                                                   |
+| `UMAMI_API_URL`                 | Base URL of the self-hosted Umami instance (used by the admin dashboard's analytics widget)                            |
+| `UMAMI_USERNAME`                | Umami login username (self-hosted Umami has no persistent API keys, so the app logs in per request)                    |
+| `UMAMI_PASSWORD`                | Umami login password                                                                                                   |
+| `UMAMI_WEBSITE_ID`              | Website ID inside Umami whose stats should be shown                                                                    |
+| `NEXT_PUBLIC_IMPRESSUM_NAME`    | Legal name shown on `/imprint`                                                                                         |
+| `NEXT_PUBLIC_IMPRESSUM_STREET`  | Street address shown on `/imprint`                                                                                     |
+| `NEXT_PUBLIC_IMPRESSUM_CITY`    | City shown on `/imprint`                                                                                               |
+| `NEXT_PUBLIC_IMPRESSUM_COUNTRY` | Country shown on `/imprint`                                                                                            |
+| `NEXT_PUBLIC_IMPRESSUM_EMAIL`   | Contact email shown on `/imprint`                                                                                      |
+| `NEXT_PUBLIC_IMPRESSUM_PHONE`   | Phone number for `/imprint` (currently unused — commented out in the page)                                             |
+
+> **Note:** the `Content-Security-Policy` in `next.config.ts` currently allows scripts/connections only to `pixelstack.me`'s Umami instance and Sentry — if you self-host Umami at a different origin, update the CSP in `next.config.ts` accordingly.
 
 > **Why Base64 for the admin password hash?**
 > A raw bcrypt hash contains `$` characters that get corrupted by `.env` expansion and some shells. Base64 is safe to copy-paste into `.env` and Vercel. The hash is decoded back at runtime in `src/auth.ts`.
