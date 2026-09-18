@@ -28,7 +28,7 @@ export const portfolios: Portfolio[] = [
       6. Interactive Map – View property locations on the detail page.
       7. Contact Agents – Send inquiries via email through the contact form (powered by Resend).
       8. Multilingual – Fully available in English and German.
-    9. Admin Dashboard – Manage the entire property catalog through a protected dashboard (try it via the read-only demo logindocs: update HomeSphere info box with AI agent and missing Features – email: demo@homesphere.app, password: 123456).`,
+    9. Admin Dashboard – Manage the entire property catalog through a protected dashboard (try it via the read-only demo login: email: demo@homesphere.app, password: 123456).`,
 
     // In-depth case study: problem, challenges, solution & tech
     caseStudy: `Project Period
@@ -41,21 +41,22 @@ export const portfolios: Portfolio[] = [
         3. Integrating third-party services (maps, email delivery, financial calculator)
         4. Managing separate frontend and backend deployments (Vercel + Render)
         5. Ensuring secure server-side validation while using Supabase only for authentication
-        6. Integrating a conversational AI agent (DeepSeek + LangGraph) for natural-language property search, including multi-turn context merging and cost-optimized prompt caching
-        7. Ensuring reliable image handling: automatic resizing and WebP conversion on upload via Sharp
+        6. Integrating a conversational AI agent for natural-language property search, including multi-turn context merging and cost-optimized prompt caching
+        7. Keeping AI costs predictable by routing requests across two providers with different reliability and schema guarantees, without degrading result quality
+        8. Ensuring reliable image handling: automatic resizing and WebP conversion on upload via Sharp
         Solution & Technologies Used
         I built a clean three-tier architecture:
         - Frontend: React 19 + Vite 8, React Router 7, Framer Motion, Leaflet, react-i18next (EN/DE), Yup for validation
         - Backend: Node.js / Express REST API with raw pg (node-postgres) driver for database queries
         - Database: PostgreSQL hosted on Supabase
         - Auth: Supabase Auth (JWT) + custom middleware using Supabase Admin Client for server-side token validation
-        - AI: DeepSeek (OpenAI-compatible API) orchestrated via LangGraph for a two-step parse-then-search pipeline
+        - AI: a dual-provider setup orchestrated via LangGraph for a two-step parse-then-search pipeline, with Free.ai (self-hosted qwen7b model) tried first and DeepSeek used as a paid fallback once Free.ai's free daily token budget is exhausted
         - Validation: Zod schemas on the backend for entries, contact form, and route params, returning field-level 400 errors
         - Testing: Vitest + React Testing Library (frontend), Vitest + Supertest (backend), enforced via a GitHub Actions CI workflow on every push/PR
         - Additional Tools: Resend, express-rate-limit, he (XSS sanitization), Sharp for image processing
 
         A notable technical aspect was the hybrid Supabase setup: Supabase is used exclusively for authentication and JWT issuance, while all CRUD operations are performed directly via the pg driver. This provided fine-grained control over database queries while maintaining secure token validation on the backend.
-        The AI Property Matching Agent lets users describe what they're looking for in plain language (EN/DE). A LangGraph pipeline extracts structured search criteria via DeepSeek, then runs a parameterized SQL query. To keep API costs predictable, the system prompt is kept byte-identical across requests to leverage DeepSeek's automatic prompt caching, and only the last 4 turns of chat history are sent.
+        The AI Property Matching Agent lets users describe what they're looking for in plain language (EN/DE). A LangGraph pipeline extracts structured search criteria, then runs a parameterized SQL query. To keep this cost-effective, Free.ai is tried first; a circuit breaker skips it for a cooldown period after a budget-exhausted response, and DeepSeek takes over as a strict-schema fallback. To keep API costs predictable on the DeepSeek side, the system prompt is kept byte-identical across requests to leverage its automatic prompt caching, and only the last 4 turns of chat history are sent.
         Uploaded photos are automatically resized (max 1200px) and re-encoded as WebP (quality 80) via Sharp before being stored in Supabase Storage.
         The platform is fully responsive and includes robust data fetching with a custom useFetch hook and AbortController to prevent race conditions and memory leaks.`,
 
@@ -85,7 +86,8 @@ export const portfolios: Portfolio[] = [
       'Express',
       'PostgreSQL (Supabase)',
       'Supabase Auth (JWT)',
-      'DeepSeek (v4-flash)',
+      'Free.ai (qwen7b, primary AI provider)',
+      'DeepSeek (v4-flash, fallback AI provider)',
       'LangGraph + @langchain/core',
       'Zod (validation)',
       'Multer (file uploads)',
