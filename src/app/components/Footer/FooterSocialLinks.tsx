@@ -7,6 +7,7 @@ const FooterSocialLinks = () => {
     <div className="flex flex-wrap justify-center gap-x-6 gap-y-4">
       <Link
         href="https://github.com/wkleus/"
+        aria-label="My GitHub Profile"
         target="_blank"
         className="group relative text-2xl text-gray-600 opacity-70 transition duration-300 hover:opacity-100 dark:text-gray-300"
       >
@@ -19,6 +20,7 @@ const FooterSocialLinks = () => {
 
       <Link
         href="https://github.com/Monocle-Labs"
+        aria-label="Monocle Labs (GitHub)"
         target="_blank"
         className="group relative text-2xl text-gray-600 opacity-70 transition duration-300 hover:opacity-100 dark:text-gray-300"
       >
