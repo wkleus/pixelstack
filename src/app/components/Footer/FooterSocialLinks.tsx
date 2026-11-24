@@ -4,14 +4,14 @@ import { FaGithub, FaGithubSquare, FaInstagram } from 'react-icons/fa'
 
 const FooterSocialLinks = () => {
   return (
-    <div className="flex space-x-6">
+    <div className="flex flex-wrap justify-center gap-x-6 gap-y-4">
       <Link
         href="https://github.com/wkleus/"
         target="_blank"
         className="group relative text-2xl text-gray-600 opacity-70 transition duration-300 hover:opacity-100 dark:text-gray-300"
       >
         <FaGithub size={26} />
-        <span className="absolute bottom-full left-1/2 mb-2 -translate-x-1/2 rounded-lg bg-gray-900 px-2 py-1 text-[11px] font-medium whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 dark:bg-yellow-100 dark:text-black">
+        <span className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 rounded-lg bg-gray-900 px-2 py-1 text-[11px] font-medium whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 lg:block dark:bg-yellow-100 dark:text-black">
           My GitHub Profile
           <span className="absolute top-full left-1/2 -translate-x-1/2 border-7 border-transparent border-t-gray-900 dark:border-t-yellow-100"></span>
         </span>
@@ -23,7 +23,7 @@ const FooterSocialLinks = () => {
         className="group relative text-2xl text-gray-600 opacity-70 transition duration-300 hover:opacity-100 dark:text-gray-300"
       >
         <FaGithubSquare size={26} />
-        <span className="absolute bottom-full left-1/2 mb-2 -translate-x-1/2 rounded-lg bg-gray-900 px-2 py-1 text-[11px] font-medium whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 dark:bg-yellow-100 dark:text-black">
+        <span className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 rounded-lg bg-gray-900 px-2 py-1 text-[11px] font-medium whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 lg:block dark:bg-yellow-100 dark:text-black">
           Monocle Labs (GitHub)
           <span className="absolute top-full left-1/2 -translate-x-1/2 border-7 border-transparent border-t-gray-900 dark:border-t-yellow-100"></span>
         </span>
@@ -41,7 +41,7 @@ const FooterSocialLinks = () => {
           height={26}
           className="relative rounded-t-full border border-gray-600 opacity-70 transition hover:opacity-100 dark:border-gray-300"
         />
-        <span className="absolute bottom-full left-1/2 mb-2 -translate-x-1/2 rounded-lg bg-gray-900 px-2 py-1 text-[11px] font-medium whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 dark:bg-yellow-100 dark:text-black">
+        <span className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 rounded-lg bg-gray-900 px-2 py-1 text-[11px] font-medium whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 lg:block dark:bg-yellow-100 dark:text-black">
           HomeSphere
           <span className="absolute top-full left-1/2 -translate-x-1/2 border-7 border-transparent border-t-gray-900 dark:border-t-yellow-100"></span>
         </span>
@@ -59,7 +59,7 @@ const FooterSocialLinks = () => {
           height={26}
           className="relative rounded-tl-2xl rounded-br-2xl border border-gray-600 opacity-70 transition hover:opacity-100 dark:border-gray-300"
         />
-        <span className="absolute bottom-full left-1/2 mb-2 -translate-x-1/2 rounded-lg bg-gray-900 px-2 py-1 text-[11px] font-medium whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 dark:bg-yellow-100 dark:text-black">
+        <span className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 rounded-lg bg-gray-900 px-2 py-1 text-[11px] font-medium whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 lg:block dark:bg-yellow-100 dark:text-black">
           Linguify
           <span className="absolute top-full left-1/2 -translate-x-1/2 border-7 border-transparent border-t-gray-900 dark:border-t-yellow-100"></span>
         </span>
@@ -77,7 +77,7 @@ const FooterSocialLinks = () => {
           height={26}
           className="relative rounded-md border border-gray-600 opacity-70 transition hover:opacity-100 dark:border-gray-300"
         />
-        <span className="absolute bottom-full left-1/2 mb-2 -translate-x-1/2 rounded-lg bg-gray-900 px-2 py-1 text-[11px] font-medium whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 dark:bg-yellow-100 dark:text-black">
+        <span className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 rounded-lg bg-gray-900 px-2 py-1 text-[11px] font-medium whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 lg:block dark:bg-yellow-100 dark:text-black">
           PixelStack Vercel Demo
           <span className="absolute top-full left-1/2 -translate-x-1/2 border-7 border-transparent border-t-gray-900 dark:border-t-yellow-100"></span>
         </span>
@@ -89,7 +89,7 @@ const FooterSocialLinks = () => {
         className="group relative text-2xl text-gray-600 opacity-70 transition duration-300 hover:opacity-100 dark:text-gray-300"
       >
         <FaInstagram size={26} />
-        <span className="absolute bottom-full left-1/2 mb-2 -translate-x-1/2 rounded-lg bg-gray-900 px-2 py-1 text-[11px] font-medium whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 dark:bg-yellow-100 dark:text-black">
+        <span className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 rounded-lg bg-gray-900 px-2 py-1 text-[11px] font-medium whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 lg:block dark:bg-yellow-100 dark:text-black">
           Instagram
           <span className="absolute top-full left-1/2 -translate-x-1/2 border-7 border-transparent border-t-gray-900 dark:border-t-yellow-100"></span>
         </span>
@@ -107,7 +107,7 @@ const FooterSocialLinks = () => {
           height={54}
           className="relative h-8 w-auto opacity-70 invert-70 transition hover:opacity-100 dark:invert-0"
         />
-        <span className="absolute bottom-full left-1/2 mb-2 -translate-x-1/2 rounded-lg bg-gray-900 px-2 py-1 text-[11px] font-medium whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 dark:bg-yellow-100 dark:text-black">
+        <span className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 rounded-lg bg-gray-900 px-2 py-1 text-[11px] font-medium whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 lg:block dark:bg-yellow-100 dark:text-black">
           WeAreDevelopers
           <span className="absolute top-full left-1/2 -translate-x-1/2 border-7 border-transparent border-t-gray-900 dark:border-t-yellow-100"></span>
         </span>
@@ -125,7 +125,7 @@ const FooterSocialLinks = () => {
           height={34}
           className="relative -top-1.5 opacity-70 brightness-0 grayscale invert-30 transition hover:opacity-100 dark:invert-70 hover:dark:invert-100"
         />
-        <span className="absolute bottom-full left-1/2 mb-2 -translate-x-1/2 rounded-lg bg-gray-900 px-2 py-1 text-[11px] font-medium whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 dark:bg-yellow-100 dark:text-black">
+        <span className="absolute bottom-full left-1/2 mb-2 hidden -translate-x-1/2 rounded-lg bg-gray-900 px-2 py-1 text-[11px] font-medium whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 lg:block dark:bg-yellow-100 dark:text-black">
           get-in-it
           <span className="absolute top-full left-1/2 -translate-x-1/2 border-7 border-transparent border-t-gray-900 dark:border-t-yellow-100"></span>
         </span>

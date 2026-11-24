@@ -19,13 +19,13 @@ export default function Profile() {
       whileInView={{ opacity: 1 }}
       viewport={{ once: true }}
       transition={{ duration: 2, ease: 'easeIn' }}
-      className="mx-auto my-15 max-w-7xl"
+      className="mx-auto my-15 max-w-7xl overflow-x-clip"
     >
       <h1 className="mb-5 text-center text-4xl font-bold">Hey,</h1>
 
       {/* Hero Section */}
       <section className="mb-15">
-        <p className="mx-auto max-w-4xl text-center text-lg dark:text-gray-300">
+        <p className="mx-auto max-w-4xl px-4 text-center text-lg dark:text-gray-300">
           I&apos;m a Full Stack Web Developer with a passion for creating
           user-friendly and visually stunning websites.
         </p>
@@ -78,7 +78,7 @@ export default function Profile() {
                 {/* Connecting arrow to next card */}
                 {i < education.length - 1 && (
                   <div
-                    className={`pointer-events-none absolute top-3/4 h-64 w-24 -translate-y-1/6 ${
+                    className={`pointer-events-none absolute top-3/4 hidden min-[840px]:block h-64 w-24 -translate-y-1/6 ${
                       i % 2 === 0 ? '-right-20' : '-left-20'
                     }`}
                   >

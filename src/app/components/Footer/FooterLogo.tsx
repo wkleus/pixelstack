@@ -15,7 +15,7 @@ const FooterLogo = () => {
         </div>
       </Link>
 
-      <p className="text-secondary my-3 text-sm">
+      <p className="text-secondary my-3 text-center text-sm">
         © {new Date().getFullYear()} PixelStack&trade; Webfolio. All rights
         reserved.
       </p>
